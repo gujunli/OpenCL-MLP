@@ -1,0 +1,124 @@
+# depslib dependency file v1.0
+1403254387 source:/home/qfzhang/AMD-work2/MLP-Linux/test-cpps/MLP_Test.cpp
+	<iostream>
+	"MLPUtil.h"
+	"MLPTrainer.h"
+	"MLPTester.h"
+	"MLPPredictor.h"
+	"MLPNetProvider.h"
+	"MLPSimpleDataProvider.h"
+	"MLPMNistDataProvider.h"
+	"MLPIFlyDataProvider.h"
+	"MLPChkPointingMgr.h"
+
+1402379376 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPUtil.h
+	<windows.h>
+	<pthread.h>
+	<signal.h>
+	<unistd.h>
+	<sstream>
+	<exception>
+	<stdexcept>
+	"MLPApiExport.h"
+
+1402302570 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPTrainer.h
+	<Windows.h>
+	<pthread.h>
+	<CL/cl.h>
+	<CL/cl_ext.h>
+	"MLPApiExport.h"
+	"MLPConstants.h"
+	"MLPCommon.h"
+	"SingleDevClass.h"
+	"MLPNetProvider.h"
+	"MLPDataProvider.h"
+	"MLPChkPointState.h"
+
+1383129523 /opt/AMDAPP/include/CL/cl.h
+	<OpenCL/cl_platform.h>
+	<CL/cl_platform.h>
+
+1383129523 /opt/AMDAPP/include/CL/cl_platform.h
+	<AvailabilityMacros.h>
+	<stdint.h>
+	<stddef.h>
+	<float.h>
+	<stddef.h>
+	<altivec.h>
+	<intrin.h>
+	<xmmintrin.h>
+	<intrin.h>
+	<emmintrin.h>
+	<mmintrin.h>
+	<intrin.h>
+	<immintrin.h>
+
+1383129523 /opt/AMDAPP/include/CL/cl_ext.h
+	<OpenCL/cl.h>
+	<AvailabilityMacros.h>
+	<CL/cl.h>
+
+1401956444 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPConstants.h
+
+1401951828 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPCommon.h
+	<CL/cl.h>
+
+1401951714 /home/qfzhang/AMD-work2/MLP-Linux/include/SingleDevClass.h
+	<CL/cl.h>
+
+1402296618 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPNetProvider.h
+	"MLPApiExport.h"
+
+1403240826 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPDataProvider.h
+	<Windows.h>
+	<pthread.h>
+	"MLPApiExport.h"
+	"MLPConstants.h"
+
+1402302502 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPTester.h
+	<CL/cl.h>
+	<CL/cl_ext.h>
+	"MLPApiExport.h"
+	"MLPConstants.h"
+	"MLPCommon.h"
+	"SingleDevClass.h"
+	"MLPNetProvider.h"
+	"MLPDataProvider.h"
+
+1402302470 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPPredictor.h
+	<CL/cl.h>
+	<CL/cl_ext.h>
+	"MLPApiExport.h"
+	"MLPCommon.h"
+	"MLPConstants.h"
+	"SingleDevClass.h"
+	"MLPNetProvider.h"
+	"MLPDataProvider.h"
+
+1403168546 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPMNistDataProvider.h
+	<fstream>
+	"MLPApiExport.h"
+	"MLPDataProvider.h"
+
+1402296326 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPApiExport.h
+
+1402302738 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPChkPointState.h
+
+1402544492 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPSimpleDataProvider.h
+	"MLPApiExport.h"
+	"MLPDataProvider.h"
+
+1402678226 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPIFlyDataProvider.h
+	<vector>
+	<fstream>
+	"MLPApiExport.h"
+	"MLPDataProvider.h"
+
+1402302724 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPChkPointingMgr.h
+	<Windows.h>
+	<pthread.h>
+	<string>
+	"MLPApiExport.h"
+	"MLPTrainer.h"
+	"MLPChkPointState.h"
+

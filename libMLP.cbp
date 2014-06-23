@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="libMLP" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/libMLP" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/libMLP" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fPIC" />
+			<Add directory="include" />
+			<Add directory="/opt/AMDAPP/include" />
+			<Add directory="/opt/clAmdBlas/include" />
+		</Compiler>
+		<Linker>
+			<Add library="clAmdBlas" />
+			<Add library="OpenCL" />
+			<Add directory="/opt/clAmdBlas/lib64" />
+		</Linker>
+		<Unit filename="include/MLPApiExport.h" />
+		<Unit filename="include/MLPChkPointState.h" />
+		<Unit filename="include/MLPChkPointingMgr.h" />
+		<Unit filename="include/MLPCommon.h" />
+		<Unit filename="include/MLPConstants.h" />
+		<Unit filename="include/MLPDataProvider.h" />
+		<Unit filename="include/MLPIFlyDataProvider.h" />
+		<Unit filename="include/MLPMNistDataProvider.h" />
+		<Unit filename="include/MLPNetProvider.h" />
+		<Unit filename="include/MLPPredictor.h" />
+		<Unit filename="include/MLPSimpleDataProvider.h" />
+		<Unit filename="include/MLPTester.h" />
+		<Unit filename="include/MLPTrainer.h" />
+		<Unit filename="include/MLPUtil.h" />
+		<Unit filename="include/SingleDevClass.h" />
+		<Unit filename="include/oclUtil.h" />
+		<Unit filename="kernels/kernels.cl" />
+		<Unit filename="lib-cpps/MLPChkPointingMgr.cpp" />
+		<Unit filename="lib-cpps/MLPCommon.cpp" />
+		<Unit filename="lib-cpps/MLPDataProvider.cpp" />
+		<Unit filename="lib-cpps/MLPIflyDataProvider.cpp" />
+		<Unit filename="lib-cpps/MLPMNistDataProvider.cpp" />
+		<Unit filename="lib-cpps/MLPNetProvider.cpp" />
+		<Unit filename="lib-cpps/MLPPredictor.cpp" />
+		<Unit filename="lib-cpps/MLPSimpleDataProvider.cpp" />
+		<Unit filename="lib-cpps/MLPTester.cpp" />
+		<Unit filename="lib-cpps/MLPTrainer.cpp" />
+		<Unit filename="lib-cpps/MLPTraining.cpp" />
+		<Unit filename="lib-cpps/MLPUtil.cpp" />
+		<Unit filename="lib-cpps/SingleDevClass.cpp" />
+		<Unit filename="lib-cpps/oclUtil.cpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
