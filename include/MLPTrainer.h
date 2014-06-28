@@ -56,8 +56,8 @@ private:
 
 	MLPDataProvider *dataProviderp; 
 
-	int currBatchNo;             // Indicates the current batchNo to be processed, also means the number of batches that has been processed, it is 
-	                             // re-initialized when recovered from one checkpoint, and need be saved when doing checkpointing
+	int currBatchNo;             // Indicate the current batchNo the training is on, need be saved when doing checkpointing 
+	int currEpoch;               // Indicate the current epoch the training is on, need be saved when doing checkpointing
 
 #ifdef WIN32                       // for Windows
 	CRITICAL_SECTION chkPointingLock; 
@@ -99,8 +99,8 @@ public:
 
 	LIBMLPAPI MLPDataProvider *getDataProvider(); 
 
-	LIBMLPAPI int batchTraining(int maxBatches);	
-	LIBMLPAPI int batchTrainingWithCheckPointing(int maxBatches, int startBatch, bool doChkPointing); 
+	LIBMLPAPI int batchTraining(int maxBatches, int epoches);	
+	LIBMLPAPI int batchTrainingWithCheckPointing(int maxBatches, int epoches, int startBatch, int startEpoch, bool doChkPointing); 
 
 	LIBMLPAPI void saveNetConfig(const char *configPath); 
 	LIBMLPAPI void synchronizeNetConfig(MLPNetProvider &netProvider); 

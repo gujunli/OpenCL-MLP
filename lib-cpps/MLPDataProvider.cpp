@@ -70,6 +70,22 @@ void MLPDataProvider::release_buffers()
 	};
 };
 
+void MLPDataProvider::reset_buffers()
+{
+	this->rbuf_count = 0;
+	this->wbuf_count = 2;
+
+#ifdef _WIN32      // for Windows
+	InitializeConditionVariable(&this->readReady);
+	InitializeConditionVariable(&this->writeReady);
+#else             // for Linux
+	pthread_cond_init(&this->readReady, NULL);
+	pthread_cond_init(&this->writeReady, NULL);
+#endif
+
+	MLP_LOCK_INIT(&this->bufferLock);
+}; 
+
 // create and start the worker thread
 int MLPDataProvider::startup_worker()
 {

@@ -41,10 +41,9 @@ private:
 	int mySetFrames;           // Total number of frames for TrainDataSet or TestDataSet we are current using, one file is splitted into training set and testing set
 	
     int stageBatchNo;          // Batch number inside each loaded batches (eg. inside each [this->m_shufflebatches * this->rounds] batches  )
-	int roundNo;               // indicate which round the [this->m_shfflebatches] batches is shuffled at
 
 	bool endOfDataSource; 
-    bool haveRemnant;          // when the total batches of the file is not a multiple of [m_shufflebatches], this will be true 
+    bool batches_loaded;       // the batches of data just were loaded from the file to the buffer
 
 	int curSentence;           // Sentence ID of the frames we are currently accessing
 	int curFrame;              // Global frame sequence number of the frame we are currently accessin
@@ -79,8 +78,8 @@ private:
 	 void prepare_batch_data();                // Implementation of private base class virtual interface
 	 bool haveBatchToProvide();                // Implementation of private base class virtual interface     
 
-	 void setup_first_data_source();           // First time read data from the file and setup them on the memory
-	 void setup_cont_data_source();            // Continue to read data from the file and setup them on the memory
+	 void setup_first_data_batches();           // First time read data from the file and setup them on the memory
+	 void setup_cont_data_batches();            // Continue to read data from the file and setup them on the memory
 	 void shuffle_data(int *index, int len); 
 
      void InitializeFromIFlySource(const char *dataPath); 

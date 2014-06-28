@@ -29,10 +29,9 @@ private:
 
 	int num_frames;            // total number of data frames
 	int stageBatchNo;          // batch number inside each loaded batches (eg. inside each [m_shufflebatches * rounds] batches
-	int roundNo;               // indicate which round the [this->m_shfflebatches] batches is shuffled at
 
 	bool endOfDataSource;
-    bool haveRemnant;          // when the total batches of the file is not a multiple of [m_shufflebatches], this will be true
+    bool batches_loaded;       // the batches of data just were loaded from the file to the buffer
 
     int imageWidth;            // width of the input image, only used by distorting_frame()
 	int imageHeight;           // height of the input image, only used by distorting_frame()
@@ -55,8 +54,8 @@ private:
 	 void prepare_batch_data();                 // implementation of private base class virtual interface
 	 bool haveBatchToProvide();                 // implementation of private base class virtual interface
 
-	 void setup_first_data_source();            // first time read data from the file and setup them on the memory
-	 void setup_cont_data_source();             // continue to read data from the file and setup them on the memory
+	 void setup_first_data_batches();            // first time read data from the file and setup them on the memory
+	 void setup_cont_data_batches();             // continue to read data from the file and setup them on the memory
 	 void shuffle_data(int *index, int len);
 
      void InitializeFromMNistSource(const char *dataPath);

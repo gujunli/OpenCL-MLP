@@ -457,6 +457,7 @@ void MLPTrainer::checkPointing(struct MLPCheckPointState &cpState)
 
      // Snapshot one value of BatchNo as the state checkpointed from the MLPTrainer
      cpState.cpBatchNo = (unsigned int) this->currBatchNo;
+	 cpState.cpEpoch = (unsigned int) this->currEpoch; 
 
      // Snapshot one value of FrameNo as the state checkpointed from the MLPDataProvider
 	 int frameNo;

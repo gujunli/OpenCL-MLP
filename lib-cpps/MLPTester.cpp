@@ -309,7 +309,7 @@ void MLPTester::batchTesting(int maxBatches)
 			MLP_CHECK(this->dataProviderp->nextBatch());
 
 			batches++;
-	}	// end of the epoch
+	}	
 
 
 	for (int i = 1; i < this->nLayers; i++) {

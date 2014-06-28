@@ -14,6 +14,8 @@
 
 using namespace std; 
 
+#define MLP_CHKPOINTING_PERIOD 3600                // checkpointing period in seconds, usually one hour
+
 MLPCheckPointManager::MLPCheckPointManager()
 {
 	this->haveChkPoint = false; 
@@ -77,6 +79,7 @@ void MLPCheckPointManager::cpFindAndLoad(const char *dirPath)
 		         LEToHostl(this->chkPointState.chkPointID); 
 		         LEToHostl(this->chkPointState.cpBatchNo); 
 		         LEToHostl(this->chkPointState.cpFrameNo); 
+				 LEToHostl(this->chkPointState.cpEpoch); 
 
 				 this->latestValidChkPoint = tmpID; 
 				 this->haveChkPoint = true; 
@@ -247,7 +250,7 @@ void *MLPCheckPointManager::timer_fun(void *argp)
 		   fstream stateFile, infoFile; 
 		   int len; 
 
-		   MLP_SLEEP(3600);   // do checkpointing every one hour
+		   MLP_SLEEP(MLP_CHKPOINTING_PERIOD);        // do checkpointing every one hour
 
 		   // Produce the names of the network configuration files
            // Use the checkpoint directory itself to save the network configuration files
@@ -281,6 +284,7 @@ void *MLPCheckPointManager::timer_fun(void *argp)
 		   HostToLEl(objp->chkPointState.chkPointID); 
 		   HostToLEl(objp->chkPointState.cpBatchNo); 
 		   HostToLEl(objp->chkPointState.cpFrameNo); 
+		   HostToLEl(objp->chkPointState.cpEpoch); 
 
 	       stateFile.write(reinterpret_cast<char*>(&objp->chkPointState), sizeof(struct MLPCheckPointState)); 
 
@@ -291,6 +295,7 @@ void *MLPCheckPointManager::timer_fun(void *argp)
 		   LEToHostl(objp->chkPointState.chkPointID); 
 		   LEToHostl(objp->chkPointState.cpBatchNo); 
 		   LEToHostl(objp->chkPointState.cpFrameNo); 
+		   LEToHostl(objp->chkPointState.cpEpoch); 
 
 		   stateFile.close(); 
 

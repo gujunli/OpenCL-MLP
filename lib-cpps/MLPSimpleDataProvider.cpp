@@ -25,9 +25,8 @@ MLPSimpleDataProvider::MLPSimpleDataProvider()
 	this->m_shuffleBatches = 50; 
 
 	this->batchNo = 0; 
-	this->rounds = 4; 
 
-	this->total_batches = this->m_batchSize * this->m_shuffleBatches * this->rounds; 
+	this->total_batches = this->m_batchSize * this->m_shuffleBatches; 
 
     this->setup_data_source(); 
 }; 
@@ -48,9 +47,8 @@ MLPSimpleDataProvider::MLPSimpleDataProvider(MLP_DATA_MODE mode, int dataFeature
 	this->m_shuffleBatches = shuffleBatches; 
 
 	this->batchNo = 0; 
-	this->rounds = 4; 
 
-	this->total_batches = this->m_shuffleBatches * this->rounds;
+	this->total_batches = this->m_shuffleBatches;
 
 	this->setup_data_source(); 
 }; 

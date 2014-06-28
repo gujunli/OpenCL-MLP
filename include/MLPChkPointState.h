@@ -17,7 +17,8 @@ struct MLPCheckPointState {
 	char netConfDataFileName[32]; 
 
 	// for the MLPTrainer
-	unsigned int cpBatchNo;                   // the batch recorded by the MLPTrainer at which it is expected to get data at
+	unsigned int cpBatchNo;                   // the batch recorded by the MLPTrainer at which it is expected to get data 
+	unsigned int cpEpoch;                     // the epoch recorded by the MLPTrainer,  which indicates where the training is getting at 
 
 	// for the MLPDataProvider
 	unsigned int cpFrameNo;                   // the frame of the data provider that it should start providing data from  

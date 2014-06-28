@@ -121,16 +121,11 @@ MLPMNistDataProvider::MLPMNistDataProvider()
 	else
 	    this->m_shuffleBatches = 1;
 
-	if ( this->dataMode == MLP_DATAMODE_TRAIN )
-		this->rounds = 200;                    // for testing and predicting, we don't need to shuffle the data
-	else
-	    this->rounds = 10;
-
     this->InitializeFromMNistSource(MNIST_PATH);
 
-	this->total_batches = ROUNDK(DIVUPK(this->num_frames,this->m_batchSize),this->m_shuffleBatches) * this->rounds;
+	this->total_batches = ROUNDK(DIVUPK(this->num_frames,this->m_batchSize),this->m_shuffleBatches);
 	this->endOfDataSource = false;
-	this->haveRemnant = false;
+	this->batches_loaded = false;
 };
 
 MLPMNistDataProvider::MLPMNistDataProvider(const char *dataPath, MLP_DATA_MODE mode, int batchSize, int shuffleBatches)
@@ -149,16 +144,11 @@ MLPMNistDataProvider::MLPMNistDataProvider(const char *dataPath, MLP_DATA_MODE m
 	else
 	     this->m_shuffleBatches = 1;
 
-	if ( this->dataMode == MLP_DATAMODE_TRAIN )
-	    this->rounds = 200;                          // for testing and predicting, we don't need to shuffle the data
-	else
-	    this->rounds = 20;
-
 	this->InitializeFromMNistSource(dataPath);
 
-	this->total_batches = ROUNDK(DIVUPK(this->num_frames,this->m_batchSize),this->m_shuffleBatches) * this->rounds;
+	this->total_batches = ROUNDK(DIVUPK(this->num_frames,this->m_batchSize),this->m_shuffleBatches);
 	this->endOfDataSource = false;
-	this->haveRemnant = false;
+	this->batches_loaded  = false;
 };
 
 MLPMNistDataProvider::~MLPMNistDataProvider()
@@ -200,26 +190,19 @@ void MLPMNistDataProvider::prepare_batch_data()
 	if ( this->supportChkPointing )
 		 MLP_UNLOCK(&this->chkPointingLock);
 
-	if ( this->stageBatchNo % this->m_shuffleBatches == 0 ) {     // go to the next round
-		 this->roundNo++;
+	if ( this->stageBatchNo == this->m_shuffleBatches ) {   
 
-	     if ( this->roundNo <  this->rounds ) {
+		  this->batches_loaded = false; 
 
-		      this->shuffle_data(this->permutations, this->m_batchSize * this->m_shuffleBatches );
+		  if ( !this->endOfDataSource ) 
+		        this->setup_cont_data_batches();
 
-		      // cout << "Produce new batches through shuffling" << endl;
-	     };
-	};
+		  if ( this->batches_loaded ) {
+		       this->shuffle_data(this->permutations, this->m_batchSize * this->m_shuffleBatches );
+		       // cout << "Load new data from files and shuffling the frame sequences" << endl;
+		  }; 
 
-	// read the data from the file if "rounds" number of shuffling has gone
-	if ( (this->roundNo == this->rounds) && !this->endOfDataSource ) {
-
-		 this->stageBatchNo = 0;
-		 this->roundNo = 0;
-
-		 this->setup_cont_data_source();
-
-		 // cout << "Load new data from files" << endl;
+		  this->stageBatchNo = 0;
 	};
 };
 
@@ -228,7 +211,7 @@ bool MLPMNistDataProvider::haveBatchToProvide()
 	if ( !this->endOfDataSource )
 		 return(true);
 
-    if ( this->haveRemnant && (this->roundNo < this->rounds) )
+    if ( this->batches_loaded )
 		 return(true);
 
 	return(false);
@@ -236,21 +219,21 @@ bool MLPMNistDataProvider::haveBatchToProvide()
 
 
 // set up the data source of MLPMNistDataProvider
-void MLPMNistDataProvider::setup_first_data_source()
+void MLPMNistDataProvider::setup_first_data_batches()
 {
-	this->permutations = new int[this->m_batchSize * this->m_shuffleBatches];
-	this->featureData  = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataFeatureSize];
-	if ( this->haveLabel )
-         this->labelData = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataLabelSize];
-
 	this->stageBatchNo = 0;
-	this->roundNo = 0;
-	this->setup_cont_data_source();
+	this->setup_cont_data_batches();
+
+    if ( this->batches_loaded ) {
+	     this->shuffle_data(this->permutations, this->m_batchSize * this->m_shuffleBatches );
+	     //cout << "Load new data from files and shuffling the frame sequences" << endl;
+    }; 
 };
 
-void MLPMNistDataProvider::setup_cont_data_source()
+void MLPMNistDataProvider::setup_cont_data_batches()
 {
 	int readCount=0;
+	int frame; 
 
 	// initial permutations, permutated each round
 	for (int k=0; k < this->m_batchSize * this->m_shuffleBatches; k++)
@@ -260,13 +243,14 @@ void MLPMNistDataProvider::setup_cont_data_source()
 	unsigned char label;
 
 	imagebuf = new unsigned char[this->m_dataFeatureSize];
-    for (int k=0; k < this->m_batchSize * this->m_shuffleBatches; k++) {  // read the data frame by frame
+    for (frame=0; frame < this->m_batchSize * this->m_shuffleBatches; frame++) {  // read the data frame by frame
+
          this->dataFile.read(reinterpret_cast<char*>(imagebuf),this->m_dataFeatureSize);
 		 if ( this->haveLabel )
 	          this->labelFile.read((char*)&label,1);
 
 		 if ( this->dataFile.eof() || this->labelFile.eof() ) {
-			  readCount = k;
+			  readCount = frame;
 		      this->endOfDataSource = true;   // no data can read from the data source any more
 			  goto endf;
 		 };
@@ -289,12 +273,12 @@ void MLPMNistDataProvider::setup_cont_data_source()
 		 };
 
 		 for (int i=0; i < this->m_dataFeatureSize; i++)
-			  this->featureData[k*this->m_dataFeatureSize+i] = (float)imagebuf[i]/255.0f-0.5f;
+			  this->featureData[frame*this->m_dataFeatureSize+i] = (float)imagebuf[i]/255.0f-0.5f;
 
 		 if ( this->haveLabel ) {
 		      for (int i=0; i < this->m_dataLabelSize; i++)
-		           this->labelData[k*this->m_dataLabelSize+i] = 0.0f;
-	          this->labelData[k*this->m_dataLabelSize+(int)label] = 1.0f;
+		           this->labelData[frame*this->m_dataLabelSize+i] = 0.0f;
+	          this->labelData[frame*this->m_dataLabelSize+(int)label] = 1.0f;
 		 };
 	};
 
@@ -317,11 +301,12 @@ endf:    // duplicate the first "readCount" records to minibatch*shuffleBatches 
 
 				dst++;
 		  };
-
-		  this->haveRemnant = true;
 	 }
 
-	delete [] imagebuf;
+	 if ( frame > 0  || readCount > 0 ) 
+		  this->batches_loaded = true; 
+
+	 delete [] imagebuf;
 };
 
 void MLPMNistDataProvider::shuffle_data(int *index, int len)
@@ -338,8 +323,8 @@ void MLPMNistDataProvider::gotoDataFrame(int frameNo)
 
 void MLPMNistDataProvider::gotoLabelFrame(int frameNo)
 {
-	this->dataFile.seekg(sizeof(struct header_labelfile));
-	this->dataFile.seekg(frameNo * 1, ios_base::cur);
+	this->labelFile.seekg(sizeof(struct header_labelfile));
+	this->labelFile.seekg(frameNo * 1, ios_base::cur);
 };
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -356,7 +341,13 @@ void MLPMNistDataProvider::setupDataProvider()
 
 	this->supportChkPointing = false;
 
-	this->setup_first_data_source();
+    // allocate batches buffer
+	this->permutations = new int[this->m_batchSize * this->m_shuffleBatches];
+	this->featureData  = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataFeatureSize];
+	if ( this->haveLabel )
+         this->labelData = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataLabelSize];
+
+	this->setup_first_data_batches();
 
 	this->create_buffers(this->m_batchSize);
 
@@ -375,18 +366,51 @@ void MLPMNistDataProvider::setupDataProvider(int startFrameNo, bool doChkPointin
 	this->gotoDataFrame(startFrameNo);
     this->gotoLabelFrame(startFrameNo);
 
-	this->batchNo = (startFrameNo / this->m_batchSize) * this->rounds;  // The new "batchNo" will start from this one
+	this->batchNo = (startFrameNo / this->m_batchSize);  // The new "batchNo" will start from this one
 
 	// For CheckPoint
 	this->supportChkPointing = doChkPointing;
 	if ( this->supportChkPointing )
 		 MLP_LOCK_INIT(&this->chkPointingLock);
 
-	this->setup_first_data_source();
+    // allocate batches buffer
+	this->permutations = new int[this->m_batchSize * this->m_shuffleBatches];
+	this->featureData  = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataFeatureSize];
+	if ( this->haveLabel )
+         this->labelData = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataLabelSize];
+
+	this->setup_first_data_batches();
 
 	this->create_buffers(this->m_batchSize);
 
 	this->initialized = true;
+
+	MLP_CHECK(this->startup_worker());
+};
+
+
+void MLPMNistDataProvider::resetDataProvider()
+{
+	if ( !this->initialized ) {
+		 mlp_log("MLPMNistDataProvider", "The DataProvider is still not started yet, no reset should be called");
+		 MLP_Exception("");
+	};
+	MLP_CHECK(this->shutdown_worker());
+
+	this->reset_buffers();
+
+    this->endOfDataSource = false;
+	this->batchNo = 0;
+	this->batches_loaded = false;
+
+    this->dataFile.clear();
+	this->gotoDataFrame(0);
+	if ( this->haveLabel ) {
+	     this->labelFile.clear();
+		 this->gotoLabelFrame(0);
+    };
+
+	this->setup_first_data_batches();
 
 	MLP_CHECK(this->startup_worker());
 };
@@ -401,7 +425,7 @@ void MLPMNistDataProvider::getCheckPointFrame(int & frameNo)
 
 	batch = this->batchNo - 2;    // This is the batchNo for the sequence of shuffled batche,  Consider there are 2 batches on the Double-buffers (may not be processed by the Trainer)
 
-	stage = batch / ( this->m_shuffleBatches * this->rounds );
+	stage = batch / this->m_shuffleBatches;
 
 	// We will start from the first frame of the "stage", since frames before this "stage" have been processed
 	frameNo = stage * this->m_shuffleBatches * this->m_batchSize;
@@ -409,35 +433,6 @@ void MLPMNistDataProvider::getCheckPointFrame(int & frameNo)
 	MLP_UNLOCK(&this->chkPointingLock);
 };
 
-
-
-void MLPMNistDataProvider::resetDataProvider()
-{
-	if ( !this->initialized ) {
-		 mlp_log("MLPMNistDataProvider", "The DataProvider is still not started yet, no reset should be called");
-		 MLP_Exception("");
-	};
-	MLP_CHECK(this->shutdown_worker());
-
-	this->release_buffers();
-	this->create_buffers(this->m_batchSize);
-
-    this->endOfDataSource = false;
-	this->batchNo = 0;
-
-    this->dataFile.clear();
-	this->dataFile.seekg(sizeof(struct header_imagefile));
-	if ( this->haveLabel ) {
-	     this->labelFile.clear();
-		 this->labelFile.seekg(sizeof(struct header_imagefile));
-    }
-
-	this->stageBatchNo = 0;
-	this->roundNo = 0;
-	this->setup_cont_data_source();
-
-	MLP_CHECK(this->startup_worker());
-};
 
 
 // if the output for the frame matches its label, return true to indicate a successful mapping of this

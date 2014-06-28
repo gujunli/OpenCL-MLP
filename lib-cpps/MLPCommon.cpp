@@ -487,7 +487,7 @@ bool check_zero(float fval)
 
 bool check_nan(float fval)
 {
-#ifdef WIN32
+#ifdef _WIN32
        if ( _isnan((double)fval) ) 
            return(true); 
 	   else 
@@ -502,7 +502,7 @@ bool check_nan(float fval)
 
 bool check_inf(float fval)
 {
-#ifdef WIN32
+#ifdef _WIN32
        if ( !_finite((double)fval) )
             return(true); 
 	   else

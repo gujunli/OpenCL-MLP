@@ -25,7 +25,6 @@ class MLPDataProvider
 protected:
 	MLP_DATA_MODE  dataMode;     // TRAIN, TEST, PREDICT standing for three different usages of the neural network
 	int  batchNo;                // Current batchNo of data it is providing
-	int  rounds;                 // Indicates the times that the (minibatch * shuffleBatches)-size array should be shuffled
 	int  total_batches;          // Total number of batches provided by the data source and provider (shuffled batches also counted)
 
 	int m_batchSize;             // Number of input frames in each minibatch
@@ -71,6 +70,7 @@ protected:
 protected:
 	void create_buffers(int batchSize);
 	void release_buffers();
+	void reset_buffers(); 
     void load_feature_batch(float *srcp, int *indexBase, int indexOffset);      // Load one batch of feature frames from the provider's internal buffer to the double-buffer
     void load_label_batch(float *srcp, int *indexBase, int indexOffset);        // Load one batch of feature frames from the provider's internal buffer to the double-buffer
 
