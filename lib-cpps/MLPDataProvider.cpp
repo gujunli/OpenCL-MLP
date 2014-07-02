@@ -15,8 +15,10 @@ MLPDataProvider::MLPDataProvider()
 	this->m_dataLabelSize = 0;
 	this->m_batchSize = 0;
 
-	this->features[0] = this->features[1] = NULL;
-	this->labels[0] = this->labels[1] = NULL;
+	for (int i=0; i< MLP_BATCH_RING_SIZE; i++) {
+	     this->features[i] = NULL;
+	     this->labels[i] = NULL;
+	}; 
 
 	this->running = false;
 
@@ -27,25 +29,24 @@ MLPDataProvider::~MLPDataProvider()
 {
 };
 
-// create the data buffers and initialize the locks and conditionvariable
+// create the data buffers and initialize the locks and condition variable
 void MLPDataProvider::create_buffers(int batchSize)
 {
-	this->features[0] = new float[batchSize*this->m_dataFeatureSize*sizeof(float)];
-	this->features[1] = new float[batchSize*this->m_dataFeatureSize*sizeof(float)];
 
-	if ( this->haveLabel ) {
-		 this->labels[0] = new float[batchSize*this->m_dataLabelSize*sizeof(float)];
-		 this->labels[1] = new float[batchSize*this->m_dataLabelSize*sizeof(float)];
-	}
-	else {
-		this->labels[0] = NULL;
-		this->labels[1] = NULL;
-	};
+	for (int i=0; i< MLP_BATCH_RING_SIZE; i++) {
+
+        this->features[i] = new float[batchSize*this->m_dataFeatureSize*sizeof(float)];
+
+	    if ( this->haveLabel ) 
+		     this->labels[i] = new float[batchSize*this->m_dataLabelSize*sizeof(float)];
+	    else 
+		     this->labels[i] = NULL;
+	}; 
 
 	this->m_batchSize = batchSize;
 
 	this->rbuf_count = 0;
-	this->wbuf_count = 2;
+	this->wbuf_count = MLP_BATCH_RING_SIZE;
 
 #ifdef _WIN32      // for Windows
 	InitializeConditionVariable(&this->readReady);
@@ -61,19 +62,19 @@ void MLPDataProvider::create_buffers(int batchSize)
 // release the data buffers
 void MLPDataProvider::release_buffers()
 {
-	delete [] this->features[0];
-	delete [] this->features[1];
 
-	if ( this->haveLabel ) {
-		 delete [] this->labels[0];
-		 delete [] this->labels[1];
-	};
+	for (int i=0; i< MLP_BATCH_RING_SIZE; i++) {
+	     delete [] this->features[i];
+
+	     if ( this->haveLabel ) 
+		      delete [] this->labels[i];
+	}; 
 };
 
 void MLPDataProvider::reset_buffers()
 {
 	this->rbuf_count = 0;
-	this->wbuf_count = 2;
+	this->wbuf_count = MLP_BATCH_RING_SIZE;
 
 #ifdef _WIN32      // for Windows
 	InitializeConditionVariable(&this->readReady);
@@ -203,7 +204,7 @@ int MLPDataProvider::nextBatch()
 
 	 this->rbuf_count--;
 	 this->wbuf_count++;
-	 this->rbuf_index = (this->rbuf_index+1)%2;
+	 this->rbuf_index = (this->rbuf_index+1) % MLP_BATCH_RING_SIZE;
 
 	 WakeConditionVariable(&this->writeReady);
 
@@ -225,10 +226,10 @@ void *MLPDataProvider::worker_fun(void *argp)
 
 	 EnterCriticalSection(&objp->bufferLock);
 
-     objp->wbuf_index = (objp->wbuf_index+1)%2;
+     objp->wbuf_index = (objp->wbuf_index+1) % MLP_BATCH_RING_SIZE;
 
 	 objp->rbuf_count = 1;
-	 objp->wbuf_count = 1;
+	 objp->wbuf_count = MLP_BATCH_RING_SIZE-1;
 
 	 WakeConditionVariable(&objp->readReady);
 
@@ -248,7 +249,7 @@ void *MLPDataProvider::worker_fun(void *argp)
 
 	             EnterCriticalSection(&objp->bufferLock);
 
-                 objp->wbuf_index = (objp->wbuf_index+1)%2;
+                 objp->wbuf_index = (objp->wbuf_index+1) % MLP_BATCH_RING_SIZE;
 				 objp->wbuf_count--;
 				 objp->rbuf_count++;
 
@@ -339,7 +340,7 @@ int MLPDataProvider::nextBatch()
 
 	 this->rbuf_count--;
 	 this->wbuf_count++;
-	 this->rbuf_index = (this->rbuf_index+1)%2;
+	 this->rbuf_index = (this->rbuf_index+1) % MLP_BATCH_RING_SIZE;
 
 	 pthread_cond_signal(&this->writeReady);
 
@@ -362,10 +363,10 @@ void *MLPDataProvider::worker_fun(void *argp)
 
 	 pthread_mutex_lock(&objp->bufferLock);
 
-     objp->wbuf_index = (objp->wbuf_index+1)%2;
+     objp->wbuf_index = (objp->wbuf_index+1) % MLP_BATCH_RING_SIZE;
 
 	 objp->rbuf_count = 1;
-	 objp->wbuf_count = 1;
+	 objp->wbuf_count = MLP_BATCH_RING_SIZE-1;
 
 	 pthread_cond_signal(&objp->readReady);
 
@@ -385,7 +386,7 @@ void *MLPDataProvider::worker_fun(void *argp)
 
 	             pthread_mutex_lock(&objp->bufferLock);
 
-                 objp->wbuf_index = (objp->wbuf_index+1)%2;
+                 objp->wbuf_index = (objp->wbuf_index+1) % MLP_BATCH_RING_SIZE;
 				 objp->wbuf_count--;
 				 objp->rbuf_count++;
 

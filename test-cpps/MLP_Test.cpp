@@ -43,9 +43,9 @@ int main()
 {
 	char anykey;
 
-    //iflytek_training3();
-	//mnist_training2();
-	mnist_training();
+    iflytek_training3();
+	//mnist_training3();
+	//mnist_training();
 	//simple_training();
 
 	//cout << "Press any key to continue ..." << endl;
@@ -53,8 +53,8 @@ int main()
 	//cin >> anykey;
 
 	//iflytek_testing();
-	//iflytek_predicting();
-	mnist_testing();
+	//iflytek_predicting(); 
+	//mnist_testing();
 	//simple_testing();
 	//mnist_predicting();
 
@@ -85,11 +85,11 @@ static void mnist_training()
 	ACT_FUNC actFuncs[nLayers] = {ANOFUNC, AFUNC_SIGMOID, AFUNC_SOFTMAX};
 	COST_FUNC costFunc = CFUNC_CE;
 
-	int minibatch = 1200;
+	int minibatch = 1000;
 	int shuffleBatches = 50;
 	int batches;
 	int totalbatches;
-	int epoches = 200;
+	int epoches = 400; 
 
 	MLPNetProvider *netProviderp=NULL;
     MLPDataProvider *dataProviderp=NULL;
@@ -98,8 +98,8 @@ static void mnist_training()
 	// Training the neural network using MNist labelled dataset
     MLPTrainer *trainerp;
 
-	dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
-	//dataProviderp = new MLPMNistDataProvider(MNIST_PATH2, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	//dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	dataProviderp = new MLPMNistDataProvider(MNIST_PATH2, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
 	dimensions[0] = dataProviderp->getFeatureSize();
 	dimensions[nLayers-1] = dataProviderp->getLabelSize();
@@ -133,11 +133,11 @@ static void mnist_training2()
 {
 	struct mlp_tv startv, endv;
 
-	int minibatch = 1024;
-	int shuffleBatches = 59;
+	int minibatch = 2000;
+	int shuffleBatches = 25;
 	int batches;
 	int totalbatches;
-	int epoches=200;
+	int epoches=800; 
 
 	MLPNetProvider *netProviderp=NULL;
     MLPDataProvider *dataProviderp=NULL;
@@ -185,13 +185,13 @@ static void mnist_training3()
 	ACT_FUNC actFuncs[nLayers] = {ANOFUNC, AFUNC_SIGMOID, AFUNC_SOFTMAX};
 	COST_FUNC costFunc = CFUNC_CE;
 
-	int minibatch = 1200;
+	int minibatch = 2000;
 	int shuffleBatches = 25;
 	int batches;
 	int totalbatches;
-	int epoches = 200;
+	int epoches = 800; 
 	int startBatch;
-	int startEpoch;
+	int startEpoch; 
 
 
 	MLPCheckPointManager cpManager;
@@ -207,24 +207,27 @@ static void mnist_training3()
 		 statep = cpManager.getChkPointState();
 		 netProviderp = new MLPNetProvider(statep->netConfPath, statep->netConfArchFileName, statep->netConfDataFileName);
 
-	     dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	     //dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+         dataProviderp = new MLPMNistDataProvider(MNIST_PATH2, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 		 dataProviderp->setupDataProvider(statep->cpFrameNo, true);
 
 		 startBatch = statep->cpBatchNo;
-		 startEpoch = statep->cpEpoch;
+		 startEpoch = statep->cpEpoch; 
 
 		 cpManager.cpUnload();
 	}
 	else {
 		 cout << "No old checkpoint found, start new checkpointing any way" << endl;
 
-         netProviderp = new MLPNetProvider(nettype, nLayers, dimensions, etas, momentum, actFuncs, costFunc, true);
+         //netProviderp = new MLPNetProvider(nettype, nLayers, dimensions, etas, momentum, actFuncs, costFunc, true);
+         netProviderp = new MLPNetProvider("./", "mlp_netarch_init.conf", "mlp_netweights_init.dat");
 
-	     dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	     //dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	     dataProviderp = new MLPMNistDataProvider(MNIST_PATH2, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	     dataProviderp->setupDataProvider(0, true);
 
 		 startBatch = 0;
-		 startEpoch = 0;
+		 startEpoch = 0; 
 	};
 
 	// Training the neural network using MNist labelled dataset
@@ -412,7 +415,7 @@ static void simple_training()
 	int shuffleBatches = 50;
 	int batches;
 	int totalbatches;
-	int epoches = 200;
+	int epoches = 200; 
 
 	MLPNetProvider *netProviderp=NULL;
     MLPDataProvider *dataProviderp=NULL;
@@ -593,7 +596,7 @@ static void iflytek_training()
 	int shuffleBatches = 50;
 	int batches;
 	int totalbatches;
-	int epoches=8;
+	int epoches=2; 
 
 	MLPNetProvider *netProviderp=NULL;
     MLPDataProvider *dataProviderp=NULL;
@@ -646,9 +649,9 @@ static void iflytek_training3()
 	int shuffleBatches = 50;
 	int batches;
 	int totalbatches;
-	int epoches=8;
+	int epoches=2; 
 	int startBatch;
-	int startEpoch;
+	int startEpoch; 
 
 	MLPCheckPointManager cpManager;
 	MLPNetProvider *netProviderp=NULL;
@@ -670,7 +673,7 @@ static void iflytek_training3()
 		 cout << "The MLPDataProvider start from Frame " << statep->cpFrameNo << endl;
 
 		 startBatch = statep->cpBatchNo;
-		 startEpoch = statep->cpEpoch;
+		 startEpoch = statep->cpEpoch; 
 
 		 cout << "The Trainer start from batch " << statep->cpBatchNo << " of Epoch " << statep->cpEpoch << endl;
 
@@ -684,7 +687,7 @@ static void iflytek_training3()
 	     dataProviderp->setupDataProvider(0, true);
 
 		 startBatch = 0;
-		 startEpoch = 0;
+		 startEpoch = 0; 
 	};
 
     trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);
@@ -781,7 +784,7 @@ static void iflytek_predicting()
 	outputVectors = new float[predictorp->getOutputVectorSize()*minibatch];
 
     totalbatches = dataProviderp->getTotalBatches();
-	totalbatches = min<int>(totalbatches, 10);
+	totalbatches = min<int>(totalbatches, 10); 
 
     cout << totalbatches << " batches of data to be predicted, just waiting ..." << endl;
 

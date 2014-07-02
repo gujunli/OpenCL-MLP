@@ -17,6 +17,8 @@
 #include "MLPApiExport.h"
 #include "MLPConstants.h"
 
+#define MLP_BATCH_RING_SIZE 4
+
 class MLPDataProvider
 {
 	 friend class MLPTrainer;
@@ -34,8 +36,8 @@ protected:
 	int m_dataLabelSize;         // Size of label frame as input to neural network, in units of float, same as the dimension of the output layer
 	bool haveLabel;              // Indicates if we need use label frames, label frames are needed for training and testing, but not for predicting
 
-	float *features[2];          // Double-buffer for feature frames, which will be directly delivered to the neural network
-	float *labels[2];            // Double-buffer for label frames, which will be directly delivered to the neural network
+	float *features[MLP_BATCH_RING_SIZE];       // ring buffer for feature frames batches, which will be directly delivered to the neural network
+	float *labels[MLP_BATCH_RING_SIZE];         // ring buffer for label frames batches, which will be directly delivered to the neural network
 	int rbuf_index,wbuf_index;
 
 	int rbuf_count;              // Used to implement a producer-consumer like synchronization between the neural network side and the data provider side

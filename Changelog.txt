@@ -1,0 +1,65 @@
+*  Fri Jun 27 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+   -  Fixed a bug in gotoLabelFrame() of MLPMNistDataProvider()
+   -  Big hack to MLPDataProvider()/MLPMNistDataProvider()/MLPIFlyDataProvider(), removed the concept of "rounds", replaced 
+       it by "epoch", resetDataProvider() added to restart the data provider between each epoches
+
+*  Thu Jun 12 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+   -  Adjusted the API of MLPDataProvider, make batchAvailable() a public interface and add separate virtual private interface
+      haveBatchToProvide() to be implemented by its derived class
+   -  Fixed a bug in batchAvailable() and corresponding codes
+
+*  Sun Jun 09 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+   -  Implemented an asynchronous checkpointing facility through a new class MLPCheckPointManager and some codes added
+      in the MLPTrainer, MLPDataProvider
+
+*  Fri Jun 06 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+   -  Made some change to the MLPNetProvider so that the configuration file names can be assigned by the user
+   -  Removed the definition of "WIN32" and "Linux" from the project profile, using the compiler predefined definition
+      "_WIN32" and "__linux" 
+
+*  Sat May 31 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+   -  Implemented the MLP trainer/tester/dataprovider codes into a dynamic library on Windows 
+
+*  Fri May 30 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>
+   -  Verified the validity of IFlytek dataset
+   -  Implemented MLPIFlyDataProvider class, made MLP Trainer work on IFlytek dataset
+   -  Reached convergence on IFlytek dataset, provided a referrence network tuning parameters for IFlytek dataset
+
+*  Wed May 14 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>
+   -  Fixed a bug in calling clAmdBlasSegmv(),  make MLP completely work on both Windows and Linux for MNIST dataset
+
+*  Wed Apr 30 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>
+   -  Implemented the support for "momentum" in the training algorithm
+   -  Fixed many bugges including the incorrect calling of clAmdBlas API, bugges in kernels
+   -  Training convergence is reached !!!!
+
+
+*  Wed Apr 23 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>
+   -  Implemented complete support of various network configuration including various algorithms for activation, cost functions. 
+   -  Move all OpenCL wrapper functions to MLPCommon.cpp
+   -  Replace all C codes by C++ implementations
+   
+
+*  Wed Apr 09 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>
+   -  Spliting the functions for training, testing, predicting into three classes MLPTrainer/MLPTester/MLPPredictor
+   -  Implemented the double-buffer service architecture of MLPDataProvider
+
+*  Wed Apr 03 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>
+   -  Add the MLPDataProvider class and implement two derived class MLPSimpleDataProvider and MLPMNistDataProvider 
+      to support emulated training data and MNIST image data
+   -  Changed the MLPTrainer class to be initialized with both MLPDataProvider and MLPNetProvider objects
+
+*  Mon Mar 24 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>
+   -  Add a MLPNetProvider class to implement support for MLP Neural network architecture (layers, weights, biases)
+   -  Rename MLP class to MLPTrainer class
+   -  Reimplement the constructor of MLPTrainer to use MLPNetProvider object as parameter
+
+*  Sun Mar 23 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>
+   -   Implement the Bias data as isolated data structure separated from the Weight matrixes
+
+*  Mon Mar 17 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>  
+   -  Clean the codes by identifying the member variables and functions with "this->"
+   -  Add the MLPUtil.cpp+MLPUtil.h to provide some utilies needed by the application (eg. time measure, error reporting)
+   -  Add the oclutil.cpp+oclutil.h to provide OpenCL device and platform interface functions
+   -  Replace the cpu SSE based matrix transposition to GPU-based matrix transposition
+

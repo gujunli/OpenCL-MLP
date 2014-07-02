@@ -1,1 +1,0 @@
-MLPMNist:Failed to open MNIST data file

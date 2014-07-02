@@ -410,6 +410,9 @@ void MLPMNistDataProvider::resetDataProvider()
 		 this->gotoLabelFrame(0);
     };
 
+	if ( this->supportChkPointing )
+		 MLP_LOCK_INIT(&this->chkPointingLock);
+
 	this->setup_first_data_batches();
 
 	MLP_CHECK(this->startup_worker());
@@ -423,7 +426,7 @@ void MLPMNistDataProvider::getCheckPointFrame(int & frameNo)
 
 	MLP_LOCK(&this->chkPointingLock);
 
-	batch = this->batchNo - 2;    // This is the batchNo for the sequence of shuffled batche,  Consider there are 2 batches on the Double-buffers (may not be processed by the Trainer)
+	batch = this->batchNo - MLP_BATCH_RING_SIZE;    // This is the batchNo for the sequence of shuffled batche,  Consider there are batches on the buffer ring (may not be processed by the Trainer)
 
 	stage = batch / this->m_shuffleBatches;
 

@@ -477,6 +477,11 @@ void MLPIFlyDataProvider::setup_first_data_batches()
 {
 	this->stageBatchNo = 0;
 	this->setup_cont_data_batches();
+
+    if ( this->batches_loaded ) {
+	     this->shuffle_data(this->permutations, this->m_batchSize * this->m_shuffleBatches );
+	     //cout << "Load new data from files and shuffling the frame sequences" << endl;
+    }; 
 };
 
 void MLPIFlyDataProvider::setup_cont_data_batches()
@@ -638,19 +643,11 @@ void MLPIFlyDataProvider::gotoLabelFrame(int frameNo)
 
 void MLPIFlyDataProvider::setupDataProvider()
 {
-	if ( this->dataMode == MLP_DATAMODE_TRAIN ) {
-	     this->gotoDataFrame(0);
-		 this->gotoLabelFrame(0);
+	this->gotoDataFrame(this->mySetStart); 
+	if ( this->haveLabel ) 
+		this->gotoLabelFrame(this->mySetStart); 
 
-		 this->curFrame = 0;
-	}
-	else {
-		 this->gotoDataFrame(this->TestSetStart);
-		 if ( this->haveLabel )
-			  this->gotoLabelFrame(this->TestSetStart);
-
-		 this->curFrame = this->TestSetStart;
-	};
+	this->curFrame = this->mySetStart; 
 
 	this->curStartFrame = this->curFrame;
 
@@ -720,26 +717,25 @@ void MLPIFlyDataProvider::resetDataProvider()
 	this->batchNo = 0;
 	this->batches_loaded = false;
 
-	if (this->dataMode == MLP_DATAMODE_TRAIN )    {  // for training dataset
-	    this->dataFile.clear();
-        this->labelFile.clear();    // clear the eof flag
-		this->gotoDataFrame(0);
-		this->gotoLabelFrame(0);
-	}
-	else   {                                         // for testing dataset
-		this->gotoDataFrame(this->TestSetStart);
-		this->dataFile.clear();
-        if ( this->haveLabel ) {
-             this->labelFile.clear();
-		     this->gotoLabelFrame(this->TestSetStart);
-        };
-	};
+	this->dataFile.clear(); 
+	this->gotoDataFrame(this->mySetStart); 
+	if ( this->haveLabel ) {
+		this->labelFile.clear(); 
+		this->gotoLabelFrame(this->mySetStart); 
+	}; 
+
+	this->curFrame = this->mySetStart; 
+
+	this->curChkPointFrame = this->lastChkPointFrame = this->curFrame;
 
 	for (int i=0; i< (int)this->sDataFrames.size(); i++)
 		 delete [] this->sDataFrames[i];
 
 	this->sDataFrames.clear();
 	this->sLabelFrames.clear();
+
+	if ( this->supportChkPointing )
+		 MLP_LOCK_INIT(&this->chkPointingLock);
 
 	this->setup_first_data_batches();
 
@@ -753,8 +749,8 @@ void MLPIFlyDataProvider::getCheckPointFrame(int & frameNo)
 	 MLP_LOCK(&this->chkPointingLock);
 
 	 stageBatch = this->stageBatchNo;
-	 if ( stageBatch > 2 )
-		  frameNo = this->curChkPointFrame;   // Even with the two batches on Double-buffers considered, this position still ensure no frame being skipped by the MLPTrainer
+	 if ( stageBatch > MLP_BATCH_RING_SIZE )
+		  frameNo = this->curChkPointFrame;   // Even with the batches on buffer considered considered, this position still ensure no frame being skipped by the MLPTrainer
 	 else
 	      frameNo = this->lastChkPointFrame;  // Use "lastChkPointFrame" as checkpoint position to ensure no frame will be skipped for processing
 
