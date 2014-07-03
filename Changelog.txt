@@ -1,3 +1,10 @@
+*  Thu Jul 03 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+   -  Added support to store the weights of MLP neural network in Little Endian bytes sequence
+
+*  Tue Jul 01 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+   -  Replaced the MLPDataProvider's implementation of batch buffers from double-buffer to a buffer ring (eg. 8 buffers), more
+      number of buffers will let the IO of the back-end data provider be completely hidden by the batch processing of the trainer.  
+
 *  Fri Jun 27 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
    -  Fixed a bug in gotoLabelFrame() of MLPMNistDataProvider()
    -  Big hack to MLPDataProvider()/MLPMNistDataProvider()/MLPIFlyDataProvider(), removed the concept of "rounds", replaced 

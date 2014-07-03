@@ -336,14 +336,12 @@ MLPNetProvider::MLPNetProvider(const char *configPath, const char *archFilename,
 			 weightfile.read(reinterpret_cast<char*>(&this->weights[i][row*this->dimensions[i]]), sizeof(float)*this->dimensions[i]);
 		weightfile.read(reinterpret_cast<char*>(&this->biases[i][0]),sizeof(float)*this->dimensions[i]);
 
-		// convert to host bytes sequence from Big Endian bytes sequence
-		/*
+		// convert to host bytes sequence from Little Endian bytes sequence
 		for (int row=0; row < this->dimensions[i-1]; row++)
 			 for (int col=0; col < this->dimensions[i]; col++)
-				  BEtoHostl(*(unsigned int *)&this->weights[i][row*this->dimensions[i]+col]);
+				  LEtoHostl(*(unsigned int *)&this->weights[i][row*this->dimensions[i]+col]);
 		for (int col=0; col < this->dimensions[i]; col++)
-			 BEtoHostl(*(unsigned int *)&this->biases[i][col]);
-		*/
+			 LEtoHostl(*(unsigned int *)&this->biases[i][col]);
 	};
 
 	archfile.close();
@@ -453,19 +451,25 @@ void MLPNetProvider::saveConfig(const char *configPath, const char *archFilename
 
 	for (int i=1; i < this->nLayers; i++) {
 
-        // convert to Big Endian bytes sequence from host bytes sequence
-		/*
+        // convert to Little Endian bytes sequence from host bytes sequence
 		for (int row=0; row < this->dimensions[i-1]; row++)
 			 for (int col=0; col < this->dimensions[i]; col++)
-				  HostToBEl(*(unsigned int *)&this->weights[i][row*this->dimensions[i]+col]);
+				  HostToLEl(*(unsigned int *)&this->weights[i][row*this->dimensions[i]+col]);
 		for (int col=0; col < this->dimensions[i]; col++)
-			 HostToBEl(*(unsigned int *)&this->biases[i][col]);
-		*/
+			 HostToLEl(*(unsigned int *)&this->biases[i][col]);
 
+        // write the converted data to file
 		for (int row=0; row < this->dimensions[i-1]; row++)
 			weightfile.write(reinterpret_cast<char*>(&this->weights[i][row*this->dimensions[i]]), sizeof(float)*this->dimensions[i]);
 
 		weightfile.write(reinterpret_cast<char*>(&this->biases[i][0]),sizeof(float)*this->dimensions[i]);
+
+        // convert back to host bytes sequence from Little Endian bytes sequence
+		for (int row=0; row < this->dimensions[i-1]; row++)
+			 for (int col=0; col < this->dimensions[i]; col++)
+				  LEtoHostl(*(unsigned int *)&this->weights[i][row*this->dimensions[i]+col]);
+		for (int col=0; col < this->dimensions[i]; col++)
+			 LEtoHostl(*(unsigned int *)&this->biases[i][col]);
 	};
 
 	weightfile.seekp(16);
