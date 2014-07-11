@@ -256,7 +256,7 @@ void MLPPredictor::batchPredicting(float *inVectors, float *outVectors)
 	CL_CHECK(clEnqueueWriteBuffer(this->CLContext->m_cmd_queues[0],this->inputs[1],CL_TRUE,0,sizeof(cl_float)*this->dimensions[0]*this->batchSize,inVectors,0,NULL,NULL));
 
 	for (int i = 1; i < nLayers; i++) {
-		 // Input[i] = Output[i-1] * Weight[i]     ¡¡
+		 // Input[i] = Output[i-1] * Weight[i]
 		 blasStatus = clAmdBlasSgemm(clAmdBlasRowMajor,clAmdBlasNoTrans,clAmdBlasNoTrans,this->batchSize,this->dimensions[i],this->dimensions[i-1],1.0f,this->inputs[i],
 				this->dimensions[i-1],this->weights[i],this->dimensions[i],0.0f,this->inputs[(i+1)%this->nLayers],this->dimensions[i],1,&this->CLContext->m_cmd_queues[0],0,NULL,NULL);
 		 AMDBLAS_CHECK(blasStatus);
@@ -286,19 +286,19 @@ void MLPPredictor::singlePredicting(float *inVector, float *outVector)
 	CL_CHECK(clEnqueueWriteBuffer(this->CLContext->m_cmd_queues[0],this->inputs[1],CL_TRUE,0,sizeof(cl_float)*this->dimensions[0],inVector,0,NULL,NULL));
 
 	for (int i = 1; i < nLayers; i++) {
-		 // Input[i] = Output[i-1] * Weight[i]
-		 blasStatus=clAmdBlasSgemv(clAmdBlasRowMajor, clAmdBlasTrans, this->dimensions[i], this->dimensions[i-1], 1.0f, this->weights[i], this->dimensions[i-1], this->inputs[i],
-					0, sizeof(float), 0.0f, this->inputs[(i+1)%this->nLayers], 0, sizeof(float), 1, &this->CLContext->m_cmd_queues[0], 0, NULL, NULL);
+		 // Input[i] = Output[i-1] * Weight[i], calculated using WeightT[i]*Output[i] to call the library interface
+		 blasStatus=clAmdBlasSgemv(clAmdBlasRowMajor, clAmdBlasTrans, this->dimensions[i-1], this->dimensions[i], 1.0f, this->weights[i], this->dimensions[i], this->inputs[i],
+					0, 1, 0.0f, this->inputs[(i+1)%this->nLayers], 0, 1, 1, &this->CLContext->m_cmd_queues[0], 0, NULL, NULL);
 
-		 // Input[i] = Input[i] + 1.0 * Bias[i],   regarding the two Matrixes as  two vectors
-		 blasStatus = clAmdBlasSaxpy(this->dimensions[i]*this->batchSize, 1.0f, this->biasMatrixes[i], 0, 1, this->inputs[(i+1)%this->nLayers], 0, 1, 1,
+		 // Input[i] = Input[i] + 1.0 * Bias[i]
+		 blasStatus = clAmdBlasSaxpy(this->dimensions[i], 1.0f, this->biases[i], 0, 1, this->inputs[(i+1)%this->nLayers], 0, 1, 1,
 			                        &this->CLContext->m_cmd_queues[0], 0, NULL, NULL);
 
 
 		 AMDBLAS_CHECK(blasStatus);
 
 		 // Output[i] = activate(Input[i])
-		this->activate(i, this->inputs[(i+1)%this->nLayers], this->inputs[(i+1)%this->nLayers], this->dimensions[i], this->batchSize);
+		this->activate(i, this->inputs[(i+1)%this->nLayers], this->inputs[(i+1)%this->nLayers], this->dimensions[i], 1);
 	}
 
 	// read the output vectors from the device to the host layer so that they can be checked

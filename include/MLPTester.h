@@ -20,63 +20,73 @@
 #include "MLPNetProvider.h"
 #include "MLPDataProvider.h"
 
+
+typedef bool (*VECTOR_MATCH)(float *inVector, float *labelVector, int len);
+
 class MLPTester
 {
 private:
-	bool initialized; 
-private:               
-	MLP_OCL_DEVTYPE devType; 
+	bool initialized;
+private:
+	MLP_OCL_DEVTYPE devType;
 
-	MLP_NETTYPE netType; 
-	int   nLayers;      
+	MLP_NETTYPE netType;
+	int   nLayers;
 	int   batchSize;
-	int  *dimensions;   
-	ACT_FUNC *actFuncs; 
+	int  *dimensions;
+	ACT_FUNC *actFuncs;
 
-	cl_mem *inputs;               
-	cl_mem *weights;             
-	cl_mem *biases;     
+	cl_mem *inputs;
+	cl_mem *weights;
+	cl_mem *biases;
 	cl_mem target;
 	cl_mem output;
 
-	MLPDataProvider *dataProviderp; 
+	cl_mem *biasMatrixes;
 
-	int succTestFrames; 
+	MLPDataProvider *dataProviderp;
+
+	int succTestFrames;
 	int totalTestFrames;
 
-private: 
-    static MLP_Kerns mykerns; 
+private:
+    static MLP_Kerns mykerns;
 
-	static SingleDevClass * CLContext; 
+	static SingleDevClass * CLContext;
 	static int nInstances ;
 
 private:
 	void setDefault();
 	void _initialize(MLPNetProvider & NetProvider, int minibatch);
-	void _dispose(); 
+	void _dispose();
 
 private:
     void expandFloatVectorToMatrix(cl_mem  myVector, cl_mem myMatrix, int width, int height);  // helper
 
-	void activate(int layer, cl_mem x, cl_mem y, int width, int height);	
+	void activate(int layer, cl_mem x, cl_mem y, int width, int height);
 
 public:
 	LIBMLPAPI MLPTester();
 	LIBMLPAPI MLPTester(MLPNetProvider & netProvider, MLPDataProvider & dataProvider, MLP_OCL_DEVTYPE devType, int minipatch);
 	LIBMLPAPI ~MLPTester();
 
-public:	 	 
+public:
 	LIBMLPAPI static SingleDevClass* getCLContext()
 	{
 		return CLContext;
 	}
-	LIBMLPAPI void setupMLP(MLPNetProvider & netProvider, MLPDataProvider & dataProvider, int minipatch);	
+	LIBMLPAPI void setupMLP(MLPNetProvider & netProvider, MLPDataProvider & dataProvider, int minipatch);
 
-	LIBMLPAPI MLPDataProvider *getDataProvider(); 
+	LIBMLPAPI MLPDataProvider *getDataProvider();
 
-	LIBMLPAPI void batchTesting(int maxBatches); 
+	LIBMLPAPI void batchTesting(int maxBatches);
+	LIBMLPAPI bool singleTesting(float *inputVector, float *labelVector, VECTOR_MATCH matchFunc);
 
-	LIBMLPAPI void getTestingStats(int &totalFrames, int &succFrames); 
+	LIBMLPAPI void getTestingStats(int &totalFrames, int &succFrames);
+
+    LIBMLPAPI int getInputVectorSize();
+    LIBMLPAPI int getOutputVectorSize();
+	LIBMLPAPI int getBatchSize();
 };
 
 

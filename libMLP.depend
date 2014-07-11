@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1404288553 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPCommon.cpp
+1405067083 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPCommon.cpp
 	"MLPUtil.h"
 	"MLPConstants.h"
 	"MLPCommon.h"
@@ -19,8 +19,10 @@
 
 1404288553 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPConstants.h
 
-1404288553 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPCommon.h
+1404983799 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPCommon.h
 	<CL/cl.h>
+	<iostream>
+	<fstream>
 
 1383129523 /opt/AMDAPP/include/CL/cl.h
 	<OpenCL/cl_platform.h>
@@ -88,7 +90,7 @@
 1404288553 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPNetProvider.h
 	"MLPApiExport.h"
 
-1404288553 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPPredictor.cpp
+1405063063 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPPredictor.cpp
 	<algorithm>
 	<clAmdBlas.h>
 	"MLPUtil.h"
@@ -102,7 +104,7 @@
 
 1364962668 /opt/clAmdBlas/include/clAmdBlas-complex.h
 
-1404288553 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPPredictor.h
+1405001107 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPPredictor.h
 	<CL/cl.h>
 	<CL/cl_ext.h>
 	"MLPApiExport.h"
@@ -129,14 +131,14 @@
 	"MLPApiExport.h"
 	"MLPDataProvider.h"
 
-1404288553 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPTester.cpp
+1405062635 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPTester.cpp
 	<algorithm>
 	<clAmdBlas.h>
 	"MLPUtil.h"
 	"MLPCommon.h"
 	"MLPTester.h"
 
-1404288553 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPTester.h
+1405006571 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPTester.h
 	<CL/cl.h>
 	<CL/cl_ext.h>
 	"MLPApiExport.h"
@@ -146,7 +148,7 @@
 	"MLPNetProvider.h"
 	"MLPDataProvider.h"
 
-1404288553 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPTrainer.cpp
+1405067055 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPTrainer.cpp
 	<algorithm>
 	<clAmdBlas.h>
 	"MLPUtil.h"

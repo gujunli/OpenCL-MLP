@@ -9,6 +9,10 @@
 #define _MLP_COMMON_H_
 
 #include <CL/cl.h>
+#include <iostream>
+#include <fstream>
+
+using namespace std;
 
 typedef struct kernels {
 	cl_kernel activate_sigmoid_kernel;
@@ -24,14 +28,14 @@ typedef struct kernels {
 	cl_kernel calculateError_CE_kernel1;
 	cl_kernel calculateError_CE_kernel2;
 
-	cl_kernel calculateDelta_SSE_Sigmoid_kernel; 
-	cl_kernel calculateDelta_CE_Softmax_kernel; 
+	cl_kernel calculateDelta_SSE_Sigmoid_kernel;
+	cl_kernel calculateDelta_CE_Softmax_kernel;
 
-    cl_kernel transpose_kernel32; 
-    cl_kernel transpose_kernel4; 
+    cl_kernel transpose_kernel32;
+    cl_kernel transpose_kernel4;
     cl_kernel transpose_sim_kernel;
 
-    cl_kernel expandMatrix_kernel; 
+    cl_kernel expandMatrix_kernel;
 } MLP_Kerns;
 
 extern void cmn_transpose_matrix_simple(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl_mem &A_cl, cl_mem &At_cl, int width, int height);
@@ -60,10 +64,10 @@ void fprint_dev_data(ofstream &ofile, char *header, cl_command_queue &cmdQueue, 
 
 typedef bool (*CHECK_FLOAT)(float x);
 
-bool check_zero(float x); 
-bool check_nan(float x); 
-bool check_inf(float x); 
+bool check_zero(float x);
+bool check_nan(float x);
+bool check_inf(float x);
 void check_memory(char *header, cl_command_queue &cmdQueue, cl_mem devBuf, int length, CHECK_FLOAT checkFunc);
 
 
-#endif 
+#endif

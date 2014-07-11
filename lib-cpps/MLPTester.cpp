@@ -158,6 +158,17 @@ void MLPTester::_initialize(MLPNetProvider & provider, int _batchSize)
 
 	this->inputs[0] = this->output;
 
+	this->biasMatrixes = new cl_mem[this->nLayers];
+
+	// create bias Matrix buffer for each layer except for the input layer
+	for (int i = 1; i < this->nLayers; i++) {
+ 	    this->biasMatrixes[i] = clCreateBuffer(this->CLContext->m_context,CL_MEM_READ_WRITE,sizeof(cl_float)*this->batchSize*this->dimensions[i],NULL,&status);
+        CL_CHECK(status);
+
+		this->expandFloatVectorToMatrix(this->biases[i],this->biasMatrixes[i],this->dimensions[i],this->batchSize);
+	};
+
+
 	this->target = clCreateBuffer(this->CLContext->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*this->dimensions[this->nLayers-1]*this->batchSize,NULL,&status);
 	CL_CHECK(status);
 }
@@ -174,6 +185,8 @@ void MLPTester::_dispose()
 		CL_CHECK( clReleaseMemObject(this->inputs[i]) );
 		CL_CHECK( clReleaseMemObject(this->weights[i]) );
 		CL_CHECK( clReleaseMemObject(this->biases[i]) );
+
+		CL_CHECK( clReleaseMemObject(this->biasMatrixes[i]) );
 	}
 
 	CL_CHECK( clReleaseMemObject(this->output) );
@@ -189,6 +202,8 @@ void MLPTester::_dispose()
 		delete [] this->weights;
 	if ( this->biases)
 		delete [] this->biases;
+	if ( this->biasMatrixes )
+		delete [] this->biasMatrixes;
 }
 
 void MLPTester::setupMLP(MLPNetProvider & netProvider, MLPDataProvider & dataProvider, int batchSize)
@@ -246,7 +261,6 @@ void MLPTester::batchTesting(int maxBatches)
 		 MLP_Exception("");
 	};
 
-	cl_int status;
 	clAmdBlasStatus blasStatus;
 
 	// the inputs for the MLP training
@@ -255,18 +269,8 @@ void MLPTester::batchTesting(int maxBatches)
 	float *outputs=NULL;         // buffer for minibatch number of output vectors
 	int veclen;                  // length of the output vector
 
-	cl_mem *biasesMatrix = new cl_mem[this->nLayers];
-
 	veclen = this->dimensions[this->nLayers-1];
 	outputs = new float[veclen * this->batchSize];
-
-	// create bias Matrix buffer for each layer except for the input layer
-	for (int i = 1; i < this->nLayers; i++) {
- 	    biasesMatrix[i] = clCreateBuffer(this->CLContext->m_context,CL_MEM_READ_WRITE,sizeof(cl_float)*this->batchSize*this->dimensions[i],NULL,&status);
-        CL_CHECK(status);
-
-		this->expandFloatVectorToMatrix(this->biases[i],biasesMatrix[i],this->dimensions[i],this->batchSize);
-	};
 
 	this->succTestFrames = 0;
 	this->totalTestFrames = 0;
@@ -279,13 +283,13 @@ void MLPTester::batchTesting(int maxBatches)
 			CL_CHECK(clEnqueueWriteBuffer(this->CLContext->m_cmd_queues[0],this->inputs[1],CL_TRUE,0,sizeof(cl_float)*this->dimensions[0]*this->batchSize,features,0,NULL,NULL));
 
 			for (int i = 1; i < nLayers; i++) {
-				// Input[i] = Output[i-1] * Weight[i]     ¡¡
+				// Input[i] = Output[i-1] * Weight[i]
 				blasStatus = clAmdBlasSgemm(clAmdBlasRowMajor,clAmdBlasNoTrans,clAmdBlasNoTrans,this->batchSize,this->dimensions[i],this->dimensions[i-1],1.0f,this->inputs[i],
 					this->dimensions[i-1],this->weights[i],this->dimensions[i],0.0f,this->inputs[(i+1)%this->nLayers],this->dimensions[i],1,&this->CLContext->m_cmd_queues[0],0,NULL,NULL);
 				AMDBLAS_CHECK(blasStatus);
 
 				// Input[i] = Input[i] + 1.0 * Bias[i],   regarding the two Matrixes as  two vectors
-				blasStatus = clAmdBlasSaxpy(this->dimensions[i]*this->batchSize, 1.0f, biasesMatrix[i], 0, 1, this->inputs[(i+1)%this->nLayers], 0, 1, 1,
+				blasStatus = clAmdBlasSaxpy(this->dimensions[i]*this->batchSize, 1.0f, this->biasMatrixes[i], 0, 1, this->inputs[(i+1)%this->nLayers], 0, 1, 1,
 					                        &this->CLContext->m_cmd_queues[0], 0, NULL, NULL);
 				AMDBLAS_CHECK(blasStatus);
 
@@ -309,14 +313,9 @@ void MLPTester::batchTesting(int maxBatches)
 			MLP_CHECK(this->dataProviderp->nextBatch());
 
 			batches++;
-	}	
-
-
-	for (int i = 1; i < this->nLayers; i++) {
-	    CL_CHECK( clReleaseMemObject(biasesMatrix[i]) );
 	}
 
-	delete [] biasesMatrix;
+
 	delete [] outputs;
 }
 
@@ -326,3 +325,60 @@ void MLPTester::getTestingStats(int &totalFrames, int &succFrames)
 	totalFrames = this->totalTestFrames;
 	succFrames = this->succTestFrames;
 };
+
+int MLPTester::getInputVectorSize()
+{
+	return(this->dimensions[0]);
+};
+
+int MLPTester::getOutputVectorSize()
+{
+	return(this->dimensions[this->nLayers-1]);
+};
+
+int MLPTester::getBatchSize()
+{
+	return(this->batchSize);
+};
+
+bool MLPTester::singleTesting(float *inVector, float *labelVector, VECTOR_MATCH matchFunc)
+{
+	if ( !this->initialized) {
+		 mlp_log("MLPPredictor", "This Predictor object should be setup with NetProvider and DataProvider first");
+		 MLP_Exception("");
+	};
+
+	clAmdBlasStatus blasStatus;
+    int outputSize;
+	float *outVector;
+
+    outputSize = this->getOutputVectorSize();
+    outVector = new float[outputSize];
+
+	CL_CHECK(clEnqueueWriteBuffer(this->CLContext->m_cmd_queues[0],this->inputs[1],CL_TRUE,0,sizeof(cl_float)*this->dimensions[0],inVector,0,NULL,NULL));
+
+	for (int i = 1; i < nLayers; i++) {
+         // Input[i] = Output[i-1] * Weight[i], matrix * matrix is also OK, but less efficient
+		 //blasStatus = clAmdBlasSgemm(clAmdBlasRowMajor,clAmdBlasNoTrans,clAmdBlasNoTrans,1,this->dimensions[i],this->dimensions[i-1],1.0f,this->inputs[i],
+		 //  this->dimensions[i-1],this->weights[i],this->dimensions[i],0.0f,this->inputs[(i+1)%this->nLayers],this->dimensions[i],1,&this->CLContext->m_cmd_queues[0],0,NULL,NULL);
+
+		 // Input[i] = Output[i-1] * Weight[i], calculated using WeightT[i]*Output[i] to call the library interface
+		 blasStatus=clAmdBlasSgemv(clAmdBlasRowMajor, clAmdBlasTrans, this->dimensions[i-1], this->dimensions[i], 1.0f, this->weights[i], this->dimensions[i], this->inputs[i],
+		 			0, 1, 0.0f, this->inputs[(i+1)%this->nLayers], 0, 1, 1, &this->CLContext->m_cmd_queues[0], 0, NULL, NULL);
+
+		 // Input[i] = Input[i] + 1.0 * Bias[i]
+		 blasStatus = clAmdBlasSaxpy(this->dimensions[i], 1.0f, this->biases[i], 0, 1, this->inputs[(i+1)%this->nLayers], 0, 1, 1,
+			                        &this->CLContext->m_cmd_queues[0], 0, NULL, NULL);
+
+
+		 AMDBLAS_CHECK(blasStatus);
+
+		 // Output[i] = activate(Input[i])
+		 this->activate(i, this->inputs[(i+1)%this->nLayers], this->inputs[(i+1)%this->nLayers], this->dimensions[i], 1);
+	}
+
+	// read the output vectors from the device to the host layer so that they can be checked
+	CL_CHECK(clEnqueueReadBuffer(this->CLContext->m_cmd_queues[0],this->output,CL_TRUE,0,sizeof(cl_float)*this->dimensions[this->nLayers-1],outVector,0,NULL,NULL));
+
+    return( matchFunc(outVector, labelVector, outputSize) );
+}

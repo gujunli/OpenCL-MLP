@@ -24,56 +24,56 @@
 class MLPPredictor
 {
 private:
-	bool initialized; 
-private:                
-	MLP_OCL_DEVTYPE devType; 
+	bool initialized;
+private:
+	MLP_OCL_DEVTYPE devType;
 
-	MLP_NETTYPE netType; 
-	int   nLayers;     
+	MLP_NETTYPE netType;
+	int   nLayers;
 	int   batchSize;
-	int  *dimensions;   
-	ACT_FUNC *actFuncs; 
+	int  *dimensions;
+	ACT_FUNC *actFuncs;
 
-	cl_mem *inputs;               
-	cl_mem *weights;             
-	cl_mem *biases;              
+	cl_mem *inputs;
+	cl_mem *weights;
+	cl_mem *biases;
 	cl_mem output;
-	
-	cl_mem *biasMatrixes;          
-		
-private: 
-	static MLP_Kerns mykerns; 
 
-	static SingleDevClass * CLContext; 
+	cl_mem *biasMatrixes;
+
+private:
+	static MLP_Kerns mykerns;
+
+	static SingleDevClass * CLContext;
 	static int nInstances ;
 
 private:
 	void setDefault();
 	void _initialize(MLPNetProvider & NetProvider, int minibatch);
-	void _dispose(); 
+	void _dispose();
 
 private:
     void expandFloatVectorToMatrix(cl_mem  myVector, cl_mem myMatrix, int width, int height);  // helper
-	void activate(int layer, cl_mem x, cl_mem y, int width, int height);	
+	void activate(int layer, cl_mem x, cl_mem y, int width, int height);
 
 public:
 	LIBMLPAPI MLPPredictor();
 	LIBMLPAPI MLPPredictor(MLPNetProvider & netProvider, MLP_OCL_DEVTYPE devType, int batchSize);
 	LIBMLPAPI ~MLPPredictor();
 
-public:	 	 
+public:
 	LIBMLPAPI static SingleDevClass* getCLContext()
 	{
 		return CLContext;
 	}
-	LIBMLPAPI void setupMLP(MLPNetProvider & netProvider, int batchSize);	
+	LIBMLPAPI void setupMLP(MLPNetProvider & netProvider, int batchSize);
 
-	LIBMLPAPI void batchPredicting(float *inputVectors, float *outputVectors);
-	LIBMLPAPI void singlePredicting(float *inputVector, float *outputVector); 
+	LIBMLPAPI void batchPredicting(float *inVectors, float *outVectors);
+	LIBMLPAPI void singlePredicting(float *inVector, float *outVector);
 
-	LIBMLPAPI int getInputVectorSize(); 
-	LIBMLPAPI int getOutputVectorSize(); 
-	LIBMLPAPI int getBatchSize(); 
+	LIBMLPAPI int getInputVectorSize();
+	LIBMLPAPI int getOutputVectorSize();
+	LIBMLPAPI int getBatchSize();
 };
 
 
