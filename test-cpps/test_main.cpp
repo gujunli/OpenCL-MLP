@@ -22,6 +22,7 @@ extern void mnist_single_testing();
 extern void mnist_predicting();
 
 extern void iflytek_training();
+extern void iflytek_training2(); 
 extern void iflytek_training3();   // training with checkpointing support
 extern void iflytek_batch_testing();
 extern void iflytek_predicting();
@@ -32,19 +33,19 @@ int main()
 {
 	char anykey;
 
-    //iflytek_training3();
+    iflytek_training2();
 	//mnist_training3();
 	//mnist_training();
 	//simple_training();
 
-	//cout << "Press any key to continue ..." << endl;
+	cout << "Press any key to continue ..." << endl;
 
-	//cin >> anykey;
+	cin >> anykey;
 
-	//iflytek_testing();
+	iflytek_batch_testing();
 	//iflytek_predicting();
 	//mnist_batch_testing();
-	mnist_single_testing();
+	//mnist_single_testing();
 	//simple_testing();
 	//mnist_predicting();
 

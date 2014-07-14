@@ -19,6 +19,7 @@
 using namespace std;
 
 void iflytek_training();
+void iflytek_training2();   // training using pretrained weight
 void iflytek_training3();   // training with checkpointing support
 void iflytek_batch_testing();
 void iflytek_predicting();
@@ -74,6 +75,85 @@ void iflytek_training()
 	delete dataProviderp;
 	delete trainerp;
 };
+
+// For training using pretrained weights
+void iflytek_training2()
+{
+	struct mlp_tv startv, endv;
+
+	int minibatch = 1024;
+	int shuffleBatches = 50;
+	int batches;
+	int totalbatches;
+	int epoches=12; 
+	int startBatch;
+	int startEpoch; 
+
+	MLPCheckPointManager cpManager;
+	MLPNetProvider *netProviderp=NULL;
+    MLPDataProvider *dataProviderp=NULL;
+    MLPTrainer *trainerp;
+
+	cpManager.cpFindAndLoad("./tmp/");
+	if ( cpManager.cpAvailable() ) {
+		 struct MLPCheckPointState *statep;
+
+	     cout << "Valid checkpoint found, recover and start new checkpointing from this one"  << endl;
+
+		 statep = cpManager.getChkPointState();
+		 netProviderp = new MLPNetProvider(statep->netConfPath, statep->netConfArchFileName, statep->netConfDataFileName);
+
+         dataProviderp = new MLPIFlyDataProvider(IFLY_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+		 dataProviderp->setupDataProvider(statep->cpFrameNo, true);
+
+		 cout << "The MLPDataProvider start from Frame " << statep->cpFrameNo << endl;
+
+		 startBatch = statep->cpBatchNo;
+		 startEpoch = statep->cpEpoch; 
+
+		 cout << "The Trainer start from batch " << statep->cpBatchNo << " of Epoch " << statep->cpEpoch << endl;
+
+		 cpManager.cpUnload();
+	}
+	else {
+		 cout << "No old checkpoint found, start new checkpointing any way" << endl;
+
+	     netProviderp = new MLPNetProvider("./", "mlp_netarch_init.conf", "mlp_netweights_init.dat");
+         dataProviderp = new MLPIFlyDataProvider(IFLY_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	     dataProviderp->setupDataProvider(0, true);
+
+		 startBatch = 0;
+		 startEpoch = 0; 
+	};
+
+    trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);
+
+	cpManager.enableCheckPointing(*trainerp, "./tmp/");
+	MLP_CHECK( cpManager.startCheckPointing() );
+
+	totalbatches = dataProviderp->getTotalBatches();
+
+	cout << totalbatches << " batches of data to be trained with " << epoches << " epoches, just waiting..." << endl;
+
+	getCurrentTime(&startv);
+	batches = trainerp->batchTrainingWithCheckPointing(0, epoches, startBatch, startEpoch,  true);
+	getCurrentTime(&endv);
+
+	MLP_CHECK( cpManager.endCheckPointing() );
+
+	cout << batches << " batches of data were trained actually" << endl;
+    cout << "Training duration: " << diff_msec(&startv, &endv) << " mill-seconds" << endl;
+
+    // Finalize the result from the training, so that the Tester or Predictor can be set up based on it
+	trainerp->saveNetConfig("./");
+
+	cpManager.cpCleanUp("./tmp/");
+
+	delete netProviderp;
+	delete dataProviderp;
+	delete trainerp;
+};
+
 
 // For testing the MLPTrainer with CheckPointing support
 void iflytek_training3()

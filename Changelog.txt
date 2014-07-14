@@ -1,3 +1,11 @@
+*  Mon Jul 14 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  
+   -  Update the iflytek_test.cpp, add iflytek_training2() which has been leeked from previous submmit
+
+*  Fri Jul 11 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  -  1.3.0
+   -  Fixed a bug with the SinglePredicting() interface of MLPPredictor  
+   -  Added the SingleTesting() interface for MLPTester to support single frame based MLP validating
+   -  Added a MLP version string to MLPCommon.cpp
+
 *  Thu Jul 03 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
    -  Added support to store the weights of MLP neural network in Little Endian bytes sequence
 
