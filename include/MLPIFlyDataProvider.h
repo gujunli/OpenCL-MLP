@@ -15,41 +15,41 @@
 #include "MLPApiExport.h"
 #include "MLPDataProvider.h"
 
-using namespace std; 
+using namespace std;
 
 // for voice data from Iflytek
 class MLPIFlyDataProvider:public MLPDataProvider
 {
 private:
-	float *featureData; 
-	float *labelData; 
-	
-	int *permutations; 
+	float *featureData;
+	float *labelData;
+
+	int *permutations;
 
 	ifstream dataFile;
-	ifstream labelFile; 
+	ifstream labelFile;
 
 private:
 	int dataFrameLen;          // Length of the raw data frame,  eg. 39 floats
-	int labelFrameLen;         // Length of the raw label frame, eg. 1  int 
+	int labelFrameLen;         // Length of the raw label frame, eg. 1  int
 
 	int numSentences;          // Number of sentences available in the total dataset file
 	int numFrames;             // Number of frames available in the total dataset file
 	int TestSetStart;          // Starting frame number of the TestDataSet, TestDataSet takes appr. 5% of the total dataset, it is also the end of the TrainDataSet
-    
+
     int mySetStart;            // Starting frame number of the currently used dataset (TrainDataSet or TestDataSet)
 	int mySetFrames;           // Total number of frames for TrainDataSet or TestDataSet we are current using, one file is splitted into training set and testing set
-	
+
     int stageBatchNo;          // Batch number inside each loaded batches (eg. inside each [this->m_shufflebatches * this->rounds] batches  )
 
-	bool endOfDataSource; 
+	bool endOfDataSource;
     bool batches_loaded;       // the batches of data just were loaded from the file to the buffer
 
 	int curSentence;           // Sentence ID of the frames we are currently accessing
 	int curFrame;              // Global frame sequence number of the frame we are currently accessin
 	int curStartFrame;         // First frame of the sentence currently accessed
-	
-	// The following three members are only used by the CheckPointing Function  
+
+	// The following three members are only used by the CheckPointing Function
 	int curChkPointFrame;      // First frame of the sentence when we call setup_cont_data_source() currently, this is used as a checkpointing position
 	int lastChkPointFrame;     // First frame of the sentence when we call setup_cont_data_source() last time, this is used as a checkpointing position
 
@@ -61,14 +61,14 @@ private:
 	vector<float> covariance_v;        //  Vector to store the covariance calculated from all frames of the dataset, used to normalize the raw input frames
 
 public:
-	LIBMLPAPI MLPIFlyDataProvider(); 
+	LIBMLPAPI MLPIFlyDataProvider();
 	LIBMLPAPI MLPIFlyDataProvider(const char *dataPath, MLP_DATA_MODE mode, int batchSize, int shuffleBatches);
 
-    ~MLPIFlyDataProvider(); 
+    ~MLPIFlyDataProvider();
 
-    void setupDataProvider();                                              // Implementation of public base class virtual interface 
-	void resetDataProvider();                                              // Implementation of public base class virtual interface
-    bool frameMatching(float *frameOutput, float *frameLabel, int len);    // Implementation of public base class virtual interface
+    void setupDataProvider();                                                          // Implementation of public base class virtual interface
+	void resetDataProvider();                                                          // Implementation of public base class virtual interface
+    bool frameMatching(const float *frameOutput, const float *frameLabel, int len);    // Implementation of public base class virtual interface
 
     // The following two interfaces are only used by the CheckPointing Function
     void getCheckPointFrame(int & frameNo);                                // Implementation of public base class virtual interface
@@ -76,17 +76,17 @@ public:
 
 private:
 	 void prepare_batch_data();                // Implementation of private base class virtual interface
-	 bool haveBatchToProvide();                // Implementation of private base class virtual interface     
+	 bool haveBatchToProvide();                // Implementation of private base class virtual interface
 
 	 void setup_first_data_batches();           // First time read data from the file and setup them on the memory
 	 void setup_cont_data_batches();            // Continue to read data from the file and setup them on the memory
-	 void shuffle_data(int *index, int len); 
+	 void shuffle_data(int *index, int len);
 
-     void InitializeFromIFlySource(const char *dataPath); 
-	 void gotoDataFrame(int frameNo); 
-	 void gotoLabelFrame(int frameNo); 
-	 void readOneSentence();    
-}; 
+     void InitializeFromIFlySource(const char *dataPath);
+	 void gotoDataFrame(int frameNo);
+	 void gotoLabelFrame(int frameNo);
+	 void readOneSentence();
+};
 
 #ifdef  _WIN32
 #define IFLY_PATH "../../IFLYTEK/87/config/"

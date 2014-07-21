@@ -88,11 +88,13 @@ SingleDevClass::SingleDevClass(MLP_OCL_DEVTYPE type)
 
 SingleDevClass::~SingleDevClass()
 {
+ 	CL_CHECK( clReleaseContext(this->m_context) );
+
 	CL_CHECK( clReleaseCommandQueue(this->m_cmd_queues[0]) );
 
 	if ( this->numQueues == 2 )
 	     CL_CHECK( clReleaseCommandQueue(this->m_cmd_queues[1]) );
 
-	CL_CHECK( clReleaseContext(this->m_context) );
+	CL_CHECK( clReleaseDevice(this->m_device) );
 };
 

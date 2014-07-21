@@ -7,7 +7,7 @@
 	<fstream>
 	<cmath>
 
-1404363900 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPUtil.h
+1405915777 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPUtil.h
 	<windows.h>
 	<pthread.h>
 	<signal.h>
@@ -47,31 +47,31 @@
 	"MLPUtil.h"
 	"MLPDataProvider.h"
 
-1404288553 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPDataProvider.h
+1405916395 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPDataProvider.h
 	<Windows.h>
 	<pthread.h>
 	"MLPApiExport.h"
 	"MLPConstants.h"
 
-1404288553 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPIflyDataProvider.cpp
+1405925496 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPIflyDataProvider.cpp
 	<algorithm>
 	<iostream>
 	"MLPUtil.h"
 	"MLPIFlyDataProvider.h"
 
-1404288553 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPIFlyDataProvider.h
+1405916289 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPIFlyDataProvider.h
 	<vector>
 	<fstream>
 	"MLPApiExport.h"
 	"MLPDataProvider.h"
 
-1404288553 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPMNistDataProvider.cpp
+1405916169 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPMNistDataProvider.cpp
 	<algorithm>
 	<iostream>
 	"MLPUtil.h"
 	"MLPMNistDataProvider.h"
 
-1404288553 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPMNistDataProvider.h
+1405916225 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPMNistDataProvider.h
 	<fstream>
 	"MLPApiExport.h"
 	"MLPDataProvider.h"
@@ -122,16 +122,16 @@
 1404288553 /home/qfzhang/AMD-work2/MLP-Linux/include/SingleDevClass.h
 	<CL/cl.h>
 
-1404288553 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPSimpleDataProvider.cpp
+1405916475 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPSimpleDataProvider.cpp
 	<algorithm>
 	"MLPUtil.h"
 	"MLPSimpleDataProvider.h"
 
-1404288553 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPSimpleDataProvider.h
+1405916449 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPSimpleDataProvider.h
 	"MLPApiExport.h"
 	"MLPDataProvider.h"
 
-1405062635 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPTester.cpp
+1405921787 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPTester.cpp
 	<algorithm>
 	<clAmdBlas.h>
 	"MLPUtil.h"
@@ -169,7 +169,7 @@
 	"MLPDataProvider.h"
 	"MLPChkPointState.h"
 
-1404288553 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPTraining.cpp
+1405913528 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPTraining.cpp
 	<algorithm>
 	<iostream>
 	<fstream>
@@ -190,7 +190,7 @@
 	<iostream>
 	<fstream>
 
-1404288553 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/SingleDevClass.cpp
+1405921431 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/SingleDevClass.cpp
 	"MLPUtil.h"
 	"oclUtil.h"
 	"SingleDevClass.h"

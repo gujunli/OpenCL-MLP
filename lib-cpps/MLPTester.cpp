@@ -45,8 +45,9 @@ MLPTester::MLPTester(MLPNetProvider & netProvider, MLPDataProvider & dataProvide
 
 MLPTester::~MLPTester()
 {
-	if ( --this->nInstances == 0 )
-	{
+    this->_dispose();
+
+	if ( --this->nInstances == 0 ) {
 		CL_CHECK( clReleaseKernel(this->mykerns.activate_sigmoid_kernel) );
 	    CL_CHECK( clReleaseKernel(this->mykerns.activate_softmax_kernel1) );
         CL_CHECK( clReleaseKernel(this->mykerns.activate_softmax_kernel2) );
@@ -60,7 +61,6 @@ MLPTester::~MLPTester()
 
 		clAmdBlasTeardown();
 	}
-	this->_dispose();
 }
 
 // only called by the constructor
@@ -71,7 +71,6 @@ void MLPTester::setDefault()
 	// class wide setting up
 	if ( this->nInstances++ == 0 )  // first instance
 	{
-
  	    this->CLContext = new SingleDevClass(this->devType);
 
 		clAmdBlasSetup();
@@ -348,6 +347,7 @@ bool MLPTester::singleTesting(float *inVector, float *labelVector, VECTOR_MATCH 
 		 MLP_Exception("");
 	};
 
+    cl_int status;
 	clAmdBlasStatus blasStatus;
     int outputSize;
 	float *outVector;
@@ -355,7 +355,8 @@ bool MLPTester::singleTesting(float *inVector, float *labelVector, VECTOR_MATCH 
     outputSize = this->getOutputVectorSize();
     outVector = new float[outputSize];
 
-	CL_CHECK(clEnqueueWriteBuffer(this->CLContext->m_cmd_queues[0],this->inputs[1],CL_TRUE,0,sizeof(cl_float)*this->dimensions[0],inVector,0,NULL,NULL));
+	status = clEnqueueWriteBuffer(this->CLContext->m_cmd_queues[0],this->inputs[1],CL_TRUE,0,sizeof(cl_float)*this->dimensions[0],inVector,0,NULL,NULL);
+    CL_CHECK(status);
 
 	for (int i = 1; i < nLayers; i++) {
          // Input[i] = Output[i-1] * Weight[i], matrix * matrix is also OK, but less efficient
@@ -365,6 +366,8 @@ bool MLPTester::singleTesting(float *inVector, float *labelVector, VECTOR_MATCH 
 		 // Input[i] = Output[i-1] * Weight[i], calculated using WeightT[i]*Output[i] to call the library interface
 		 blasStatus=clAmdBlasSgemv(clAmdBlasRowMajor, clAmdBlasTrans, this->dimensions[i-1], this->dimensions[i], 1.0f, this->weights[i], this->dimensions[i], this->inputs[i],
 		 			0, 1, 0.0f, this->inputs[(i+1)%this->nLayers], 0, 1, 1, &this->CLContext->m_cmd_queues[0], 0, NULL, NULL);
+
+		 AMDBLAS_CHECK(blasStatus);
 
 		 // Input[i] = Input[i] + 1.0 * Bias[i]
 		 blasStatus = clAmdBlasSaxpy(this->dimensions[i], 1.0f, this->biases[i], 0, 1, this->inputs[(i+1)%this->nLayers], 0, 1, 1,
@@ -378,7 +381,14 @@ bool MLPTester::singleTesting(float *inVector, float *labelVector, VECTOR_MATCH 
 	}
 
 	// read the output vectors from the device to the host layer so that they can be checked
-	CL_CHECK(clEnqueueReadBuffer(this->CLContext->m_cmd_queues[0],this->output,CL_TRUE,0,sizeof(cl_float)*this->dimensions[this->nLayers-1],outVector,0,NULL,NULL));
+	status = clEnqueueReadBuffer(this->CLContext->m_cmd_queues[0],this->output,CL_TRUE,0,sizeof(cl_float)*this->dimensions[this->nLayers-1],outVector,0,NULL,NULL);
+    CL_CHECK(status);
 
-    return( matchFunc(outVector, labelVector, outputSize) );
+    bool result;
+
+    result = (*matchFunc)(outVector, labelVector, outputSize);
+
+    delete [] outVector;
+
+    return(result);
 }

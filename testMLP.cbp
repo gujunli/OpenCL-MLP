@@ -40,7 +40,10 @@
 			<Add directory="bin/Release" />
 			<Add directory="/opt/clAmdBlas/lib64" />
 		</Linker>
-		<Unit filename="test-cpps/MLP_Test.cpp" />
+		<Unit filename="test-cpps/iflytek_test.cpp" />
+		<Unit filename="test-cpps/mnist_test.cpp" />
+		<Unit filename="test-cpps/simple_test.cpp" />
+		<Unit filename="test-cpps/test_main.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

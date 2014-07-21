@@ -190,17 +190,17 @@ void MLPMNistDataProvider::prepare_batch_data()
 	if ( this->supportChkPointing )
 		 MLP_UNLOCK(&this->chkPointingLock);
 
-	if ( this->stageBatchNo == this->m_shuffleBatches ) {   
+	if ( this->stageBatchNo == this->m_shuffleBatches ) {
 
-		  this->batches_loaded = false; 
+		  this->batches_loaded = false;
 
-		  if ( !this->endOfDataSource ) 
+		  if ( !this->endOfDataSource )
 		        this->setup_cont_data_batches();
 
 		  if ( this->batches_loaded ) {
 		       this->shuffle_data(this->permutations, this->m_batchSize * this->m_shuffleBatches );
 		       // cout << "Load new data from files and shuffling the frame sequences" << endl;
-		  }; 
+		  };
 
 		  this->stageBatchNo = 0;
 	};
@@ -227,13 +227,13 @@ void MLPMNistDataProvider::setup_first_data_batches()
     if ( this->batches_loaded ) {
 	     this->shuffle_data(this->permutations, this->m_batchSize * this->m_shuffleBatches );
 	     //cout << "Load new data from files and shuffling the frame sequences" << endl;
-    }; 
+    };
 };
 
 void MLPMNistDataProvider::setup_cont_data_batches()
 {
 	int readCount=0;
-	int frame; 
+	int frame;
 
 	// initial permutations, permutated each round
 	for (int k=0; k < this->m_batchSize * this->m_shuffleBatches; k++)
@@ -303,8 +303,8 @@ endf:    // duplicate the first "readCount" records to minibatch*shuffleBatches 
 		  };
 	 }
 
-	 if ( frame > 0  || readCount > 0 ) 
-		  this->batches_loaded = true; 
+	 if ( frame > 0  || readCount > 0 )
+		  this->batches_loaded = true;
 
 	 delete [] imagebuf;
 };
@@ -441,7 +441,7 @@ void MLPMNistDataProvider::getCheckPointFrame(int & frameNo)
 // if the output for the frame matches its label, return true to indicate a successful mapping of this
 // frame by the neural network.  This interface will be called by the MLPTester class when calculating
 // the success ratio of the neural network on this type of data
-bool MLPMNistDataProvider::frameMatching(float *frameOutput, float *frameLabel, int len)
+bool MLPMNistDataProvider::frameMatching(const float *frameOutput, const float *frameLabel, int len)
 {
 	float element;
 

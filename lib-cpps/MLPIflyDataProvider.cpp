@@ -367,17 +367,17 @@ void MLPIFlyDataProvider::prepare_batch_data()
 	if ( this->supportChkPointing )
 		 MLP_UNLOCK(&this->chkPointingLock);
 
-	if ( this->stageBatchNo == this->m_shuffleBatches ) {   
+	if ( this->stageBatchNo == this->m_shuffleBatches ) {
 
-		  this->batches_loaded = false; 
+		  this->batches_loaded = false;
 
-		  if ( !this->endOfDataSource ) 
+		  if ( !this->endOfDataSource )
 		        this->setup_cont_data_batches();
 
 		  if ( this->batches_loaded ) {
 		       this->shuffle_data(this->permutations, this->m_batchSize * this->m_shuffleBatches );
 		       // cout << "Load new data from files and shuffling the frame sequences" << endl;
-		  }; 
+		  };
 
 		  this->stageBatchNo = 0;
 	};
@@ -425,8 +425,10 @@ void MLPIFlyDataProvider::readOneSentence()
 	};
 
 	this->sDataFrames.push_back(dataRecord);
-	if ( this->haveLabel )
+	if ( this->haveLabel ) {
 		 this->sLabelFrames.push_back(label);
+		 delete [] labelRecord;
+	};
 
 	this->curFrame++;
 
@@ -451,8 +453,10 @@ void MLPIFlyDataProvider::readOneSentence()
 
 		  if ( sentenceID ==  frameHeader[0] ) {
 			   this->sDataFrames.push_back(dataRecord);
-			   if ( this->haveLabel )
+			   if ( this->haveLabel ) {
 		            this->sLabelFrames.push_back(label);
+		            delete [] labelRecord;
+			   };
 		  }
 		  else {
 			   delete [] dataRecord;
@@ -481,13 +485,13 @@ void MLPIFlyDataProvider::setup_first_data_batches()
     if ( this->batches_loaded ) {
 	     this->shuffle_data(this->permutations, this->m_batchSize * this->m_shuffleBatches );
 	     //cout << "Load new data from files and shuffling the frame sequences" << endl;
-    }; 
+    };
 };
 
 void MLPIFlyDataProvider::setup_cont_data_batches()
 {
 	int readCount=0;
-	int frame; 
+	int frame;
 
 	// Initial permutations, permutated each round
 	for (int k=0; k < this->m_batchSize * this->m_shuffleBatches; k++)
@@ -599,8 +603,8 @@ endf:    // duplicate the first "readCount" records to minibatch*shuffleBatches 
 		  };
 	 };
 
-	 if ( frame > 0  || readCount > 0 ) 
-		  this->batches_loaded = true; 
+	 if ( frame > 0  || readCount > 0 )
+		  this->batches_loaded = true;
 
 	 delete [] tmpFeature;
 };
@@ -643,11 +647,11 @@ void MLPIFlyDataProvider::gotoLabelFrame(int frameNo)
 
 void MLPIFlyDataProvider::setupDataProvider()
 {
-	this->gotoDataFrame(this->mySetStart); 
-	if ( this->haveLabel ) 
-		this->gotoLabelFrame(this->mySetStart); 
+	this->gotoDataFrame(this->mySetStart);
+	if ( this->haveLabel )
+		this->gotoLabelFrame(this->mySetStart);
 
-	this->curFrame = this->mySetStart; 
+	this->curFrame = this->mySetStart;
 
 	this->curStartFrame = this->curFrame;
 
@@ -717,14 +721,14 @@ void MLPIFlyDataProvider::resetDataProvider()
 	this->batchNo = 0;
 	this->batches_loaded = false;
 
-	this->dataFile.clear(); 
-	this->gotoDataFrame(this->mySetStart); 
+	this->dataFile.clear();
+	this->gotoDataFrame(this->mySetStart);
 	if ( this->haveLabel ) {
-		this->labelFile.clear(); 
-		this->gotoLabelFrame(this->mySetStart); 
-	}; 
+		this->labelFile.clear();
+		this->gotoLabelFrame(this->mySetStart);
+	};
 
-	this->curFrame = this->mySetStart; 
+	this->curFrame = this->mySetStart;
 
 	this->curChkPointFrame = this->lastChkPointFrame = this->curFrame;
 
@@ -761,7 +765,7 @@ void MLPIFlyDataProvider::getCheckPointFrame(int & frameNo)
 // if the output for the frame matches its label, return true to indicate a successful mapping of this
 // frame by the neural network.  This interface will be called by the MLPTester class when calculating
 // the success ratio of the neural network on this type of data
-bool MLPIFlyDataProvider::frameMatching(float *frameOutput, float *frameLabel, int len)
+bool MLPIFlyDataProvider::frameMatching(const float *frameOutput, const float *frameLabel, int len)
 {
 	float element;
 

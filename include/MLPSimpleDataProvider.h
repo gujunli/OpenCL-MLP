@@ -16,21 +16,21 @@
 class MLPSimpleDataProvider:public MLPDataProvider
 {
 private:
-	float *featureData; 
-	float *labelData; 
-	
-	int *permutations; 
+	float *featureData;
+	float *labelData;
+
+	int *permutations;
 
 public:
-	LIBMLPAPI MLPSimpleDataProvider(); 
+	LIBMLPAPI MLPSimpleDataProvider();
 	LIBMLPAPI MLPSimpleDataProvider(MLP_DATA_MODE mode, int dataFeatureSize, int dataLabelSize, int batchSize, int shuffleBatches);
 
-    ~MLPSimpleDataProvider(); 
+    ~MLPSimpleDataProvider();
 
-    void setupDataProvider(); 
-	void resetDataProvider(); 
-    bool endofInputBatches(); 
-    bool frameMatching(float *frameOutput, float *frameLabel, int len); 
+    void setupDataProvider();
+	void resetDataProvider();
+    bool endofInputBatches();
+    bool frameMatching(const float *frameOutput, const float *frameLabel, int len);
 
     // The following two interfaces are only used by the CheckPointing Function
 	void getCheckPointFrame(int & frameNo) {};                            // Use to get the Frame Position the DataProvider should start from
@@ -40,10 +40,10 @@ private:
 	 void prepare_batch_data();          // implementation of base class virtual interface
 	 bool haveBatchToProvide();          // implementation of base class virtual interface
 
-	 void setup_data_source(); 
-	 void shuffle_data(int *index, int len); 
+	 void setup_data_source();
+	 void shuffle_data(int *index, int len);
 
-	 friend class MLPTrainer; 
-}; 
+	 friend class MLPTrainer;
+};
 
-#endif 
+#endif

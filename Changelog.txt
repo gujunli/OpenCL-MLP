@@ -1,3 +1,8 @@
+*  Mon Jul 21 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+   -  Fix a memory leek bug in MLPIFlytekDataProvider.cpp that "labelRecord" is not released in ::readOneSentence()
+   -  Fix a memory leek bug in MLPTester.cpp that "OutVector" is not released in ::SingleTesting()
+   -  Some other misc changes of the codes
+
 *  Mon Jul 14 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  
    -  Update the iflytek_test.cpp, add iflytek_training2() which has been leeked from previous submmit
 

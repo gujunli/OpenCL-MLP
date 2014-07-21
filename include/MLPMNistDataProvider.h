@@ -42,9 +42,9 @@ public:
 
     ~MLPMNistDataProvider();
 
-    void setupDataProvider();                                                 // implementation of public base class virtual interface
-	void resetDataProvider();                                                 // implementation of public base class virtual interface
-    bool frameMatching(float *frameOutput, float *frameLabel, int len);       // implementation of public base class virtual interface
+    void setupDataProvider();                                                             // implementation of public base class virtual interface
+	void resetDataProvider();                                                             // implementation of public base class virtual interface
+    bool frameMatching(const float *frameOutput, const float *frameLabel, int len);       // implementation of public base class virtual interface
 
     // The following two interfaces are only used by the CheckPointing Function
     void getCheckPointFrame(int & frameNo);                                   // implementation of public base class virtual interface
