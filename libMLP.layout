@@ -1,97 +1,97 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="include/MLPApiExport.h" open="1" top="0" tabpos="22">
+	<File name="include/MLPApiExport.h" open="0" top="0" tabpos="22">
 		<Cursor position="256" topLine="0" />
 	</File>
-	<File name="include/MLPChkPointState.h" open="1" top="0" tabpos="21">
-		<Cursor position="481" topLine="0" />
+	<File name="include/MLPChkPointState.h" open="0" top="0" tabpos="21">
+		<Cursor position="925" topLine="6" />
 	</File>
-	<File name="include/MLPChkPointingMgr.h" open="1" top="0" tabpos="18">
+	<File name="include/MLPChkPointingMgr.h" open="0" top="0" tabpos="18">
 		<Cursor position="372" topLine="33" />
 	</File>
-	<File name="include/MLPCommon.h" open="1" top="0" tabpos="1">
+	<File name="include/MLPCommon.h" open="0" top="0" tabpos="1">
 		<Cursor position="2832" topLine="39" />
 	</File>
-	<File name="include/MLPConstants.h" open="1" top="0" tabpos="23">
+	<File name="include/MLPConstants.h" open="0" top="0" tabpos="23">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="include/MLPDataProvider.h" open="1" top="0" tabpos="24">
-		<Cursor position="3858" topLine="77" />
+	<File name="include/MLPDataProvider.h" open="1" top="0" tabpos="5">
+		<Cursor position="220" topLine="5" />
 	</File>
-	<File name="include/MLPIFlyDataProvider.h" open="1" top="0" tabpos="25">
+	<File name="include/MLPIFlyDataProvider.h" open="0" top="0" tabpos="25">
 		<Cursor position="3682" topLine="53" />
 	</File>
-	<File name="include/MLPMNistDataProvider.h" open="1" top="0" tabpos="8">
+	<File name="include/MLPMNistDataProvider.h" open="0" top="0" tabpos="8">
 		<Cursor position="1316" topLine="34" />
 	</File>
-	<File name="include/MLPNetProvider.h" open="1" top="0" tabpos="26">
-		<Cursor position="1508" topLine="2" />
+	<File name="include/MLPNetProvider.h" open="0" top="0" tabpos="26">
+		<Cursor position="2636" topLine="73" />
 	</File>
-	<File name="include/MLPPredictor.h" open="1" top="0" tabpos="2">
+	<File name="include/MLPPredictor.h" open="0" top="0" tabpos="2">
 		<Cursor position="273" topLine="6" />
 	</File>
-	<File name="include/MLPSimpleDataProvider.h" open="1" top="0" tabpos="27">
+	<File name="include/MLPSimpleDataProvider.h" open="0" top="0" tabpos="27">
 		<Cursor position="1285" topLine="15" />
 	</File>
-	<File name="include/MLPTester.h" open="1" top="0" tabpos="11">
+	<File name="include/MLPTester.h" open="0" top="0" tabpos="11">
 		<Cursor position="270" topLine="1" />
 	</File>
-	<File name="include/MLPTrainer.h" open="1" top="0" tabpos="10">
+	<File name="include/MLPTrainer.h" open="0" top="0" tabpos="10">
 		<Cursor position="4499" topLine="79" />
 	</File>
-	<File name="include/MLPUtil.h" open="1" top="0" tabpos="20">
+	<File name="include/MLPUtil.h" open="0" top="0" tabpos="20">
 		<Cursor position="4512" topLine="173" />
 	</File>
-	<File name="include/SingleDevClass.h" open="1" top="0" tabpos="9">
+	<File name="include/SingleDevClass.h" open="0" top="0" tabpos="9">
 		<Cursor position="332" topLine="2" />
 	</File>
-	<File name="include/oclUtil.h" open="1" top="0" tabpos="19">
+	<File name="include/oclUtil.h" open="0" top="0" tabpos="19">
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="kernels/kernels.cl" open="0" top="0" tabpos="15">
 		<Cursor position="19926" topLine="600" />
 	</File>
-	<File name="lib-cpps/MLPChkPointingMgr.cpp" open="1" top="0" tabpos="17">
-		<Cursor position="9134" topLine="327" />
+	<File name="lib-cpps/MLPChkPointingMgr.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="338" topLine="0" />
 	</File>
-	<File name="lib-cpps/MLPCommon.cpp" open="1" top="0" tabpos="15">
-		<Cursor position="2" topLine="500" />
+	<File name="lib-cpps/MLPCommon.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="339" topLine="0" />
 	</File>
-	<File name="lib-cpps/MLPDataProvider.cpp" open="1" top="0" tabpos="13">
-		<Cursor position="10782" topLine="401" />
+	<File name="lib-cpps/MLPDataProvider.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="592" topLine="24" />
 	</File>
-	<File name="lib-cpps/MLPIflyDataProvider.cpp" open="1" top="0" tabpos="16">
-		<Cursor position="12592" topLine="413" />
+	<File name="lib-cpps/MLPIflyDataProvider.cpp" open="0" top="0" tabpos="16">
+		<Cursor position="11794" topLine="383" />
 	</File>
-	<File name="lib-cpps/MLPMNistDataProvider.cpp" open="1" top="0" tabpos="7">
+	<File name="lib-cpps/MLPMNistDataProvider.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="13960" topLine="422" />
 	</File>
-	<File name="lib-cpps/MLPNetProvider.cpp" open="1" top="0" tabpos="14">
-		<Cursor position="15470" topLine="460" />
+	<File name="lib-cpps/MLPNetProvider.cpp" open="1" top="1" tabpos="2">
+		<Cursor position="10658" topLine="306" />
 	</File>
-	<File name="lib-cpps/MLPPredictor.cpp" open="1" top="0" tabpos="3">
+	<File name="lib-cpps/MLPPredictor.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="6617" topLine="230" />
 	</File>
-	<File name="lib-cpps/MLPSimpleDataProvider.cpp" open="1" top="0" tabpos="29">
+	<File name="lib-cpps/MLPSimpleDataProvider.cpp" open="0" top="0" tabpos="29">
 		<Cursor position="6045" topLine="167" />
 	</File>
-	<File name="lib-cpps/MLPTester.cpp" open="1" top="0" tabpos="6">
-		<Cursor position="14209" topLine="356" />
+	<File name="lib-cpps/MLPTester.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="7955" topLine="155" />
 	</File>
-	<File name="lib-cpps/MLPTrainer.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="2" topLine="0" />
+	<File name="lib-cpps/MLPTrainer.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="18290" topLine="455" />
 	</File>
-	<File name="lib-cpps/MLPTraining.cpp" open="1" top="0" tabpos="12">
+	<File name="lib-cpps/MLPTraining.cpp" open="0" top="0" tabpos="12">
 		<Cursor position="12253" topLine="259" />
 	</File>
-	<File name="lib-cpps/MLPUtil.cpp" open="1" top="0" tabpos="28">
+	<File name="lib-cpps/MLPUtil.cpp" open="0" top="0" tabpos="28">
 		<Cursor position="299" topLine="98" />
 	</File>
-	<File name="lib-cpps/SingleDevClass.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="2793" topLine="15" />
+	<File name="lib-cpps/SingleDevClass.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="2793" topLine="0" />
 	</File>
-	<File name="lib-cpps/oclUtil.cpp" open="1" top="0" tabpos="30">
+	<File name="lib-cpps/oclUtil.cpp" open="0" top="0" tabpos="30">
 		<Cursor position="1291" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

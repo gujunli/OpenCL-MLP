@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <functional>
 #include <vector>
+#include <cstring>
 
 #include "MLPUtil.h"
 #include "MLPNetProvider.h"
@@ -25,141 +26,153 @@ static const int default_dimensions[DEFAULT_LAYERS] = {429,2048,2048,2048,2048,2
 static const char *getNetTypeName(MLP_NETTYPE nettype);
 static const char *getActFuncName(ACT_FUNC actFunc);
 static const char *getCostFuncName(COST_FUNC costFunc);
+
 static MLP_NETTYPE getNetTypeID(string &typeName);
+static MLP_NETTYPE getNetTypeID(char *typeName);
 static ACT_FUNC getActFuncID(string &funcName);
+static ACT_FUNC getActFuncID(char *funcName);
 static COST_FUNC getCostFuncID(string &funcName);
+
+static void lowerCaselize(char *str);
 
 MLPNetProvider::MLPNetProvider()
 {
-	this->netType = NETTYPE_MULTI_CLASSIFICATION;
-	this->nLayers = DEFAULT_LAYERS;
-	this->dimensions = new int[DEFAULT_LAYERS];
-	this->biases = new float*[DEFAULT_LAYERS];
-	this->weights = new float*[DEFAULT_LAYERS];
-	this->etas = new float[DEFAULT_LAYERS];
-	this->actFuncs = new ACT_FUNC[DEFAULT_LAYERS];
+    this->netType = NETTYPE_MULTI_CLASSIFICATION;
+    this->nLayers = DEFAULT_LAYERS;
+    this->dimensions = new int[DEFAULT_LAYERS];
+    this->biases = new float*[DEFAULT_LAYERS];
+    this->weights = new float*[DEFAULT_LAYERS];
+    this->etas = new float[DEFAULT_LAYERS];
+    this->actFuncs = new ACT_FUNC[DEFAULT_LAYERS];
 
-	for (int i=0; i< this->nLayers; i++)
-		 this->dimensions[i] = default_dimensions[i];
+    for (int i=0; i< this->nLayers; i++)
+        this->dimensions[i] = default_dimensions[i];
 
-	this->biases[0] = NULL;
-	for (int i=1; i< this->nLayers; i++)
-		this->biases[i] = new float[this->dimensions[i]];
+    this->biases[0] = NULL;
+    for (int i=1; i< this->nLayers; i++)
+        this->biases[i] = new float[this->dimensions[i]];
 
-	this->weights[0] = NULL;
-	for (int i=1; i< this->nLayers; i++)
-		this->weights[i] = new float[this->dimensions[i-1]*this->dimensions[i]];
+    this->weights[0] = NULL;
+    for (int i=1; i< this->nLayers; i++)
+        this->weights[i] = new float[this->dimensions[i-1]*this->dimensions[i]];
 
-	this->weightsInitialize();
-	this->biasesInitialize();
-	this->etasInitialize();
+    this->weightsInitialize();
+    this->biasesInitialize();
+    this->etasInitialize();
     this->actFuncsInitialize();
-	this->costFunc = CFUNC_SSE;
-	this->momentum = 0.4f;
+    this->costFunc = CFUNC_SSE;
+    this->momentum = 0.4f;
 };
 
+
+// this constructor should be used by the MLPTrainer, not the MLPTester and MLPPredictor
 MLPNetProvider::MLPNetProvider(MLP_NETTYPE type, int layers, int dimensions_[], float etas_[], float momentum_, ACT_FUNC actFuncs_[], COST_FUNC costFunc_, bool DoInitialize)
 {
-	this->netType = type;
-	this->nLayers = layers;
-	this->dimensions = new int[this->nLayers];
-	this->biases = new float*[this->nLayers];
-	this->weights = new float*[this->nLayers];
-	this->etas = new float[this->nLayers];
-	this->actFuncs = new ACT_FUNC[this->nLayers];
+    this->netType = type;
+    this->nLayers = layers;
+    this->dimensions = new int[this->nLayers];
+    this->biases = new float*[this->nLayers];
+    this->weights = new float*[this->nLayers];
+    this->etas = new float[this->nLayers];
+    this->actFuncs = new ACT_FUNC[this->nLayers];
 
-	for (int i=0; i< this->nLayers; i++)
-		 this->dimensions[i] = dimensions_[i];
+    for (int i=0; i< this->nLayers; i++)
+        this->dimensions[i] = dimensions_[i];
 
-	this->etas[0] = 0.0f;
+    this->etas[0] = 0.0f;
     for (int i=1; i< this->nLayers; i++)
-		 this->etas[i] = etas_[i];
+        this->etas[i] = etas_[i];
 
-	this->actFuncs[0] = ANOFUNC;
+    this->actFuncs[0] = ANOFUNC;
     for (int i=1; i< this->nLayers; i++)
-		 this->actFuncs[i] = actFuncs_[i];
+        this->actFuncs[i] = actFuncs_[i];
 
-	this->costFunc = costFunc_;
-	this->momentum = momentum_;
+    this->costFunc = costFunc_;
+    this->momentum = momentum_;
 
-	this->biases[0] = NULL;
-	for (int i=1; i< this->nLayers; i++)
-		this->biases[i] = new float[this->dimensions[i]];
+    this->biases[0] = NULL;
+    for (int i=1; i< this->nLayers; i++)
+        this->biases[i] = new float[this->dimensions[i]];
 
-	this->weights[0] = NULL;
-	for (int i=1; i< this->nLayers; i++)
-		this->weights[i] = new float[this->dimensions[i-1]*this->dimensions[i]];
+    this->weights[0] = NULL;
+    for (int i=1; i< this->nLayers; i++)
+        this->weights[i] = new float[this->dimensions[i-1]*this->dimensions[i]];
 
-	if ( DoInitialize ) {
-  	     this->weightsInitialize();
-	     this->biasesInitialize();
-	};
+    if ( DoInitialize ) {
+        this->weightsInitialize();
+        this->biasesInitialize();
+    };
 };
+
 
 MLPNetProvider::MLPNetProvider(int layers, int dimensions_[], bool DoInitialize)
 {
-	this->nLayers = layers;
-	this->dimensions = new int[this->nLayers];
-	this->biases = new float*[this->nLayers];
-	this->weights = new float*[this->nLayers];
-	this->etas = new float[this->nLayers];
-	this->actFuncs = new ACT_FUNC[this->nLayers];
+    this->nLayers = layers;
+    this->dimensions = new int[this->nLayers];
+    this->biases = new float*[this->nLayers];
+    this->weights = new float*[this->nLayers];
+    this->etas = new float[this->nLayers];
+    this->actFuncs = new ACT_FUNC[this->nLayers];
 
-	for (int i=0; i< this->nLayers; i++)
-		 this->dimensions[i] = dimensions_[i];
+    for (int i=0; i< this->nLayers; i++)
+        this->dimensions[i] = dimensions_[i];
 
-	this->biases[0] = NULL;
-	for (int i=1; i< this->nLayers; i++)
-		this->biases[i] = new float[this->dimensions[i]];
+    this->biases[0] = NULL;
+    for (int i=1; i< this->nLayers; i++)
+        this->biases[i] = new float[this->dimensions[i]];
 
-	this->weights[0] = NULL;
-	for (int i=1; i< this->nLayers; i++)
-		this->weights[i] = new float[this->dimensions[i-1]*this->dimensions[i]];
+    this->weights[0] = NULL;
+    for (int i=1; i< this->nLayers; i++)
+        this->weights[i] = new float[this->dimensions[i-1]*this->dimensions[i]];
 
-	if ( DoInitialize ) {
-		 this->netType = NETTYPE_MULTI_CLASSIFICATION;
-  	     this->weightsInitialize();
-	     this->biasesInitialize();
-	     this->etasInitialize();
-         this->actFuncsInitialize();
-	     this->costFunc = CFUNC_SSE;
-		 this->momentum = 0.4f;
-	};
+    if ( DoInitialize )
+    {
+        this->netType = NETTYPE_MULTI_CLASSIFICATION;
+        this->weightsInitialize();
+        this->biasesInitialize();
+        this->etasInitialize();
+        this->actFuncsInitialize();
+        this->costFunc = CFUNC_SSE;
+        this->momentum = 0.4f;
+    };
 };
 
 
 // remove the spaces from the front of the line ( provided by Zhitao Zhou@amd.com)
 static void ltrim(string &str)
 {
-     str.erase(str.begin(), ::find_if(str.begin(),str.end(),std::not1(std::ptr_fun(::isspace))));
+    str.erase(str.begin(), ::find_if(str.begin(),str.end(),std::not1(std::ptr_fun(::isspace))));
 };
 
-MLPNetProvider::MLPNetProvider(const char *configPath, const char *archFilename, const char *weightFilename)
+
+// this constructor should be used by the MLPTrainer, not the MLPTester and MLPPredictor
+// the MLPTrainer will initialize its neural network parameters from the exiting config file and nnet data file
+MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, const char *nnetDataFile)
 {
-	string archfname(configPath);
-	string weightfname(configPath);
+	string configFileName(dir);
+	string nnetFileName(dir);
 
-	archfname.append(archFilename);
-	weightfname.append(weightFilename);
+	configFileName.append(trainingConfigFile);
+	nnetFileName.append(nnetDataFile);
 
-	ifstream archfile;
-	ifstream weightfile;
+	ifstream configFile;
+	ifstream nnetFile;
 
-	archfile.open(archfname.c_str(),ios_base::in);
-	weightfile.open(weightfname.c_str(),ios_base::in|ios_base::binary);
+	configFile.open(configFileName.c_str(),ios_base::in);
+	nnetFile.open(nnetFileName.c_str(),ios_base::in|ios_base::binary);
 
-	if ( ! archfile.is_open() || ! weightfile.is_open() ) {
-		   mlp_log("MLPNET", "Failed to open MLP net config files for reading");
+	if ( ! configFile.is_open() || ! nnetFile.is_open() ) {
+		   mlp_log("MLPNetProvider", "Failed to open MLP net config files for reading");
 		   MLP_Exception("");
 	};
 
 
 	vector<string> lines;
 
-    while ( ! archfile.eof() ) {
+    while ( ! configFile.eof() ) {
           string myline;
 
-          getline(archfile,myline);
+          getline(configFile,myline);
           ltrim(myline);
 
           if ( !myline.empty() && !(myline[0] == '#') )
@@ -187,7 +200,7 @@ MLPNetProvider::MLPNetProvider(const char *configPath, const char *archFilename,
 		  mlp_log("MLPNetProvider", "The setting for <Network Type> from the config file is not correct");
 		  MLP_Exception("");
 	};
-	this->netType = NETTYPE_MULTI_CLASSIFICATION;
+	this->netType = typeID;
 
     // read Layers information
     int layers=0;
@@ -317,24 +330,61 @@ MLPNetProvider::MLPNetProvider(const char *configPath, const char *archFilename,
 	for (int i=1; i< this->nLayers; i++)
 		this->weights[i] = new float[this->dimensions[i-1]*this->dimensions[i]];
 
-	// read weights and biases data from the binary file
-	weightfile.seekg(16);   // skip the checksum
 
-	string corrMark("DONE");
+    // read information from the neural network data file
+	nnetFile.seekg(16);   // skip the checksum
+
+	string corrMark("NNET");
 	char Mark[5];
 
-	weightfile.read(&Mark[0], 4);
+	nnetFile.read(&Mark[0], 4);
 	Mark[4] = '\0';
 
 	if ( corrMark != Mark ) {
-		 mlp_log("MLPNetProvider", "checking the integrity of the weight file failed, discarded");
+		 mlp_log("MLPNetProvider", "checking the integrity of MLP neural network data file failed, discarded");
 		 MLP_Exception("");
 	};
 
+	nnetFile.seekg(16+4);  // skip the checksum and the tag
+
+	struct mlp_nnet_data_header header;
+
+	nnetFile.read(reinterpret_cast<char*>(&header), sizeof(header));
+
+	// convert the data in the header to host bytes sequence from Little Endian bytes sequence
+	LEtoHostl(header.nLayers);
+	for (int i=0; i < this->nLayers; i++)
+	     LEtoHostl(header.layers[i].dimension);
+	for (int i=1; i < this->nLayers; i++)
+	     LEtoHostl(header.weight_offsets[i]);
+
+    lowerCaselize(header.nnet_type);
+
+    // check whether the information from the config file and the nnet data matches
+    bool match=true;
+
+    match = ( this->nLayers == (int)header.nLayers )? match:false;
+    match = ( this->netType == getNetTypeID(header.nnet_type) )? match:false;
+    if ( match ) {
+         for (int i=0; i < this->nLayers; i++)
+              match = ( this->dimensions[i] == (int)header.layers[i].dimension )? match:false;
+
+         for (int i=1; i < this->nLayers; i++)
+              match = ( this->actFuncs[i] == getActFuncID(header.layers[i].activation) )? match:false;
+    };
+
+    if ( ! match ) {
+         mlp_log("MLPNetProvider", "The infomration from the config file and the neural network data file does not match");
+         MLP_Exception("");
+    };
+
 	for (int i=1; i < this->nLayers; i++) {
+
+	    nnetFile.seekg(header.weight_offsets[i]);
+
 		for (int row=0; row < this->dimensions[i-1]; row++)
-			 weightfile.read(reinterpret_cast<char*>(&this->weights[i][row*this->dimensions[i]]), sizeof(float)*this->dimensions[i]);
-		weightfile.read(reinterpret_cast<char*>(&this->biases[i][0]),sizeof(float)*this->dimensions[i]);
+			 nnetFile.read(reinterpret_cast<char*>(&this->weights[i][row*this->dimensions[i]]), sizeof(float)*this->dimensions[i]);
+		nnetFile.read(reinterpret_cast<char*>(&this->biases[i][0]),sizeof(float)*this->dimensions[i]);
 
 		// convert to host bytes sequence from Little Endian bytes sequence
 		for (int row=0; row < this->dimensions[i-1]; row++)
@@ -344,252 +394,439 @@ MLPNetProvider::MLPNetProvider(const char *configPath, const char *archFilename,
 			 LEtoHostl(*(unsigned int *)&this->biases[i][col]);
 	};
 
-	archfile.close();
-	weightfile.close();
+    configFile.close();
+    nnetFile.close();
+}
+
+// this constructor should be used by the MLPTester and MLPPredictor, not the MLPTrainer
+MLPNetProvider::MLPNetProvider(const char *dir, const char *nnetDataFile)
+{
+    string nnetFileName(dir);
+
+    nnetFileName.append(nnetDataFile);
+
+    ifstream nnetFile;
+
+    nnetFile.open(nnetFileName.c_str(),ios_base::in|ios_base::binary);
+
+    if ( ! nnetFile.is_open() )
+    {
+        mlp_log("MLPNetProvider", "Failed to open MLP neural network data file for reading");
+        MLP_Exception("");
+    };
+
+    nnetFile.seekg(16);   // skip the checksum
+
+    string corrMark("NNET");
+    char Mark[5];
+
+    nnetFile.read(&Mark[0], 4);
+    Mark[4] = '\0';
+
+    if ( corrMark != Mark )
+    {
+        mlp_log("MLPNetProvider", "checking the integrity of MLP neural network data file failed, discarded");
+        MLP_Exception("");
+    };
+
+    nnetFile.seekg(16+4);  // skip the checksum and the tag
+
+    struct mlp_nnet_data_header header;
+
+    nnetFile.read(reinterpret_cast<char*>(&header), sizeof(header));
+
+    // convert the data in the header to host bytes sequence from Little Endian bytes sequence
+    LEtoHostl(header.nLayers);
+    for (int i=0; i < this->nLayers; i++)
+        LEtoHostl(header.layers[i].dimension);
+    for (int i=1; i < this->nLayers; i++)
+        LEtoHostl(header.weight_offsets[i]);
+
+    lowerCaselize(header.nnet_type);
+
+    // allocate data structures for the MLPNetProvider
+    this->nLayers = header.nLayers;
+    this->netType = getNetTypeID(header.nnet_type);
+    this->dimensions = new int[this->nLayers];
+    this->biases = new float*[this->nLayers];
+    this->weights = new float*[this->nLayers];
+    this->etas = new float[this->nLayers];
+    this->actFuncs = new ACT_FUNC[this->nLayers];
+
+    // absorb the information directly from the nnet data file header
+    for (int i=0; i< this->nLayers; i++)
+        this->dimensions[i] = header.layers[i].dimension;
+    for (int i=1; i< this->nLayers; i++)
+        this->actFuncs[i] = getActFuncID(header.layers[i].activation);
+
+    // allocate memory for weights and biases data of each layer
+    this->biases[0] = NULL;
+    for (int i=1; i< this->nLayers; i++)
+        this->biases[i] = new float[this->dimensions[i]];
+
+    this->weights[0] = NULL;
+    for (int i=1; i< this->nLayers; i++)
+        this->weights[i] = new float[this->dimensions[i-1]*this->dimensions[i]];
+
+    // read the weights and biases information for all layers from the nnet data file
+    for (int i=1; i < this->nLayers; i++)
+    {
+
+        nnetFile.seekg(header.weight_offsets[i]);
+
+        for (int row=0; row < this->dimensions[i-1]; row++)
+            nnetFile.read(reinterpret_cast<char*>(&this->weights[i][row*this->dimensions[i]]), sizeof(float)*this->dimensions[i]);
+        nnetFile.read(reinterpret_cast<char*>(&this->biases[i][0]),sizeof(float)*this->dimensions[i]);
+
+        // convert to host bytes sequence from Little Endian bytes sequence
+        for (int row=0; row < this->dimensions[i-1]; row++)
+            for (int col=0; col < this->dimensions[i]; col++)
+                LEtoHostl(*(unsigned int *)&this->weights[i][row*this->dimensions[i]+col]);
+        for (int col=0; col < this->dimensions[i]; col++)
+            LEtoHostl(*(unsigned int *)&this->biases[i][col]);
+    };
+
+    nnetFile.close();
 };
+
 
 MLPNetProvider::~MLPNetProvider()
 {
-	for (int i=0; i< this->nLayers; i++)
-		 if ( this->biases[i] )
-			  delete [] this->biases[i];
+    for (int i=0; i< this->nLayers; i++)
+        if ( this->biases[i] )
+            delete [] this->biases[i];
 
-	for (int i=0; i < this->nLayers; i++)
-		 if ( this->weights[i] )
-			 delete [] this->weights[i];
+    for (int i=0; i < this->nLayers; i++)
+        if ( this->weights[i] )
+            delete [] this->weights[i];
 
-	delete [] this->biases;
-	delete [] this->weights;
-	delete [] this->dimensions;
-	delete [] this->etas;
-	delete [] this->actFuncs;
+    delete [] this->biases;
+    delete [] this->weights;
+    delete [] this->dimensions;
+    delete [] this->etas;
+    delete [] this->actFuncs;
 };
 
 void MLPNetProvider::biasesInitialize()
 {
-	float *datap;
+    float *datap;
 
-	for (int i=1; i< this->nLayers; i++) {
-		 datap = this->biases[i];
-         for (int k=0; k< this->dimensions[i]; k++) {
-			  *datap = 0.0f;
-			  datap++;
-		 };
-	};
+    for (int i=1; i< this->nLayers; i++)
+    {
+        datap = this->biases[i];
+        for (int k=0; k< this->dimensions[i]; k++)
+        {
+            *datap = 0.0f;
+            datap++;
+        };
+    };
 };
 
 void MLPNetProvider::weightsInitialize()
 {
-	float *datap;
+    float *datap;
 
-	struct mlp_tv tv;
+    struct mlp_tv tv;
 
-	getCurrentTime(&tv);
-	srand(tv.tv_usec); // use current time as random seed
+    getCurrentTime(&tv);
+    srand(tv.tv_usec); // use current time as random seed
 
-	for (int i=1; i< this->nLayers; i++)
-         for (int col=0; col< this->dimensions[i]; col++)       {      // go through all columns
-			  datap = this->weights[i] + col;
-		      for (int row=0; row< this->dimensions[i-1]; row++)  {    // go through all lines
-		          *datap = (float)rand()/((float)RAND_MAX+1.0f)-0.5f;
-				  datap += this->dimensions[i];
-		      };
-		 };
+    for (int i=1; i< this->nLayers; i++)
+        for (int col=0; col< this->dimensions[i]; col++)              // go through all columns
+        {
+            datap = this->weights[i] + col;
+            for (int row=0; row< this->dimensions[i-1]; row++)       // go through all lines
+            {
+                *datap = (float)rand()/((float)RAND_MAX+1.0f)-0.5f;
+                datap += this->dimensions[i];
+            };
+        };
 };
 
 void MLPNetProvider::etasInitialize()
 {
-	this->etas[0] = 0;
-	for (int i=1; i< this->nLayers; i++)
-		this->etas[i] = 0.0002f;
+    this->etas[0] = 0;
+    for (int i=1; i< this->nLayers; i++)
+        this->etas[i] = 0.0002f;
 };
 
 void MLPNetProvider::actFuncsInitialize()
 {
-	this->actFuncs[0] = ANOFUNC;
-	for (int i=1; i< this->nLayers; i++)
-		this->actFuncs[i] = AFUNC_SIGMOID;
+    this->actFuncs[0] = ANOFUNC;
+    for (int i=1; i< this->nLayers; i++)
+        this->actFuncs[i] = AFUNC_SIGMOID;
 };
 
-void MLPNetProvider::saveConfig(const char *configPath, const char *archFilename, const char *weightFilename)
+
+void MLPNetProvider::saveConfig(const char *dir, const char *trainingConfigFile, const char *nnetDataFile)
 {
-	string archfname(configPath);
-	string weightfname(configPath);
+    string configFileName(dir);
+    string nnetFileName(dir);
 
-	archfname.append(archFilename);
-	weightfname.append(weightFilename);
+    configFileName.append(trainingConfigFile);
+    nnetFileName.append(nnetDataFile);
 
-	ofstream archfile;
-	ofstream weightfile;
+    ofstream configFile;
+    ofstream nnetFile;
 
-	archfile.open(archfname.c_str(),ios_base::out|ios_base::trunc);
-	weightfile.open(weightfname.c_str(),ios_base::out|ios_base::binary|ios_base::trunc);
+    configFile.open(configFileName.c_str(),ios_base::out|ios_base::trunc);
+    nnetFile.open(nnetFileName.c_str(),ios_base::out|ios_base::binary|ios_base::trunc);
 
-	if ( ! archfile.is_open() || ! weightfile.is_open() ) {
-		   mlp_log("MLPNET", "Failed to create MLP net config files");
-		   MLP_Exception("");
-	};
+    if ( ! configFile.is_open() || ! nnetFile.is_open() )
+    {
+        mlp_log("MLPNetProvider", "Failed to create MLP net config files");
+        MLP_Exception("");
+    };
 
-	archfile << "### Configuration file for the neural network, produced automatically "  << endl;
-	archfile << "### You can do modification for your need "  << endl;
+    configFile << "### Configuration file for the neural network training, produced automatically "  << endl;
+    configFile << "### You can do modification for your need "  << endl;
 
-	archfile << endl << "Network Type: " << getNetTypeName(this->netType) << endl;
-	archfile << endl << "Layers: " << this->nLayers << endl;
-	archfile << endl << "Cost Function: " << getCostFuncName(this->costFunc) << endl;
-	archfile << endl << "Momentum: " << this->momentum << endl;
-	archfile << endl << "Layer 0: " << this->dimensions[0] << endl;
-	for (int i=1; i < this->nLayers; i++ )
-		archfile << "Layer " << i << ": " << this->dimensions[i] << " " << this->etas[i] << " " << getActFuncName(this->actFuncs[i]) << endl;
+    configFile << endl << "Network Type: " << getNetTypeName(this->netType) << endl;
+    configFile << endl << "Layers: " << this->nLayers << endl;
+    configFile << endl << "Cost Function: " << getCostFuncName(this->costFunc) << endl;
+    configFile << endl << "Momentum: " << this->momentum << endl;
+    configFile << endl << "Layer 0: " << this->dimensions[0] << endl;
+    for (int i=1; i < this->nLayers; i++ )
+        configFile << "Layer " << i << ": " << this->dimensions[i] << " " << this->etas[i] << " " << getActFuncName(this->actFuncs[i]) << endl;
 
-	archfile.flush();
+    configFile.flush();
 
- 	// Save the weights and Biases into binary file
+    // Save static network parameters into an binary file
 
-	weightfile.seekp(16);   // first 16 bytes left as checksum
-	weightfile.write("FAIL", 4);
-	weightfile.flush();
+    nnetFile.seekp(16);           // first 16 bytes preserved for checksum-ing
+    nnetFile.write("FAIL", 4);    // 4-bytes used as the tag of the file
+    nnetFile.flush();
 
-	for (int i=1; i < this->nLayers; i++) {
+    struct mlp_nnet_data_header header;
+
+    // set up the header of the neural network data from the information in the MLPNetProvider
+    header.nLayers = this->nLayers;
+    strcpy(header.nnet_type, getNetTypeName(this->netType));
+    for (int i=0; i < this->nLayers; i++)
+        header.layers[i].dimension = this->dimensions[i];
+
+    for (int i=1; i < this->nLayers; i++)
+        strcpy(header.layers[i].activation, getActFuncName(this->actFuncs[i]));
+
+    header.weight_offsets[1] = ( (16 + 4 + sizeof(header) + 1023 ) / 1024 ) * 1024;    // round to 1024n
+    for (int i=2; i < this->nLayers; i++)
+    {
+        int bytes;
+
+        bytes = this->dimensions[i-2]*this->dimensions[i-1]*sizeof(float) + this->dimensions[i-1]*sizeof(float);
+        header.weight_offsets[i] = ( (header.weight_offsets[i-1] + bytes + 1023 ) / 1024 ) * 1024;     // round to 1024n
+    };
+
+
+    for (int i=1; i < this->nLayers; i++)
+    {
+        // go to the location for writing the weights and biases for this layer
+        nnetFile.seekp(header.weight_offsets[i]);
 
         // convert to Little Endian bytes sequence from host bytes sequence
-		for (int row=0; row < this->dimensions[i-1]; row++)
-			 for (int col=0; col < this->dimensions[i]; col++)
-				  HostToLEl(*(unsigned int *)&this->weights[i][row*this->dimensions[i]+col]);
-		for (int col=0; col < this->dimensions[i]; col++)
-			 HostToLEl(*(unsigned int *)&this->biases[i][col]);
+        for (int row=0; row < this->dimensions[i-1]; row++)
+            for (int col=0; col < this->dimensions[i]; col++)
+                HostToLEl(*(unsigned int *)&this->weights[i][row*this->dimensions[i]+col]);
+        for (int col=0; col < this->dimensions[i]; col++)
+            HostToLEl(*(unsigned int *)&this->biases[i][col]);
 
         // write the converted data to file
-		for (int row=0; row < this->dimensions[i-1]; row++)
-			weightfile.write(reinterpret_cast<char*>(&this->weights[i][row*this->dimensions[i]]), sizeof(float)*this->dimensions[i]);
+        for (int row=0; row < this->dimensions[i-1]; row++)
+            nnetFile.write(reinterpret_cast<char*>(&this->weights[i][row*this->dimensions[i]]), sizeof(float)*this->dimensions[i]);
 
-		weightfile.write(reinterpret_cast<char*>(&this->biases[i][0]),sizeof(float)*this->dimensions[i]);
+        nnetFile.write(reinterpret_cast<char*>(&this->biases[i][0]),sizeof(float)*this->dimensions[i]);
 
         // convert back to host bytes sequence from Little Endian bytes sequence
-		for (int row=0; row < this->dimensions[i-1]; row++)
-			 for (int col=0; col < this->dimensions[i]; col++)
-				  LEtoHostl(*(unsigned int *)&this->weights[i][row*this->dimensions[i]+col]);
-		for (int col=0; col < this->dimensions[i]; col++)
-			 LEtoHostl(*(unsigned int *)&this->biases[i][col]);
-	};
+        for (int row=0; row < this->dimensions[i-1]; row++)
+            for (int col=0; col < this->dimensions[i]; col++)
+                LEtoHostl(*(unsigned int *)&this->weights[i][row*this->dimensions[i]+col]);
+        for (int col=0; col < this->dimensions[i]; col++)
+            LEtoHostl(*(unsigned int *)&this->biases[i][col]);
+    };
 
-	weightfile.seekp(16);
-	weightfile.write("DONE", 4);
-	weightfile.flush();
+    // convert the data in the header to Little Endian bytes sequence from host bytes sequence
+    HostToLEl(header.nLayers);
+    for (int i=0; i < this->nLayers; i++)
+        HostToLEl(header.layers[i].dimension);
+    for (int i=1; i < this->nLayers; i++)
+        HostToLEl(header.weight_offsets[i]);
 
-	archfile.close();
-	weightfile.close();
-};
+    nnetFile.seekp(16+4);
+
+    nnetFile.write(reinterpret_cast<char*>(&header), sizeof(header));
+
+    nnetFile.seekp(16);            // skip the checksum (TODO)
+    nnetFile.write("NNET", 4);     // write the tag of the file
+    nnetFile.flush();
+
+    configFile.close();
+    nnetFile.close();
+}
+
+
 
 void MLPNetProvider::showConfig()
 {
-	cout << "Network Type: " << getNetTypeName(this->netType) << endl;
-	cout << "Layers: " << this->nLayers << endl;
-	cout << "Cost Function: " << getCostFuncName(this->costFunc) << endl;
+    cout << "Network Type: " << getNetTypeName(this->netType) << endl;
+    cout << "Layers: " << this->nLayers << endl;
+    cout << "Cost Function: " << getCostFuncName(this->costFunc) << endl;
     cout << "Momentum: " << this->momentum << endl;
-	cout << "Layer 0: " << this->dimensions[0] << endl;
-	for (int i=1; i < this->nLayers; i++ )
-		cout << "Layer " << i << ": " << this->dimensions[i] << " " << this->etas[i] << " " << getActFuncName(this->actFuncs[i]) << endl;
+    cout << "Layer 0: " << this->dimensions[0] << endl;
+    for (int i=1; i < this->nLayers; i++ )
+        cout << "Layer " << i << ": " << this->dimensions[i] << " " << this->etas[i] << " " << getActFuncName(this->actFuncs[i]) << endl;
 
-	int myprec;
+    int myprec;
 
-	myprec = (int)cout.precision();
-	cout.precision(6);
-	cout << endl;
-	for (int i=1; i < this->nLayers; i++) {
-		cout << "Weights connecting layer " << i-1 << " to " << i << endl;
-		for (int row=0; row < this->dimensions[i-1]; row++) {
-			for (int col=0; col < this->dimensions[i]; col++)
-				 cout << this->weights[i][row*this->dimensions[i]+col] << " ";
-			cout << endl;
-		};
-		cout << "Biases of layer " << i << endl;
-		for (int col=0; col < this->dimensions[i]; col++)
-			     cout << this->biases[i][col]<< " ";
-		cout << endl << endl;
-	};
-	cout.precision(myprec);
+    myprec = (int)cout.precision();
+    cout.precision(6);
+    cout << endl;
+    for (int i=1; i < this->nLayers; i++)
+    {
+        cout << "Weights connecting layer " << i-1 << " to " << i << endl;
+        for (int row=0; row < this->dimensions[i-1]; row++)
+        {
+            for (int col=0; col < this->dimensions[i]; col++)
+                cout << this->weights[i][row*this->dimensions[i]+col] << " ";
+            cout << endl;
+        };
+        cout << "Biases of layer " << i << endl;
+        for (int col=0; col < this->dimensions[i]; col++)
+            cout << this->biases[i][col]<< " ";
+        cout << endl << endl;
+    };
+    cout.precision(myprec);
 };
 
 
 static const char *getNetTypeName(MLP_NETTYPE nettype)
 {
-    switch (nettype) {
-	case NETTYPE_BIN_CLASSIFICATION:
-         return("Binary Classification");
-	case NETTYPE_MULTI_CLASSIFICATION:
-		 return("Multiple Classification");
-	case NETTYPE_LINEAR_REGRESSION:
-		 return("Linear Regression");
-	default:
-		 return("");
-	};
+    switch (nettype)
+    {
+    case NETTYPE_BIN_CLASSIFICATION:
+        return("Binary Classification");
+    case NETTYPE_MULTI_CLASSIFICATION:
+        return("Multiple Classification");
+    case NETTYPE_LINEAR_REGRESSION:
+        return("Linear Regression");
+    default:
+        return("");
+    };
 };
 
 
 static const char *getActFuncName(ACT_FUNC actFunc)
 {
-	switch (actFunc) {
-	case AFUNC_SIGMOID:
-		return("Sigmoid");
-	case AFUNC_SOFTMAX:
-		return("Softmax");
-	case AFUNC_IDENTITY:
-		return("Identity");
-	case AFUNC_RELU:
-		return("Relu");
-	case AFUNC_TANH:
-		return("Tanh");
-	default:
-		return("");
-	};
+    switch (actFunc)
+    {
+    case AFUNC_SIGMOID:
+        return("sigmoid");
+    case AFUNC_SOFTMAX:
+        return("softmax");
+    case AFUNC_IDENTITY:
+        return("identity");
+    case AFUNC_RELU:
+        return("relu");
+    case AFUNC_TANH:
+        return("tanh");
+    default:
+        return("");
+    };
 };
 
 static const char *getCostFuncName(COST_FUNC costFunc)
 {
-	switch (costFunc) {
-	case CFUNC_SSE:
-		return("SSE");
-	case CFUNC_CE:
-		return("CE");
-	default:
-		return("");
-	};
+    switch (costFunc)
+    {
+    case CFUNC_SSE:
+        return("SSE");
+    case CFUNC_CE:
+        return("CE");
+    default:
+        return("");
+    };
 };
 
+// the typeName should already be in lower case
 static MLP_NETTYPE getNetTypeID(string &typeName)
 {
-	if ( typeName == "binary classification" )
-		 return(NETTYPE_BIN_CLASSIFICATION);
-	if ( typeName == "multiple classification" )
-		 return(NETTYPE_MULTI_CLASSIFICATION);
-	if ( typeName == "linear regression" )
-		 return(NETTYPE_LINEAR_REGRESSION);
+    if ( typeName == "binary classification" )
+        return(NETTYPE_BIN_CLASSIFICATION);
+    if ( typeName == "multiple classification" )
+        return(NETTYPE_MULTI_CLASSIFICATION);
+    if ( typeName == "linear regression" )
+        return(NETTYPE_LINEAR_REGRESSION);
 
-	return(NETNOTYPE);
+    return(NETNOTYPE);
 };
 
+// the typeName should already be in lower case
+static MLP_NETTYPE getNetTypeID(char *typeName)
+{
+    string sTypeName(typeName);
+
+    if ( sTypeName == "binary classification" )
+        return(NETTYPE_BIN_CLASSIFICATION);
+    if ( sTypeName == "multiple classification" )
+        return(NETTYPE_MULTI_CLASSIFICATION);
+    if ( sTypeName == "linear regression" )
+        return(NETTYPE_LINEAR_REGRESSION);
+
+    return(NETNOTYPE);
+};
+
+
+// the funcName should already be in lower case
 static ACT_FUNC getActFuncID(string &funcName)
 {
-	if ( funcName == "sigmoid" )
-		return(AFUNC_SIGMOID);
-	if ( funcName == "softmax" )
-		return(AFUNC_SOFTMAX);
-	if ( funcName == "linear" )
-		return(AFUNC_IDENTITY);
-	if ( funcName == "relu" )
-		return(AFUNC_RELU);
-	if ( funcName == "tanh" )
-		return(AFUNC_TANH);
+    if ( funcName == "sigmoid" )
+        return(AFUNC_SIGMOID);
+    if ( funcName == "softmax" )
+        return(AFUNC_SOFTMAX);
+    if ( funcName == "linear" )
+        return(AFUNC_IDENTITY);
+    if ( funcName == "relu" )
+        return(AFUNC_RELU);
+    if ( funcName == "tanh" )
+        return(AFUNC_TANH);
 
-	return(ANOFUNC);
+    return(ANOFUNC);
 };
+
+// the funcName should already be in lower case
+static ACT_FUNC getActFuncID(char *funcName)
+{
+    string sFuncName(funcName);
+
+    if ( sFuncName == "sigmoid" )
+        return(AFUNC_SIGMOID);
+    if ( sFuncName == "softmax" )
+        return(AFUNC_SOFTMAX);
+    if ( sFuncName == "linear" )
+        return(AFUNC_IDENTITY);
+    if ( sFuncName == "relu" )
+        return(AFUNC_RELU);
+    if ( sFuncName == "tanh" )
+        return(AFUNC_TANH);
+
+    return(ANOFUNC);
+};
+
 
 static COST_FUNC getCostFuncID(string &funcName)
 {
-	if ( funcName == "SSE" )
-		return(CFUNC_SSE);
-	if ( funcName == "CE" )
-		return(CFUNC_CE);
+    if ( funcName == "SSE" )
+        return(CFUNC_SSE);
+    if ( funcName == "CE" )
+        return(CFUNC_CE);
 
-	return(CNOFUNC);
+    return(CNOFUNC);
 };
+
+static void lowerCaselize(char *str)
+{
+    if ( str ) {
+         for (int i=0; i< (int)strlen(str); i++)
+              if ( isupper(str[i]) )
+                   str[i] = (char)tolower(str[i]);
+    }
+}

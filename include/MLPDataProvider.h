@@ -17,7 +17,7 @@
 #include "MLPApiExport.h"
 #include "MLPConstants.h"
 
-#define MLP_BATCH_RING_SIZE 4
+#define MLP_BATCH_RING_SIZE 8
 
 class MLPDataProvider
 {

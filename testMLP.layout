@@ -2,15 +2,15 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
 	<File name="test-cpps/iflytek_test.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="1413" topLine="237" />
+		<Cursor position="6656" topLine="331" />
 	</File>
 	<File name="test-cpps/mnist_test.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="10409" topLine="233" />
+		<Cursor position="5224" topLine="155" />
 	</File>
 	<File name="test-cpps/simple_test.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="1546" topLine="18" />
+		<Cursor position="4341" topLine="128" />
 	</File>
-	<File name="test-cpps/test_main.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="929" topLine="24" />
+	<File name="test-cpps/test_main.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="878" topLine="10" />
 	</File>
 </CodeBlocks_layout_file>

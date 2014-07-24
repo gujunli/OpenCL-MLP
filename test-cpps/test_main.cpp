@@ -34,13 +34,13 @@ int main()
 	char anykey;
 
     //iflytek_training2();
-	//mnist_training3();
-	mnist_training();
+	mnist_training3();
+	//mnist_training2();
 	//simple_training();
 
-	//cout << "Press any key to continue ..." << endl;
+	cout << "Press any key to continue ..." << endl;
 
-	//cin >> anykey;
+	cin >> anykey;
 
 	//iflytek_batch_testing();
 	//iflytek_predicting();

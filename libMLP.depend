@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1405067083 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPCommon.cpp
+1406212463 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPCommon.cpp
 	"MLPUtil.h"
 	"MLPConstants.h"
 	"MLPCommon.h"
@@ -47,7 +47,7 @@
 	"MLPUtil.h"
 	"MLPDataProvider.h"
 
-1405916395 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPDataProvider.h
+1406207914 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPDataProvider.h
 	<Windows.h>
 	<pthread.h>
 	"MLPApiExport.h"
@@ -76,7 +76,7 @@
 	"MLPApiExport.h"
 	"MLPDataProvider.h"
 
-1404361096 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPNetProvider.cpp
+1406194302 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPNetProvider.cpp
 	<iostream>
 	<fstream>
 	<sstream>
@@ -84,10 +84,11 @@
 	<algorithm>
 	<functional>
 	<vector>
+	<cstring>
 	"MLPUtil.h"
 	"MLPNetProvider.h"
 
-1404288553 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPNetProvider.h
+1406189048 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPNetProvider.h
 	"MLPApiExport.h"
 
 1405063063 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPPredictor.cpp
@@ -148,7 +149,7 @@
 	"MLPNetProvider.h"
 	"MLPDataProvider.h"
 
-1405067055 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPTrainer.cpp
+1406191707 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPTrainer.cpp
 	<algorithm>
 	<clAmdBlas.h>
 	"MLPUtil.h"
@@ -219,7 +220,7 @@
 	"MLPApiExport.h"
 	"MLPTrainer.h"
 
-1404360767 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPChkPointingMgr.cpp
+1406208566 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPChkPointingMgr.cpp
 	<iostream>
 	<fstream>
 	<sstream>
@@ -234,5 +235,5 @@
 	"MLPTrainer.h"
 	"MLPChkPointState.h"
 
-1404288553 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPChkPointState.h
+1406190545 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPChkPointState.h
 

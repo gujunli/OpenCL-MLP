@@ -45,7 +45,7 @@ void MLPCheckPointManager::cpFindAndLoad(const char *dirPath)
 	if ( infoFile.is_open() ) {   // foud checkpoints
 		int tmpID;
 		char Mark[5];
-		string corrMark("DONE");
+		string corrMark("CKPT");
 
 		infoFile >> tmpID;
 		tmpID += 1;        // search one more checkpoint since the mlp_checkpoints.inf file might not have been written successfully
@@ -127,7 +127,7 @@ void MLPCheckPointManager::cpCleanUp(const char *dirPath)
 		struct MLPCheckPointState tmpState;
 		int tmpID;
 		char Mark[5];
-		string corrMark("DONE");
+		string corrMark("CKPT");
 
 		infoFile >> tmpID;
 		tmpID += 1;        // search one more checkpoint since the mlp_checkpoints.inf file might not have been written successfully
@@ -155,13 +155,13 @@ void MLPCheckPointManager::cpCleanUp(const char *dirPath)
 				 string tmpFname;
 
 				 tmpFname =  tmpState.netConfPath;
-				 tmpFname += tmpState.netConfArchFileName ;
+				 tmpFname += tmpState.ncTrainingConfigFname;
 				 remove(tmpFname.c_str());
 
 				 tmpFname.clear();
 
 				 tmpFname = tmpState.netConfPath;
-				 tmpFname += tmpState.netConfDataFileName;
+				 tmpFname += tmpState.ncNNetDataFname;
 				 remove(tmpFname.c_str());
 
 				 stateFile.close();
@@ -257,14 +257,14 @@ void *MLPCheckPointManager::timer_fun(void *argp)
 		   len = (int) objp->chkPointPath.copy(objp->chkPointState.netConfPath, 255);
 		   objp->chkPointState.netConfPath[len] = '\0';
 
-		   strFname << "mlp_cp_netarch_" << objp->chkPointState.chkPointID << ".conf";
-		   len = (int) strFname.str().copy(objp->chkPointState.netConfArchFileName, 31);
-		   objp->chkPointState.netConfArchFileName[len] = '\0';
+		   strFname << "mlp_cp_training_" << objp->chkPointState.chkPointID << ".conf";
+		   len = (int) strFname.str().copy(objp->chkPointState.ncTrainingConfigFname, 31);
+		   objp->chkPointState.ncTrainingConfigFname[len] = '\0';
 		   strFname.str("");
 
-		   strFname << "mlp_cp_weights_" << objp->chkPointState.chkPointID << ".dat";
-		   len = (int) strFname.str().copy(objp->chkPointState.netConfDataFileName, 31);
-		   objp->chkPointState.netConfDataFileName[len] = '\0';
+		   strFname << "mlp_cp_nnet_" << objp->chkPointState.chkPointID << ".dat";
+		   len = (int) strFname.str().copy(objp->chkPointState.ncNNetDataFname, 31);
+		   objp->chkPointState.ncNNetDataFname[len] = '\0';
 		   strFname.str("");
 
            // Create the CheckPoint State file
@@ -289,7 +289,7 @@ void *MLPCheckPointManager::timer_fun(void *argp)
 	       stateFile.write(reinterpret_cast<char*>(&objp->chkPointState), sizeof(struct MLPCheckPointState));
 
 		   stateFile.seekp(16);
-		   stateFile.write("DONE", 4);  // Tag the file header again after the real content is written
+		   stateFile.write("CKPT", 4);  // Tag the file header again after the real content is written
 		   stateFile.flush();
 
 		   LEtoHostl(objp->chkPointState.chkPointID);
@@ -317,7 +317,7 @@ void *MLPCheckPointManager::timer_fun(void *argp)
 
 		   int tmpID;
 		   struct MLPCheckPointState tmpState;
-	       string corrMark("DONE");
+	       string corrMark("CKPT");
 	       char Mark[5];
 
 		   tmpID =  objp->chkPointState.chkPointID - MLP_MAX_CHECKPOINTS;
@@ -344,11 +344,11 @@ void *MLPCheckPointManager::timer_fun(void *argp)
 				remove(strFname.str().c_str());  // remove the checkpoint state file
 
 				strFname.str("");
-				strFname << tmpState.netConfPath << tmpState.netConfArchFileName ;       // remove the mlp_cp_netarch_xxx.conf file
+				strFname << tmpState.netConfPath << tmpState.ncTrainingConfigFname;       // remove the mlp_cp_netarch_xxx.conf file
 				remove(strFname.str().c_str());
 
 				strFname.str("");
-				strFname << tmpState.netConfPath << tmpState.netConfDataFileName ;       // remove the mlp_cp_netweights_xxx.dat file
+				strFname << tmpState.netConfPath << tmpState.ncNNetDataFname;       // remove the mlp_cp_netweights_xxx.dat file
 				remove(strFname.str().c_str());
 		   };
 

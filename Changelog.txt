@@ -1,6 +1,14 @@
+
+*  Thu Jul 24 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  - 1.4.0
+   -  Changed the MLP neural network configuration method, renamed files "mlp_netarch.conf" and "mlp_netweights.dat" to 
+      "mlp_training.conf" and "mlp_nnet.dat" respectively
+   -  Improved the information included by "mlp_nnet.dat", Added a contructor for MLPNetProvider so that the MLPTester and 
+      MLPPredictor only need to use mlp_nnet.dat for neural network initialization
+   -  Many other codes changes related to the variation of MLPNetProvider
+   
 *  Mon Jul 21 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
-   -  Fix a memory leek bug in MLPIFlytekDataProvider.cpp that "labelRecord" is not released in ::readOneSentence()
-   -  Fix a memory leek bug in MLPTester.cpp that "OutVector" is not released in ::SingleTesting()
+   -  Fixed a memory leek bug in MLPIFlytekDataProvider.cpp that "labelRecord" is not released in ::readOneSentence()
+   -  Fixed a memory leek bug in MLPTester.cpp that "OutVector" is not released in ::SingleTesting()
    -  Some other misc changes of the codes
 
 *  Mon Jul 14 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  

@@ -101,7 +101,7 @@ void mnist_training2()
 	int shuffleBatches = 25;
 	int batches;
 	int totalbatches;
-	int epoches=800;
+	int epoches=200;
 
 	MLPNetProvider *netProviderp=NULL;
     MLPDataProvider *dataProviderp=NULL;
@@ -110,11 +110,12 @@ void mnist_training2()
 	// Training the neural network using MNist labelled dataset
     MLPTrainer *trainerp;
 
-	dataProviderp = new MLPMNistDataProvider(MNIST_PATH2, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	//dataProviderp = new MLPMNistDataProvider(MNIST_PATH2, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
 	totalbatches = dataProviderp->getTotalBatches();
 
-	netProviderp = new MLPNetProvider("./", "mlp_netarch_init.conf", "mlp_netweights_init.dat");
+	netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
 
     trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);    // set up the trainer
 
@@ -161,7 +162,7 @@ void mnist_training3()
 		 cout << "Valid checkpoint found, recover and start new checkpointing from this one" << endl;
 
 		 statep = cpManager.getChkPointState();
-		 netProviderp = new MLPNetProvider(statep->netConfPath, statep->netConfArchFileName, statep->netConfDataFileName);
+		 netProviderp = new MLPNetProvider(statep->netConfPath, statep->ncTrainingConfigFname, statep->ncNNetDataFname);
 
 	     //dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
          dataProviderp = new MLPMNistDataProvider(MNIST_PATH2, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
@@ -176,7 +177,7 @@ void mnist_training3()
 		 cout << "No old checkpoint found, start new checkpointing any way" << endl;
 
          //netProviderp = new MLPNetProvider(nettype, nLayers, dimensions, etas, momentum, actFuncs, costFunc, true);
-         netProviderp = new MLPNetProvider("./", "mlp_netarch_init.conf", "mlp_netweights_init.dat");
+         netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
 
 	     //dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	     dataProviderp = new MLPMNistDataProvider(MNIST_PATH2, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
@@ -231,7 +232,7 @@ void mnist_batch_testing()
 	// Testing the MNist labelled dataset on the trained neural network
 	MLPTester *testerp=NULL;
 
-	netProviderp = new MLPNetProvider("./", MLP_NC_ARCH_NEW, MLP_NC_DATA_NEW);
+	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
 	dataProviderp =	new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TEST, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
@@ -286,7 +287,7 @@ void mnist_single_testing()
 	// Testing the MNist labelled dataset on the trained neural network
 	MLPTester *testerp=NULL;
 
-	netProviderp = new MLPNetProvider("./", MLP_NC_ARCH_NEW, MLP_NC_DATA_NEW);
+	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
 	dataProviderp =	new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TEST, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
@@ -355,7 +356,7 @@ void mnist_predicting()
 	float *inputVectors;
 	float *outputVectors;
 
-	netProviderp = new MLPNetProvider("./", MLP_NC_ARCH, MLP_NC_DATA);
+	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
 	dataProviderp =	new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_PREDICT, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 

@@ -285,7 +285,7 @@ void MLPTrainer::saveNetConfig(const char *configPath)
 
 	this->synchronizeNetConfig(netProvider);
 
-	netProvider.saveConfig(configPath, MLP_NC_ARCH_NEW, MLP_NC_DATA_NEW);
+	netProvider.saveConfig(configPath, MLP_NP_TRAINING_CONF_NEW, MLP_NP_NNET_DATA_NEW);
 };
 
 void MLPTrainer::synchronizeNetConfig(MLPNetProvider &netProvider)
@@ -467,7 +467,7 @@ void MLPTrainer::checkPointing(struct MLPCheckPointState &cpState)
      // Snapshot one state of network configuration from the MLPTrainer, and save it to the files
      MLPNetProvider  netProvider(this->nLayers,this->dimensions,false);
      this->synchronizeNetConfig(netProvider);
-     netProvider.saveConfig(cpState.netConfPath, cpState.netConfArchFileName, cpState.netConfDataFileName);
+     netProvider.saveConfig(cpState.netConfPath, cpState.ncTrainingConfigFname, cpState.ncNNetDataFname);
 
      MLP_UNLOCK(&this->chkPointingLock);
 }

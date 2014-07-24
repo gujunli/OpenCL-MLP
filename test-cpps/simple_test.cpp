@@ -94,7 +94,7 @@ void simple_batch_testing()
 	// Testing the Simple labelled dataset on the trained neural network
 	MLPTester *testerp=NULL;
 
-	netProviderp = new MLPNetProvider("./", MLP_NC_ARCH_NEW, MLP_NC_DATA_NEW);
+	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
 	dataProviderp =	new MLPSimpleDataProvider(MLP_DATAMODE_TEST,dimensions[0],dimensions[nLayers-1],minibatch,shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
@@ -137,7 +137,7 @@ void simple_predicting()
 	float *inputVectors;
 	float *outputVectors;
 
-	netProviderp = new MLPNetProvider("./", MLP_NC_ARCH, MLP_NC_DATA);
+	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
     dataProviderp =	new MLPSimpleDataProvider(MLP_DATAMODE_PREDICT,dimensions[0],dimensions[nLayers-1],minibatch,0);
 	dataProviderp->setupDataProvider();                               // set up the data provider
 

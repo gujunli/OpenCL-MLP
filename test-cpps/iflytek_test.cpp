@@ -85,9 +85,9 @@ void iflytek_training2()
 	int shuffleBatches = 50;
 	int batches;
 	int totalbatches;
-	int epoches=12; 
+	int epoches=12;
 	int startBatch;
-	int startEpoch; 
+	int startEpoch;
 
 	MLPCheckPointManager cpManager;
 	MLPNetProvider *netProviderp=NULL;
@@ -101,7 +101,7 @@ void iflytek_training2()
 	     cout << "Valid checkpoint found, recover and start new checkpointing from this one"  << endl;
 
 		 statep = cpManager.getChkPointState();
-		 netProviderp = new MLPNetProvider(statep->netConfPath, statep->netConfArchFileName, statep->netConfDataFileName);
+		 netProviderp = new MLPNetProvider(statep->netConfPath, statep->ncTrainingConfigFname, statep->ncNNetDataFname);
 
          dataProviderp = new MLPIFlyDataProvider(IFLY_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 		 dataProviderp->setupDataProvider(statep->cpFrameNo, true);
@@ -109,7 +109,7 @@ void iflytek_training2()
 		 cout << "The MLPDataProvider start from Frame " << statep->cpFrameNo << endl;
 
 		 startBatch = statep->cpBatchNo;
-		 startEpoch = statep->cpEpoch; 
+		 startEpoch = statep->cpEpoch;
 
 		 cout << "The Trainer start from batch " << statep->cpBatchNo << " of Epoch " << statep->cpEpoch << endl;
 
@@ -118,12 +118,12 @@ void iflytek_training2()
 	else {
 		 cout << "No old checkpoint found, start new checkpointing any way" << endl;
 
-	     netProviderp = new MLPNetProvider("./", "mlp_netarch_init.conf", "mlp_netweights_init.dat");
+	     netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
          dataProviderp = new MLPIFlyDataProvider(IFLY_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	     dataProviderp->setupDataProvider(0, true);
 
 		 startBatch = 0;
-		 startEpoch = 0; 
+		 startEpoch = 0;
 	};
 
     trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);
@@ -188,7 +188,7 @@ void iflytek_training3()
 	     cout << "Valid checkpoint found, recover and start new checkpointing from this one"  << endl;
 
 		 statep = cpManager.getChkPointState();
-		 netProviderp = new MLPNetProvider(statep->netConfPath, statep->netConfArchFileName, statep->netConfDataFileName);
+		 netProviderp = new MLPNetProvider(statep->netConfPath, statep->ncTrainingConfigFname, statep->ncNNetDataFname);
 
          dataProviderp = new MLPIFlyDataProvider(IFLY_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 		 dataProviderp->setupDataProvider(statep->cpFrameNo, true);
@@ -256,7 +256,7 @@ void iflytek_batch_testing()
 	// Testing the MNist labelled dataset on the trained neural network
 	MLPTester *testerp=NULL;
 
-	netProviderp = new MLPNetProvider("./", MLP_NC_ARCH_NEW, MLP_NC_DATA_NEW);
+	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
 	dataProviderp =	new MLPIFlyDataProvider(IFLY_PATH, MLP_DATAMODE_TEST, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
@@ -298,7 +298,7 @@ void iflytek_predicting()
 	float *inputVectors;
 	float *outputVectors;
 
-	netProviderp = new MLPNetProvider("./", MLP_NC_ARCH, MLP_NC_DATA);
+	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
 	dataProviderp =	new MLPIFlyDataProvider(".", MLP_DATAMODE_PREDICT, minibatch, 0);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
