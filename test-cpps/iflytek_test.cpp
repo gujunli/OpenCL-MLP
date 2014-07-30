@@ -85,7 +85,7 @@ void iflytek_training2()
 	int shuffleBatches = 50;
 	int batches;
 	int totalbatches;
-	int epoches=12;
+	int epoches=16;
 	int startBatch;
 	int startEpoch;
 

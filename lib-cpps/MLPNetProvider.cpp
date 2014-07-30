@@ -125,8 +125,7 @@ MLPNetProvider::MLPNetProvider(int layers, int dimensions_[], bool DoInitialize)
     for (int i=1; i< this->nLayers; i++)
         this->weights[i] = new float[this->dimensions[i-1]*this->dimensions[i]];
 
-    if ( DoInitialize )
-    {
+    if ( DoInitialize ) {
         this->netType = NETTYPE_MULTI_CLASSIFICATION;
         this->weightsInitialize();
         this->biasesInitialize();
@@ -397,6 +396,197 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
     configFile.close();
     nnetFile.close();
 }
+
+// this constuctor is used by the trainer to create a randomly initialized neural network
+ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, bool DoInitialize)
+{
+	string configFileName(dir);
+	string nnetFileName(dir);
+
+	configFileName.append(trainingConfigFile);
+
+	ifstream configFile;
+
+	configFile.open(configFileName.c_str(),ios_base::in);
+
+	if ( ! configFile.is_open() ) {
+		   mlp_log("MLPNetProvider", "Failed to open MLP training configuration for reading");
+		   MLP_Exception("");
+	};
+
+
+	vector<string> lines;
+
+    while ( ! configFile.eof() ) {
+          string myline;
+
+          getline(configFile,myline);
+          ltrim(myline);
+
+          if ( !myline.empty() && !(myline[0] == '#') )
+			   lines.push_back(myline);
+
+    };
+
+    // read Network Type name
+    string typeName1, typeName2;
+    string key0("Network Type:");
+
+	for (vector<string>::iterator it=lines.begin(); it != lines.end(); ++it) {
+		  if ( (*it).compare(0,key0.length(),key0) == 0 ) {
+                istringstream mystream((*it).substr(key0.length()));
+
+                mystream >> typeName1 >> typeName2;
+                transform(typeName1.begin(),typeName1.end(),typeName1.begin(),::tolower);      // porvided by ZhiTao Zhou
+                transform(typeName2.begin(),typeName2.end(),typeName2.begin(),::tolower);      // porvided by ZhiTao Zhou
+				typeName1 = typeName1 + " " + typeName2;
+                break;
+          };
+    };
+    MLP_NETTYPE typeID=getNetTypeID(typeName1);
+	if ( typeID == NETNOTYPE ) {
+		  mlp_log("MLPNetProvider", "The setting for <Network Type> from the config file is not correct");
+		  MLP_Exception("");
+	};
+	this->netType = typeID;
+
+    // read Layers information
+    int layers=0;
+    string key1("Layers:");
+    for (vector<string>::iterator it=lines.begin(); it != lines.end(); ++it) {
+          if ( (*it).compare(0,key1.length(),key1) == 0 ) {
+                istringstream mystream((*it).substr(key1.length()));
+
+                mystream >> layers;
+                break;
+          };
+    };
+	if ( (layers < 2) || (layers > 9 )) {
+		  mlp_log("MLPNetProvider", "The setting for <Layers> from the config file is not correct");
+		  MLP_Exception("");
+	};
+	this->nLayers = layers;
+	this->dimensions = new int[this->nLayers];
+	this->biases = new float*[this->nLayers];
+	this->weights = new float*[this->nLayers];
+	this->etas = new float[this->nLayers];
+	this->actFuncs = new ACT_FUNC[this->nLayers];
+
+    // read cost function name
+    string funName;
+    string key2("Cost Function:");
+    for (vector<string>::iterator it=lines.begin(); it != lines.end(); ++it) {
+		  if ( (*it).compare(0,key2.length(),key2) == 0 ) {
+                istringstream mystream((*it).substr(key2.length()));
+
+                mystream >> funName;
+                transform(funName.begin(),funName.end(),funName.begin(),::toupper);      // porvided by ZhiTao Zhou
+                break;
+          };
+    };
+    COST_FUNC cfunID=getCostFuncID(funName);
+	if ( cfunID == CNOFUNC ) {
+		  mlp_log("MLPNetProvider", "The setting for <Cost Function> from the config file is not correct");
+		  MLP_Exception("");
+	};
+
+	this->costFunc = cfunID;
+
+	// read the parameters for the Input layer
+	int layer0_dim=0;
+    string key3("Layer 0:");
+    for (vector<string>::iterator it=lines.begin(); it != lines.end(); ++it) {
+          if ( (*it).compare(0,key3.length(),key3) == 0 ) {
+                istringstream mystream((*it).substr(key3.length()));
+
+                mystream >> layer0_dim;
+                break;
+          };
+    };
+    if ( layer0_dim < 2  ) {
+		  mlp_log("MLPNetProvider", "The setting for <Layer 0> from the config file is not correct");
+		  MLP_Exception("");
+	};
+	this->dimensions[0] = layer0_dim;
+
+	// read parameters for the Hidden layers and the Output layer
+	int *layers_dim = new int[layers-1];
+    float *layers_eta = new float[layers-1];
+    string *funNames = new string[layers-1];
+    for (int k=0; k< layers-1; k++) {
+          ostringstream keystream;
+          keystream << "Layer " << k+1 << ":";
+
+		  bool found=false;
+          for (vector<string>::iterator it=lines.begin(); it != lines.end(); ++it) {
+               if ( (*it).compare(0, keystream.str().length(),keystream.str()) == 0 ) {
+                    istringstream mystream((*it).substr(keystream.str().length()));
+
+                    mystream >> layers_dim[k] >> layers_eta[k] >> funNames[k];
+                    transform(funNames[k].begin(),funNames[k].end(),funNames[k].begin(),::tolower);  // porvided by ZhiTao Zhou
+
+					ACT_FUNC afunID=getActFuncID(funNames[k]);
+					if ( (layers_dim[k] < 2) || (layers_eta[k] <= 0.0f) || (layers_eta[k] >= 1.0f) || (afunID == ANOFUNC) ) {
+						  ostringstream errBuf;
+						  errBuf << "The setting for layer " << k+1 << " is not correct";
+		                  mlp_log("MLPNetProvider", errBuf.str().c_str());
+		                  MLP_Exception("");
+					};
+                    found = true;
+					this->dimensions[k+1] = layers_dim[k];
+					this->etas[k+1] = layers_eta[k];
+					this->actFuncs[k+1] = afunID;
+                    break;
+               };
+          };
+		  if ( !found ) {
+			   ostringstream errBuf;
+
+			   errBuf << "The setting for layer " << k+1 << " is not found" ;
+		       mlp_log("MLPNetProvider", errBuf.str().c_str());
+		       MLP_Exception("");
+		  };
+    };
+
+	delete [] layers_dim;
+    delete [] layers_eta;
+    delete [] funNames;
+
+	// read momentum value
+	float mmValue;
+	string key4("Momentum:");
+    for (vector<string>::iterator it=lines.begin(); it != lines.end(); ++it) {
+          if ( (*it).compare(0,key4.length(),key4) == 0 ) {
+                istringstream mystream((*it).substr(key4.length()));
+
+                mystream >> mmValue;
+                break;
+          };
+    };
+    if ( mmValue < 0.0f || mmValue >= 1.0f  ) {
+		  mlp_log("MLPNetProvider", "The setting for <Momentum> from the config file may be not reasonable");
+		  MLP_Exception("");
+	};
+	this->momentum = mmValue;
+
+	// allocate memory for weights and biases data of each layer
+	this->biases[0] = NULL;
+	for (int i=1; i< this->nLayers; i++)
+		this->biases[i] = new float[this->dimensions[i]];
+
+	this->weights[0] = NULL;
+	for (int i=1; i< this->nLayers; i++)
+		this->weights[i] = new float[this->dimensions[i-1]*this->dimensions[i]];
+
+    configFile.close();
+
+    if ( DoInitialize ) {
+        this->weightsInitialize();
+        this->biasesInitialize();
+    };
+}; 
+
+
 
 // this constructor should be used by the MLPTester and MLPPredictor, not the MLPTrainer
 MLPNetProvider::MLPNetProvider(const char *dir, const char *nnetDataFile)

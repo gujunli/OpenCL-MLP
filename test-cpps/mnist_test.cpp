@@ -19,6 +19,7 @@
 using namespace std;
 
 #define MNIST_PATH2 "../../MNIST2/"
+#define MNIST_PATH3 "../../MNIST3/"
 
 void mnist_training();
 void mnist_training2();
@@ -41,6 +42,7 @@ void mnist_training()
 {
 	struct mlp_tv startv, endv;
 
+	/*
 	MLP_NETTYPE nettype = NETTYPE_MULTI_CLASSIFICATION;
 	const int nLayers = 3;
 	int dimensions[nLayers] = {784, 800, 10};
@@ -48,12 +50,13 @@ void mnist_training()
 	float momentum = 0.4f;
 	ACT_FUNC actFuncs[nLayers] = {ANOFUNC, AFUNC_SIGMOID, AFUNC_SOFTMAX};
 	COST_FUNC costFunc = CFUNC_CE;
+	*/
 
-	int minibatch = 1200;
-	int shuffleBatches = 50;
+	int minibatch = 1000;
+	int shuffleBatches = 25;
 	int batches;
 	int totalbatches;
-	int epoches = 100;
+	int epoches = 400;
 
 	MLPNetProvider *netProviderp=NULL;
     MLPDataProvider *dataProviderp=NULL;
@@ -62,15 +65,21 @@ void mnist_training()
 	// Training the neural network using MNist labelled dataset
     MLPTrainer *trainerp;
 
-	dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
-	//dataProviderp = new MLPMNistDataProvider(MNIST_PATH2, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	//dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	dataProviderp = new MLPMNistDataProvider(MNIST_PATH3, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
+
+	/*
 	dimensions[0] = dataProviderp->getFeatureSize();
 	dimensions[nLayers-1] = dataProviderp->getLabelSize();
+	*/
+
+
 	totalbatches = dataProviderp->getTotalBatches();
 
 
-    netProviderp = new MLPNetProvider(nettype, nLayers, dimensions, etas, momentum, actFuncs, costFunc, true);
+    // netProviderp = new MLPNetProvider(nettype, nLayers, dimensions, etas, momentum, actFuncs, costFunc, true);
+    netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", true);
 
     trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);    // set up the trainer
 
@@ -101,7 +110,7 @@ void mnist_training2()
 	int shuffleBatches = 25;
 	int batches;
 	int totalbatches;
-	int epoches=200;
+	int epoches=400;
 
 	MLPNetProvider *netProviderp=NULL;
     MLPDataProvider *dataProviderp=NULL;
@@ -110,8 +119,8 @@ void mnist_training2()
 	// Training the neural network using MNist labelled dataset
     MLPTrainer *trainerp;
 
-	//dataProviderp = new MLPMNistDataProvider(MNIST_PATH2, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
-	dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	dataProviderp = new MLPMNistDataProvider(MNIST_PATH2, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	//dataProviderp = new MLPMNistDataProvider(MNIST_PATH3, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
 	totalbatches = dataProviderp->getTotalBatches();
 
@@ -146,7 +155,7 @@ void mnist_training3()
 	int shuffleBatches = 25;
 	int batches;
 	int totalbatches;
-	int epoches = 800;
+	int epoches = 400;
 	int startBatch;
 	int startEpoch;
 
@@ -165,7 +174,7 @@ void mnist_training3()
 		 netProviderp = new MLPNetProvider(statep->netConfPath, statep->ncTrainingConfigFname, statep->ncNNetDataFname);
 
 	     //dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
-         dataProviderp = new MLPMNistDataProvider(MNIST_PATH2, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+         dataProviderp = new MLPMNistDataProvider(MNIST_PATH3, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 		 dataProviderp->setupDataProvider(statep->cpFrameNo, true);
 
 		 startBatch = statep->cpBatchNo;
@@ -180,7 +189,7 @@ void mnist_training3()
          netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
 
 	     //dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
-	     dataProviderp = new MLPMNistDataProvider(MNIST_PATH2, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	     dataProviderp = new MLPMNistDataProvider(MNIST_PATH3, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	     dataProviderp->setupDataProvider(0, true);
 
 		 startBatch = 0;

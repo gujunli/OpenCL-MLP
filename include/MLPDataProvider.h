@@ -73,8 +73,8 @@ protected:
 	void create_buffers(int batchSize);
 	void release_buffers();
 	void reset_buffers();
-    void load_feature_batch(float *srcp, int *indexBase, int indexOffset);      // Load one batch of feature frames from the provider's internal buffer to the double-buffer
-    void load_label_batch(float *srcp, int *indexBase, int indexOffset);        // Load one batch of feature frames from the provider's internal buffer to the double-buffer
+    void load_feature_batch(float *srcp, int *indexBase, int indexOffset);      // Load one batch of feature frames from the provider's internal buffer to the buffer ring
+    void load_label_batch(float *srcp, int *indexBase, int indexOffset);        // Load one batch of feature frames from the provider's internal buffer to the buffer ring
 
 	int startup_worker();
 	int shutdown_worker();
@@ -102,8 +102,8 @@ public:
 	LIBMLPAPI virtual bool frameMatching(const float *frameOutput, const float *frameLabel, int len)=0;
 
     // The following two interfaces are only used by the CheckPointing Function
-    virtual void getCheckPointFrame(int & frameNo)=0;                           // Use to get the Frame Position the DataProvider should start from
-    virtual void setupDataProvider(int startFrameNo, bool doChkPointing)=0;     // Setup the DataProvider to provide data start from this Frame Position
+    LIBMLPAPI virtual void getCheckPointFrame(int & frameNo)=0;                           // Use to get the Frame Position the DataProvider should start from
+    LIBMLPAPI virtual void setupDataProvider(int startFrameNo, bool doChkPointing)=0;     // Setup the DataProvider to provide data start from this Frame Position
 
 	LIBMLPAPI bool batchAvailable();
 };

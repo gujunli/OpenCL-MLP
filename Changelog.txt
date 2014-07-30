@@ -1,3 +1,6 @@
+*  Wed Jul 30 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  
+   -  Modified MLPNetProvider.h and MLPNetProvider.cpp to add one constructor to support read the training configuration from file
+   -  Added a  readme.txt
 
 *  Thu Jul 24 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  - 1.4.0
    -  Changed the MLP neural network configuration method, renamed files "mlp_netarch.conf" and "mlp_netweights.dat" to 

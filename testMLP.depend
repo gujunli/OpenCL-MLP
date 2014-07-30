@@ -68,10 +68,10 @@
 1404288553 /home/qfzhang/AMD-work2/MLP-Linux/include/SingleDevClass.h
 	<CL/cl.h>
 
-1406189048 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPNetProvider.h
+1406699898 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPNetProvider.h
 	"MLPApiExport.h"
 
-1406207914 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPDataProvider.h
+1406702196 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPDataProvider.h
 	<Windows.h>
 	<pthread.h>
 	"MLPApiExport.h"

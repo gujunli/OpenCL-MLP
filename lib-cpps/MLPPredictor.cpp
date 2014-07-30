@@ -161,6 +161,7 @@ void MLPPredictor::_initialize(MLPNetProvider & provider, int _batchSize)
 		this->expandFloatVectorToMatrix(this->biases[i],this->biasMatrixes[i],this->dimensions[i],this->batchSize);
 	};
 
+    CL_CHECK( clFinish(this->CLContext->m_cmd_queues[0]) );
 }
 
 // only called by the destructor

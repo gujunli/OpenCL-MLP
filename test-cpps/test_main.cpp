@@ -34,7 +34,7 @@ int main()
 	char anykey;
 
     //iflytek_training2();
-	mnist_training3();
+	mnist_training();
 	//mnist_training2();
 	//simple_training();
 
@@ -49,9 +49,9 @@ int main()
 	//simple_testing();
 	//mnist_predicting();
 
-	//out << "Press any key to end ..." << endl;
+	cout << "Press any key to end ..." << endl;
 
-	//cin >> anykey;
+	cin >> anykey;
 
 	return(0);
 };

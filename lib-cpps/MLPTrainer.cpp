@@ -227,6 +227,8 @@ void MLPTrainer::_initialize(MLPNetProvider & provider, int _minibatch)
 
 	this->target = clCreateBuffer(this->CLContext->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*this->dimensions[this->nLayers-1]*this->minibatch,NULL,&status);
 	CL_CHECK(status);
+
+    CL_CHECK( clFinish(this->CLContext->m_cmd_queues[0]) );
 }
 
 // only called by the destructor
