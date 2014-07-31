@@ -1,5 +1,10 @@
+*  Thu Jul 31 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+   -  Changed the MLPDataProvider implementation to more clearly split the work between the base class and derived class, 
+      made setupDataProvider()/resetDataProvider complete base class interfaces, added setupBackendProvider/resetBackendProvider
+      for derived class 
+
 *  Wed Jul 30 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  
-   -  Modified MLPNetProvider.h and MLPNetProvider.cpp to add one constructor to support read the training configuration from file
+   -  Modified MLPNetProvider.h MLPNetProvider.cpp to add one constructor to support read the training configuration from file
    -  Added a  readme.txt
 
 *  Thu Jul 24 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  - 1.4.0

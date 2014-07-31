@@ -34,7 +34,7 @@ int main()
 	char anykey;
 
     //iflytek_training2();
-	mnist_training();
+	mnist_training3();
 	//mnist_training2();
 	//simple_training();
 

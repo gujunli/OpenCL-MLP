@@ -21,12 +21,11 @@
 
 class MLPDataProvider
 {
-	 friend class MLPTrainer;
-	 friend class MLPTester;
-	 friend class MLPPredictor;
+	friend class MLPTrainer;
+	friend class MLPTester;
+	friend class MLPPredictor;
 protected:
 	MLP_DATA_MODE  dataMode;     // TRAIN, TEST, PREDICT standing for three different usages of the neural network
-	int  batchNo;                // Current batchNo of data it is providing
 	int  total_batches;          // Total number of batches provided by the data source and provider (shuffled batches also counted)
 
 	int m_batchSize;             // Number of input frames in each minibatch
@@ -97,13 +96,17 @@ public:
 	LIBMLPAPI int getTotalBatches();
 
 	LIBMLPAPI virtual ~MLPDataProvider()=0;
-	LIBMLPAPI virtual void setupDataProvider()=0;
-	LIBMLPAPI virtual void resetDataProvider()=0;
+	LIBMLPAPI void setupDataProvider();
+	          virtual void setupBackendDataProvider()=0;
+	LIBMLPAPI void resetDataProvider();
+              virtual void resetBackendDataProvider()=0;
+
 	LIBMLPAPI virtual bool frameMatching(const float *frameOutput, const float *frameLabel, int len)=0;
 
     // The following two interfaces are only used by the CheckPointing Function
-    LIBMLPAPI virtual void getCheckPointFrame(int & frameNo)=0;                           // Use to get the Frame Position the DataProvider should start from
-    LIBMLPAPI virtual void setupDataProvider(int startFrameNo, bool doChkPointing)=0;     // Setup the DataProvider to provide data start from this Frame Position
+    LIBMLPAPI virtual void getCheckPointFrame(int & frameNo)=0;                   // Use to get the Frame Position the DataProvider should start from
+    LIBMLPAPI void setupDataProvider(int startFrameNo, bool doChkPointing);       // Setup the DataProvider to provide data start from this Frame Position
+              virtual void setupBackendDataProvider(int startFrameNo, bool doChkPointing)=0;
 
 	LIBMLPAPI bool batchAvailable();
 };

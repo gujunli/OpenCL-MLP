@@ -18,7 +18,7 @@ MLPDataProvider::MLPDataProvider()
 	for (int i=0; i< MLP_BATCH_RING_SIZE; i++) {
 	     this->features[i] = NULL;
 	     this->labels[i] = NULL;
-	}; 
+	};
 
 	this->running = false;
 
@@ -37,11 +37,11 @@ void MLPDataProvider::create_buffers(int batchSize)
 
         this->features[i] = new float[batchSize*this->m_dataFeatureSize*sizeof(float)];
 
-	    if ( this->haveLabel ) 
+	    if ( this->haveLabel )
 		     this->labels[i] = new float[batchSize*this->m_dataLabelSize*sizeof(float)];
-	    else 
+	    else
 		     this->labels[i] = NULL;
-	}; 
+	};
 
 	this->m_batchSize = batchSize;
 
@@ -66,9 +66,9 @@ void MLPDataProvider::release_buffers()
 	for (int i=0; i< MLP_BATCH_RING_SIZE; i++) {
 	     delete [] this->features[i];
 
-	     if ( this->haveLabel ) 
+	     if ( this->haveLabel )
 		      delete [] this->labels[i];
-	}; 
+	};
 };
 
 void MLPDataProvider::reset_buffers()
@@ -85,7 +85,7 @@ void MLPDataProvider::reset_buffers()
 #endif
 
 	MLP_LOCK_INIT(&this->bufferLock);
-}; 
+};
 
 // create and start the worker thread
 int MLPDataProvider::startup_worker()
@@ -433,3 +433,57 @@ bool MLPDataProvider::batchAvailable()
 
 	return(false);
 };
+
+void MLPDataProvider::setupDataProvider()
+{
+	this->supportChkPointing = false;
+
+	this->create_buffers(this->m_batchSize);
+
+    this->setupBackendDataProvider();
+
+	this->initialized = true;
+
+	MLP_CHECK(this->startup_worker());
+};
+
+void MLPDataProvider::setupDataProvider(int startFrameNo, bool doChkPointing)
+{
+ 	if ( this->dataMode != MLP_DATAMODE_TRAIN ) {
+		 mlp_log("MLPDataProvider", "This interface can only be called with the TRAIN mode");
+		 MLP_Exception("");
+	};
+
+	// For CheckPoint
+	this->supportChkPointing = doChkPointing;
+	if ( this->supportChkPointing )
+		 MLP_LOCK_INIT(&this->chkPointingLock);
+
+	this->create_buffers(this->m_batchSize);
+
+    this->setupBackendDataProvider(startFrameNo, doChkPointing);
+
+	this->initialized = true;
+
+	MLP_CHECK(this->startup_worker());
+};
+
+
+void MLPDataProvider::resetDataProvider()
+{
+ 	if ( !this->initialized ) {
+		 mlp_log("MLPDataProvider", "The DataProvider is still not started yet, no reset should be called");
+		 MLP_Exception("");
+	};
+	MLP_CHECK(this->shutdown_worker());
+
+	this->reset_buffers();
+
+	if ( this->supportChkPointing )
+		 MLP_LOCK_INIT(&this->chkPointingLock);
+
+	this->resetBackendDataProvider();
+
+	MLP_CHECK(this->startup_worker());
+};
+

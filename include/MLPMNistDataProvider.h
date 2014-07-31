@@ -27,6 +27,8 @@ private:
 	ifstream dataFile;
 	ifstream labelFile;
 
+	int batchNo;               // Current batchNo of data it is providing
+
 	int num_frames;            // total number of data frames
 	int stageBatchNo;          // batch number inside each loaded batches (eg. inside each [m_shufflebatches * rounds] batches
 
@@ -42,13 +44,13 @@ public:
 
     ~MLPMNistDataProvider();
 
-    void setupDataProvider();                                                             // implementation of public base class virtual interface
-	void resetDataProvider();                                                             // implementation of public base class virtual interface
+    void setupBackendDataProvider();                                                      // implementation of public base class virtual interface
+	void resetBackendDataProvider();                                                      // implementation of public base class virtual interface
     bool frameMatching(const float *frameOutput, const float *frameLabel, int len);       // implementation of public base class virtual interface
 
     // The following two interfaces are only used by the CheckPointing Function
     void getCheckPointFrame(int & frameNo);                                   // implementation of public base class virtual interface
-    void setupDataProvider(int startFrameNo, bool doChkPointing);             // implementation of public base class virtual interface
+    void setupBackendDataProvider(int startFrameNo, bool doChkPointing);      // implementation of public base class virtual interface
 
 private:
 	 void prepare_batch_data();                 // implementation of private base class virtual interface

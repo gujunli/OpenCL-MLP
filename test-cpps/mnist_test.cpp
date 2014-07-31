@@ -56,7 +56,7 @@ void mnist_training()
 	int shuffleBatches = 25;
 	int batches;
 	int totalbatches;
-	int epoches = 400;
+	int epoches = 200;
 
 	MLPNetProvider *netProviderp=NULL;
     MLPDataProvider *dataProviderp=NULL;
@@ -106,7 +106,7 @@ void mnist_training2()
 {
 	struct mlp_tv startv, endv;
 
-	int minibatch = 2000;
+	int minibatch = 1000;
 	int shuffleBatches = 25;
 	int batches;
 	int totalbatches;
@@ -151,7 +151,7 @@ void mnist_training3()
 {
 	struct mlp_tv startv, endv;
 
-	int minibatch = 2000;
+	int minibatch = 1000;
 	int shuffleBatches = 25;
 	int batches;
 	int totalbatches;

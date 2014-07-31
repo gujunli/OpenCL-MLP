@@ -66,13 +66,13 @@ public:
 
     ~MLPIFlyDataProvider();
 
-    void setupDataProvider();                                                          // Implementation of public base class virtual interface
-	void resetDataProvider();                                                          // Implementation of public base class virtual interface
+    void setupBackendDataProvider();                                                   // Implementation of public base class virtual interface
+	void resetBackendDataProvider();                                                   // Implementation of public base class virtual interface
     bool frameMatching(const float *frameOutput, const float *frameLabel, int len);    // Implementation of public base class virtual interface
 
     // The following two interfaces are only used by the CheckPointing Function
     void getCheckPointFrame(int & frameNo);                                // Implementation of public base class virtual interface
-    void setupDataProvider(int startFrameNo, bool doChkPointing);          // Implementation of public base class virtual interface
+    void setupBackendDataProvider(int startFrameNo, bool doChkPointing);   // Implementation of public base class virtual interface
 
 private:
 	 void prepare_batch_data();                // Implementation of private base class virtual interface

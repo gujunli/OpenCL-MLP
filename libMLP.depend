@@ -43,35 +43,35 @@
 	<intrin.h>
 	<immintrin.h>
 
-1404288553 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPDataProvider.cpp
+1406784411 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPDataProvider.cpp
 	"MLPUtil.h"
 	"MLPDataProvider.h"
 
-1406702196 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPDataProvider.h
+1406778984 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPDataProvider.h
 	<Windows.h>
 	<pthread.h>
 	"MLPApiExport.h"
 	"MLPConstants.h"
 
-1405925496 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPIflyDataProvider.cpp
+1406778250 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPIflyDataProvider.cpp
 	<algorithm>
 	<iostream>
 	"MLPUtil.h"
 	"MLPIFlyDataProvider.h"
 
-1405916289 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPIFlyDataProvider.h
+1406776027 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPIFlyDataProvider.h
 	<vector>
 	<fstream>
 	"MLPApiExport.h"
 	"MLPDataProvider.h"
 
-1405916169 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPMNistDataProvider.cpp
+1406775704 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPMNistDataProvider.cpp
 	<algorithm>
 	<iostream>
 	"MLPUtil.h"
 	"MLPMNistDataProvider.h"
 
-1405916225 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPMNistDataProvider.h
+1406777945 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPMNistDataProvider.h
 	<fstream>
 	"MLPApiExport.h"
 	"MLPDataProvider.h"
@@ -123,12 +123,12 @@
 1404288553 /home/qfzhang/AMD-work2/MLP-Linux/include/SingleDevClass.h
 	<CL/cl.h>
 
-1405916475 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPSimpleDataProvider.cpp
+1406776371 source:/home/qfzhang/AMD-work2/MLP-Linux/lib-cpps/MLPSimpleDataProvider.cpp
 	<algorithm>
 	"MLPUtil.h"
 	"MLPSimpleDataProvider.h"
 
-1405916449 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPSimpleDataProvider.h
+1406778715 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPSimpleDataProvider.h
 	"MLPApiExport.h"
 	"MLPDataProvider.h"
 

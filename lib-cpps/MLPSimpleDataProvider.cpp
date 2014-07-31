@@ -145,30 +145,17 @@ void MLPSimpleDataProvider::shuffle_data(int *index, int len)
 ////                          public member functions                             ////
 //////////////////////////////////////////////////////////////////////////////////////
 
-void MLPSimpleDataProvider::setupDataProvider()
+void MLPSimpleDataProvider::setupBackendDataProvider()
 {
-	this->create_buffers(this->m_batchSize);
-
-	this->initialized = true;
-
-	this->startup_worker();
 };
 
-void MLPSimpleDataProvider::resetDataProvider()
+void MLPSimpleDataProvider::resetBackendDataProvider()
 {
-	if ( !this->initialized ) {
-		 mlp_log("MLPSimpleDataProvider", "The DataProvider is still not started yet, no reset should be called");
-		 MLP_Exception("");
-	};
-	MLP_CHECK(this->shutdown_worker());
-
 	this->batchNo = 0;
 
 	// initial permutations, permutated each epoch
 	for (int k=0; k < this->m_batchSize * this->m_shuffleBatches; k++)
 		    this->permutations[k] = k;
-
-	MLP_CHECK(this->startup_worker());
 };
 
 bool MLPSimpleDataProvider::endofInputBatches()
@@ -195,9 +182,5 @@ bool MLPSimpleDataProvider::frameMatching(const float *frameOutput, const float 
 
 	return(true);
 };
-
-
-
-
 
 

@@ -294,7 +294,6 @@ MLPIFlyDataProvider::MLPIFlyDataProvider()
 	this->endOfDataSource = false;
 	this->batches_loaded = false;
 	this->curSentence = -1;
-	this->batchNo = 0;
 };
 
 MLPIFlyDataProvider::MLPIFlyDataProvider(const char *dataPath, MLP_DATA_MODE mode, int batchSize, int shuffleBatches)
@@ -319,7 +318,6 @@ MLPIFlyDataProvider::MLPIFlyDataProvider(const char *dataPath, MLP_DATA_MODE mod
 	this->endOfDataSource = false;
 	this->batches_loaded = false;
 	this->curSentence = -1;
-	this->batchNo = 0;
 };
 
 MLPIFlyDataProvider::~MLPIFlyDataProvider()
@@ -357,11 +355,10 @@ void MLPIFlyDataProvider::prepare_batch_data()
 	     MLP_LOCK(&this->chkPointingLock);
 
 	// transfer one batch from the data source to the Double-buffer
-	this->load_feature_batch(this->featureData,this->permutations,this->m_batchSize*(this->batchNo % this->m_shuffleBatches));
+	this->load_feature_batch(this->featureData,this->permutations,this->m_batchSize*(this->stageBatchNo % this->m_shuffleBatches));
 	if ( this->haveLabel )
-	     this->load_label_batch(this->labelData,this->permutations,this->m_batchSize*(this->batchNo % this->m_shuffleBatches));
+	     this->load_label_batch(this->labelData,this->permutations,this->m_batchSize*(this->stageBatchNo % this->m_shuffleBatches));
 
-	this->batchNo++;
 	this->stageBatchNo++;
 
 	if ( this->supportChkPointing )
@@ -645,7 +642,7 @@ void MLPIFlyDataProvider::gotoLabelFrame(int frameNo)
 //////////////////////////////////////////////////////////////////////////////////////
 
 
-void MLPIFlyDataProvider::setupDataProvider()
+void MLPIFlyDataProvider::setupBackendDataProvider()
 {
 	this->gotoDataFrame(this->mySetStart);
 	if ( this->haveLabel )
@@ -655,8 +652,6 @@ void MLPIFlyDataProvider::setupDataProvider()
 
 	this->curStartFrame = this->curFrame;
 
-	this->supportChkPointing = false;
-
 	// allocate batches buffer
 	this->permutations = new int[this->m_batchSize * this->m_shuffleBatches];
 	this->featureData  = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataFeatureSize];
@@ -664,22 +659,11 @@ void MLPIFlyDataProvider::setupDataProvider()
          this->labelData = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataLabelSize];
 
 	this->setup_first_data_batches();
-
-	this->create_buffers(this->m_batchSize);
-
-	this->initialized = true;
-
-	MLP_CHECK(this->startup_worker());
 };
 
 // This one is called when we want the data provider first to recover from a checkpointed start, and the may start checkpointing or not
-void MLPIFlyDataProvider::setupDataProvider(int startFrameNo, bool doChkPointing)
+void MLPIFlyDataProvider::setupBackendDataProvider(int startFrameNo, bool doChkPointing)
 {
-	if ( this->dataMode != MLP_DATAMODE_TRAIN ) {
-		 mlp_log("MLPIFlyDataProvider", "This interface can only be called with the TRAIN mode");
-		 MLP_Exception("");
-	};
-
 	this->gotoDataFrame(startFrameNo);
 	this->gotoLabelFrame(startFrameNo);
 
@@ -688,37 +672,17 @@ void MLPIFlyDataProvider::setupDataProvider(int startFrameNo, bool doChkPointing
 
 	this->curChkPointFrame = this->lastChkPointFrame = this->curFrame;
 
-	// For CheckPoint
-	this->supportChkPointing = doChkPointing;
-	if ( this->supportChkPointing )
-		 MLP_LOCK_INIT(&this->chkPointingLock);
-
 	this->permutations = new int[this->m_batchSize * this->m_shuffleBatches];
 	this->featureData  = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataFeatureSize];
 	if ( this->haveLabel )
          this->labelData = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataLabelSize];
 
 	this->setup_first_data_batches();
-
-	this->create_buffers(this->m_batchSize);
-
-	this->initialized = true;
-
-	MLP_CHECK(this->startup_worker());
 };
 
-void MLPIFlyDataProvider::resetDataProvider()
+void MLPIFlyDataProvider::resetBackendDataProvider()
 {
-	if ( !this->initialized ) {
-		 mlp_log("MLPIFlyDataProvider", "The DataProvider is still not started yet, no reset should be called");
-		 MLP_Exception("");
-	};
-	MLP_CHECK(this->shutdown_worker());
-
-	this->reset_buffers();
-
     this->endOfDataSource = false;
-	this->batchNo = 0;
 	this->batches_loaded = false;
 
 	this->dataFile.clear();
@@ -738,12 +702,7 @@ void MLPIFlyDataProvider::resetDataProvider()
 	this->sDataFrames.clear();
 	this->sLabelFrames.clear();
 
-	if ( this->supportChkPointing )
-		 MLP_LOCK_INIT(&this->chkPointingLock);
-
 	this->setup_first_data_batches();
-
-	MLP_CHECK(this->startup_worker());
 };
 
 void MLPIFlyDataProvider::getCheckPointFrame(int & frameNo)

@@ -71,7 +71,7 @@
 1406699898 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPNetProvider.h
 	"MLPApiExport.h"
 
-1406702196 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPDataProvider.h
+1406778984 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPDataProvider.h
 	<Windows.h>
 	<pthread.h>
 	"MLPApiExport.h"
@@ -97,7 +97,7 @@
 	"MLPNetProvider.h"
 	"MLPDataProvider.h"
 
-1405916225 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPMNistDataProvider.h
+1406777945 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPMNistDataProvider.h
 	<fstream>
 	"MLPApiExport.h"
 	"MLPDataProvider.h"
@@ -106,11 +106,11 @@
 
 1406190545 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPChkPointState.h
 
-1405916449 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPSimpleDataProvider.h
+1406778715 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPSimpleDataProvider.h
 	"MLPApiExport.h"
 	"MLPDataProvider.h"
 
-1405916289 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPIFlyDataProvider.h
+1406776027 /home/qfzhang/AMD-work2/MLP-Linux/include/MLPIFlyDataProvider.h
 	<vector>
 	<fstream>
 	"MLPApiExport.h"
@@ -124,7 +124,7 @@
 	"MLPTrainer.h"
 	"MLPChkPointState.h"
 
-1406208321 source:/home/qfzhang/AMD-work2/MLP-Linux/test-cpps/mnist_test.cpp
+1406784998 source:/home/qfzhang/AMD-work2/MLP-Linux/test-cpps/mnist_test.cpp
 	<iostream>
 	"MLPUtil.h"
 	"MLPTrainer.h"
@@ -146,7 +146,7 @@
 	"MLPIFlyDataProvider.h"
 	"MLPChkPointingMgr.h"
 
-1406192002 source:/home/qfzhang/AMD-work2/MLP-Linux/test-cpps/iflytek_test.cpp
+1406625478 source:/home/qfzhang/AMD-work2/MLP-Linux/test-cpps/iflytek_test.cpp
 	<iostream>
 	"MLPUtil.h"
 	"MLPTrainer.h"
@@ -156,6 +156,6 @@
 	"MLPIFlyDataProvider.h"
 	"MLPChkPointingMgr.h"
 
-1406207638 source:/home/qfzhang/AMD-work2/MLP-Linux/test-cpps/test_main.cpp
+1406784930 source:/home/qfzhang/AMD-work2/MLP-Linux/test-cpps/test_main.cpp
 	<iostream>
 

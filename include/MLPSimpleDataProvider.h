@@ -21,20 +21,21 @@ private:
 
 	int *permutations;
 
+    int  batchNo;                // Current batchNo of data it is providing
 public:
 	LIBMLPAPI MLPSimpleDataProvider();
 	LIBMLPAPI MLPSimpleDataProvider(MLP_DATA_MODE mode, int dataFeatureSize, int dataLabelSize, int batchSize, int shuffleBatches);
 
     ~MLPSimpleDataProvider();
 
-    void setupDataProvider();
-	void resetDataProvider();
+    void setupBackendDataProvider();
+	void resetBackendDataProvider();
     bool endofInputBatches();
     bool frameMatching(const float *frameOutput, const float *frameLabel, int len);
 
     // The following two interfaces are only used by the CheckPointing Function
 	void getCheckPointFrame(int & frameNo) {};                            // Use to get the Frame Position the DataProvider should start from
-	void setupDataProvider(int startFrameNo, bool doChkPointing) {};      // Setup the DataProvider to provide data starting from this Frame Position
+	void setupBackendDataProvider(int startFrameNo, bool doChkPointing) {};      // Setup the DataProvider to provide data starting from this Frame Position
 
 private:
 	 void prepare_batch_data();          // implementation of base class virtual interface
@@ -42,8 +43,6 @@ private:
 
 	 void setup_data_source();
 	 void shuffle_data(int *index, int len);
-
-	 friend class MLPTrainer;
 };
 
 #endif

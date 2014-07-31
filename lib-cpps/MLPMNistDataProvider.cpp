@@ -331,7 +331,7 @@ void MLPMNistDataProvider::gotoLabelFrame(int frameNo)
 ////                          public member functions                             ////
 //////////////////////////////////////////////////////////////////////////////////////
 
-void MLPMNistDataProvider::setupDataProvider()
+void MLPMNistDataProvider::setupBackendDataProvider()
 {
 	this->gotoDataFrame(0);
 	if ( this->haveLabel )
@@ -339,8 +339,6 @@ void MLPMNistDataProvider::setupDataProvider()
 
 	this->batchNo = 0;
 
-	this->supportChkPointing = false;
-
     // allocate batches buffer
 	this->permutations = new int[this->m_batchSize * this->m_shuffleBatches];
 	this->featureData  = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataFeatureSize];
@@ -348,31 +346,15 @@ void MLPMNistDataProvider::setupDataProvider()
          this->labelData = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataLabelSize];
 
 	this->setup_first_data_batches();
-
-	this->create_buffers(this->m_batchSize);
-
-	this->initialized = true;
-
-	MLP_CHECK(this->startup_worker());
 };
 
-void MLPMNistDataProvider::setupDataProvider(int startFrameNo, bool doChkPointing)
+void MLPMNistDataProvider::setupBackendDataProvider(int startFrameNo, bool doChkPointing)
 {
-	if ( this->dataMode != MLP_DATAMODE_TRAIN ) {
-		 mlp_log("MLPMNistDataProvider", "This interface can only be called with the TRAIN mode");
-		 MLP_Exception("");
-	};
-
 	this->gotoDataFrame(startFrameNo);
     this->gotoLabelFrame(startFrameNo);
 
 	this->batchNo = (startFrameNo / this->m_batchSize);  // The new "batchNo" will start from this one
 
-	// For CheckPoint
-	this->supportChkPointing = doChkPointing;
-	if ( this->supportChkPointing )
-		 MLP_LOCK_INIT(&this->chkPointingLock);
-
     // allocate batches buffer
 	this->permutations = new int[this->m_batchSize * this->m_shuffleBatches];
 	this->featureData  = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataFeatureSize];
@@ -380,25 +362,11 @@ void MLPMNistDataProvider::setupDataProvider(int startFrameNo, bool doChkPointin
          this->labelData = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataLabelSize];
 
 	this->setup_first_data_batches();
-
-	this->create_buffers(this->m_batchSize);
-
-	this->initialized = true;
-
-	MLP_CHECK(this->startup_worker());
 };
 
 
-void MLPMNistDataProvider::resetDataProvider()
+void MLPMNistDataProvider::resetBackendDataProvider()
 {
-	if ( !this->initialized ) {
-		 mlp_log("MLPMNistDataProvider", "The DataProvider is still not started yet, no reset should be called");
-		 MLP_Exception("");
-	};
-	MLP_CHECK(this->shutdown_worker());
-
-	this->reset_buffers();
-
     this->endOfDataSource = false;
 	this->batchNo = 0;
 	this->batches_loaded = false;
@@ -410,12 +378,7 @@ void MLPMNistDataProvider::resetDataProvider()
 		 this->gotoLabelFrame(0);
     };
 
-	if ( this->supportChkPointing )
-		 MLP_LOCK_INIT(&this->chkPointingLock);
-
 	this->setup_first_data_batches();
-
-	MLP_CHECK(this->startup_worker());
 };
 
 
