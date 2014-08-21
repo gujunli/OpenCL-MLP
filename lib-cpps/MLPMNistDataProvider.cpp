@@ -406,6 +406,7 @@ void MLPMNistDataProvider::getCheckPointFrame(int & frameNo)
 // the success ratio of the neural network on this type of data
 bool MLPMNistDataProvider::frameMatching(const float *frameOutput, const float *frameLabel, int len)
 {
+/*
 	float element;
 
 	for (int i=0; i< len; i++) {
@@ -416,4 +417,24 @@ bool MLPMNistDataProvider::frameMatching(const float *frameOutput, const float *
 	};
 
 	return(true);
+
+*/
+
+    float maxVal;
+    int maxInd;
+
+    maxVal = frameOutput[0];
+    maxInd = 0;
+
+    for (int i=1; i< len; i++) {
+         if ( frameOutput[i] > maxVal ) {
+              maxInd = i;
+              maxVal = frameOutput[i];
+         }
+    };
+
+    if ( frameLabel[maxInd] == 1.0f )
+         return(true);
+    else
+         return(false);
 };

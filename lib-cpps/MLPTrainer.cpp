@@ -14,7 +14,7 @@
 #include "MLPTrainer.h"
 #include "MLPChkPointState.h"
 
-//Class specific member shared by all instances
+// Class specific member shared by all instances
 SingleDevClass *MLPTrainer::CLContext = NULL;
 int MLPTrainer::nInstances = 0;
 

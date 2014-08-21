@@ -38,11 +38,55 @@ void test_cp_cleanup()
 
 };
 
+
+// Training the neural network using MNist labelled dataset
 void mnist_training()
 {
 	struct mlp_tv startv, endv;
 
-	/*
+	int minibatch = 1000;
+	int shuffleBatches = 20;
+	int batches, totalbatches;
+	int epoches = 200;
+
+	MLPNetProvider *netProviderp=NULL;
+    MLPDataProvider *dataProviderp=NULL;
+
+    MLPTrainer *trainerp;
+
+	dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	dataProviderp->setupDataProvider();                            // set up the data provider
+
+	totalbatches = dataProviderp->getTotalBatches();
+
+    netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", true);
+
+    trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);    // set up the trainer
+
+	cout << totalbatches << " batches of data to be trained with " << epoches << " epoches, just waiting..." << endl;
+
+	getCurrentTime(&startv);
+	batches = trainerp->batchTraining(0, epoches);                                       // do the training
+	getCurrentTime(&endv);
+
+	cout << batches << " batches of data were trained actually" << endl;
+    cout << "Training duration: " << diff_msec(&startv, &endv) << " mill-seconds" << endl;
+
+    // Finalize the result from the training, so that the trained neural network can be used by the Tester or Predictor
+	trainerp->saveNetConfig("./");
+
+	delete netProviderp;
+	delete dataProviderp;
+	delete trainerp;
+};
+
+
+/*
+// Training the neural network using MNist labelled dataset
+void mnist_training()
+{
+	struct mlp_tv startv, endv;
+
 	MLP_NETTYPE nettype = NETTYPE_MULTI_CLASSIFICATION;
 	const int nLayers = 3;
 	int dimensions[nLayers] = {784, 800, 10};
@@ -50,7 +94,6 @@ void mnist_training()
 	float momentum = 0.4f;
 	ACT_FUNC actFuncs[nLayers] = {ANOFUNC, AFUNC_SIGMOID, AFUNC_SOFTMAX};
 	COST_FUNC costFunc = CFUNC_CE;
-	*/
 
 	int minibatch = 1000;
 	int shuffleBatches = 25;
@@ -65,21 +108,15 @@ void mnist_training()
 	// Training the neural network using MNist labelled dataset
     MLPTrainer *trainerp;
 
-	//dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
-	dataProviderp = new MLPMNistDataProvider(MNIST_PATH3, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
 
-	/*
 	dimensions[0] = dataProviderp->getFeatureSize();
 	dimensions[nLayers-1] = dataProviderp->getLabelSize();
-	*/
-
 
 	totalbatches = dataProviderp->getTotalBatches();
 
-
-    // netProviderp = new MLPNetProvider(nettype, nLayers, dimensions, etas, momentum, actFuncs, costFunc, true);
-    netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", true);
+    netProviderp = new MLPNetProvider(nettype, nLayers, dimensions, etas, momentum, actFuncs, costFunc, true);
 
     trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);    // set up the trainer
 
@@ -92,7 +129,6 @@ void mnist_training()
 	cout << batches << " batches of data were trained actually" << endl;
     cout << "Training duration: " << diff_msec(&startv, &endv) << " mill-seconds" << endl;
 
-
     // Finalize the result from the training work, so that the Tester or Predictor can be set up based on it
 	trainerp->saveNetConfig("./");
 
@@ -100,6 +136,7 @@ void mnist_training()
 	delete dataProviderp;
 	delete trainerp;
 };
+*/
 
 // doing MNIST training based on pre-trained weights
 void mnist_training2()
@@ -227,6 +264,8 @@ void mnist_training3()
 	delete trainerp;
 };
 
+
+// Testing the MNist labelled dataset on the trained neural network
 void mnist_batch_testing()
 {
 	struct mlp_tv startv, endv;
@@ -238,7 +277,6 @@ void mnist_batch_testing()
 	MLPNetProvider *netProviderp=NULL;
     MLPDataProvider *dataProviderp=NULL;
 
-	// Testing the MNist labelled dataset on the trained neural network
 	MLPTester *testerp=NULL;
 
 	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);

@@ -47,9 +47,10 @@ LIBMLPAPI extern void mlp_log_retval(const char *header, int retVal);
 
 #define MLP_CHECK(flag)                                                                                           \
 	do  {                                                                                                         \
-	    if (flag != 0) {                                                                                          \
+        int _tmpVal;                                                                                              \
+	    if ( (_tmpVal = flag) != 0) {                                                                             \
 	        ostringstream mystream;                                                                               \
-		    mystream << "MLP Function Failed (" << __FILE__ << "," << __LINE__ << "), Error Code:" << flag;       \
+		    mystream << "MLP Function Failed (" << __FILE__ << "," << __LINE__ << "), Error Code:" << _tmpVal;    \
 		    mlp_log("MLP", mystream.str().c_str());                                                               \
 			MLP_Exception("MLP function call returned unexpected value");                                         \
 	    }                                                                                                         \
@@ -58,24 +59,26 @@ LIBMLPAPI extern void mlp_log_retval(const char *header, int retVal);
 
 #define CL_CHECK(flag)                                                                                            \
 	do  {                                                                                                         \
-	    if (flag != 0) {                                                                                          \
+	    int _tmpVal;                                                                                              \
+	    if ( (_tmpVal = flag) != 0) {                                                                             \
 	        ostringstream mystream;                                                                               \
-		    mystream << "OpenCL Function Failed (" << __FILE__ << "," << __LINE__ << "), Error Code:" << flag;    \
+		    mystream << "OpenCL Function Failed (" << __FILE__ << "," << __LINE__ << "), Error Code:" << _tmpVal; \
 		    mlp_log("MLP", mystream.str().c_str());                                                               \
 			MLP_Exception("OpenCL function call returned unexpected value");                                      \
 	    }                                                                                                         \
 	}                                                                                                             \
     while (0)
 
-#define AMDBLAS_CHECK(flag)                                                                                       \
-	do  {                                                                                                         \
-	    if (flag != 0) {                                                                                          \
-	        ostringstream mystream;                                                                               \
-		    mystream << "AmdBlas Function Failed (" << __FILE__ << "," << __LINE__ << "), Error Code:" << flag;   \
-		    mlp_log("MLP", mystream.str().c_str());                                                               \
-            MLP_Exception("clAmdBlas function call returned unexpected value");                                   \
-	    }                                                                                                         \
-	}                                                                                                             \
+#define AMDBLAS_CHECK(flag)                                                                                         \
+	do  {                                                                                                           \
+	    int _tmpVal;                                                                                                \
+	    if ( (_tmpVal = flag) != 0) {                                                                               \
+	        ostringstream mystream;                                                                                 \
+		    mystream << "AmdBlas Function Failed (" << __FILE__ << "," << __LINE__ << "), Error Code:" << _tmpVal;  \
+		    mlp_log("MLP", mystream.str().c_str());                                                                 \
+            MLP_Exception("clAmdBlas function call returned unexpected value");                                     \
+	    }                                                                                                           \
+	}                                                                                                               \
 	while (0)
 
 

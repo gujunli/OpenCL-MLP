@@ -43,10 +43,11 @@ struct mlp_nnet_layer_desc {
 };
 
 struct mlp_nnet_data_header {
-    char  nnet_type[32];                               // a typename describing the neural network, might not be used right now, but reserved
-    unsigned int  nLayers;                             // the total number of layers of the neural network including the input layer
+    char  nnet_type[32];            // a typename describing the neural network, might not be used right now, but reserved
+    unsigned int  nLayers;          // the total number of layers of the neural network including the input layer
     struct mlp_nnet_layer_desc layers[MLP_NNET_MAX_LAYERS];
-    unsigned int weight_offsets[MLP_NNET_MAX_LAYERS];  // offset of the weights matrix and bias vector for each layer(at 1024-byte boundary)
+    unsigned int weight_offsets[MLP_NNET_MAX_LAYERS];  // offsets of the weights matrix and bias vector for each layer
+                                                       // at 1024-byte boundary
 };
 
 
