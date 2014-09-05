@@ -2,14 +2,14 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="testMLP" />
+		<Option title="mlpDataProviders" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/testMLP" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Debug/libmlpDataProviders" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
-				<Option type="1" />
+				<Option type="3" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
@@ -19,9 +19,9 @@
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/testMLP" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/libmlpDataProviders" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
-				<Option type="1" />
+				<Option type="3" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
@@ -34,25 +34,17 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add directory="libMLP/include" />
+			<Add option="-fPIC" />
 			<Add directory="mlpDataProviders/include" />
-			<Add directory="/opt/AMDAPP/include" />
-			<Add directory="/opt/clAmdBlas/include" />
+			<Add directory="libMLP/include" />
 		</Compiler>
 		<Linker>
-			<Add library="clAmdBlas" />
-			<Add library="OpenCL" />
 			<Add library="MLP" />
-			<Add library="mlpDataProviders" />
-			<Add directory="bin/Release" />
-			<Add directory="/opt/clAmdBlas/lib64" />
 		</Linker>
-		<Unit filename="testMLP/iflytek_test.cpp" />
-		<Unit filename="testMLP/mnist_test.cpp" />
-		<Unit filename="testMLP/ptc_ch_test.cpp" />
-		<Unit filename="testMLP/ptc_en_test.cpp" />
-		<Unit filename="testMLP/simple_test.cpp" />
-		<Unit filename="testMLP/test_main.cpp" />
+		<Unit filename="mlpDataProviders/cpps/MLPIflyDataProvider.cpp" />
+		<Unit filename="mlpDataProviders/cpps/MLPPtcDataProvider.cpp" />
+		<Unit filename="mlpDataProviders/include/MLPIFlyDataProvider.h" />
+		<Unit filename="mlpDataProviders/include/MLPPtcDataProvider.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

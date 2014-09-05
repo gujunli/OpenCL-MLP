@@ -1,0 +1,44 @@
+# depslib dependency file v1.0
+1406784778 source:/home/qfzhang/AMD-work2/MLP-Linux/mlpDataProviders/cpps/MLPIflyDataProvider.cpp
+	<algorithm>
+	<iostream>
+	"MLPUtil.h"
+	"MLPIFlyDataProvider.h"
+
+1409729332 /home/qfzhang/AMD-work2/MLP-Linux/libMLP/include/MLPUtil.h
+	<windows.h>
+	<pthread.h>
+	<signal.h>
+	<unistd.h>
+	<sstream>
+	<exception>
+	<stdexcept>
+	"MLPApiExport.h"
+
+1404288553 /home/qfzhang/AMD-work2/MLP-Linux/libMLP/include/MLPApiExport.h
+
+1406784704 /home/qfzhang/AMD-work2/MLP-Linux/mlpDataProviders/include/MLPIFlyDataProvider.h
+	<vector>
+	<fstream>
+	"MLPApiExport.h"
+	"MLPDataProvider.h"
+
+1409735550 /home/qfzhang/AMD-work2/MLP-Linux/libMLP/include/MLPDataProvider.h
+	<Windows.h>
+	<pthread.h>
+	"MLPApiExport.h"
+	"MLPConstants.h"
+
+1404288553 /home/qfzhang/AMD-work2/MLP-Linux/libMLP/include/MLPConstants.h
+
+1409817294 source:/home/qfzhang/AMD-work2/MLP-Linux/mlpDataProviders/cpps/MLPPtcDataProvider.cpp
+	<algorithm>
+	<iostream>
+	"MLPUtil.h"
+	"MLPPtcDataProvider.h"
+
+1409727680 /home/qfzhang/AMD-work2/MLP-Linux/mlpDataProviders/include/MLPPtcDataProvider.h
+	<fstream>
+	"MLPApiExport.h"
+	"MLPDataProvider.h"
+

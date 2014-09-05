@@ -35,7 +35,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fPIC" />
-			<Add directory="include" />
+			<Add directory="libMLP/include" />
 			<Add directory="/opt/AMDAPP/include" />
 			<Add directory="/opt/clAmdBlas/include" />
 		</Compiler>
@@ -44,37 +44,35 @@
 			<Add library="OpenCL" />
 			<Add directory="/opt/clAmdBlas/lib64" />
 		</Linker>
-		<Unit filename="include/MLPApiExport.h" />
-		<Unit filename="include/MLPChkPointState.h" />
-		<Unit filename="include/MLPChkPointingMgr.h" />
-		<Unit filename="include/MLPCommon.h" />
-		<Unit filename="include/MLPConstants.h" />
-		<Unit filename="include/MLPDataProvider.h" />
-		<Unit filename="include/MLPIFlyDataProvider.h" />
-		<Unit filename="include/MLPMNistDataProvider.h" />
-		<Unit filename="include/MLPNetProvider.h" />
-		<Unit filename="include/MLPPredictor.h" />
-		<Unit filename="include/MLPSimpleDataProvider.h" />
-		<Unit filename="include/MLPTester.h" />
-		<Unit filename="include/MLPTrainer.h" />
-		<Unit filename="include/MLPUtil.h" />
-		<Unit filename="include/SingleDevClass.h" />
-		<Unit filename="include/oclUtil.h" />
-		<Unit filename="kernels/kernels.cl" />
-		<Unit filename="lib-cpps/MLPChkPointingMgr.cpp" />
-		<Unit filename="lib-cpps/MLPCommon.cpp" />
-		<Unit filename="lib-cpps/MLPDataProvider.cpp" />
-		<Unit filename="lib-cpps/MLPIflyDataProvider.cpp" />
-		<Unit filename="lib-cpps/MLPMNistDataProvider.cpp" />
-		<Unit filename="lib-cpps/MLPNetProvider.cpp" />
-		<Unit filename="lib-cpps/MLPPredictor.cpp" />
-		<Unit filename="lib-cpps/MLPSimpleDataProvider.cpp" />
-		<Unit filename="lib-cpps/MLPTester.cpp" />
-		<Unit filename="lib-cpps/MLPTrainer.cpp" />
-		<Unit filename="lib-cpps/MLPTraining.cpp" />
-		<Unit filename="lib-cpps/MLPUtil.cpp" />
-		<Unit filename="lib-cpps/SingleDevClass.cpp" />
-		<Unit filename="lib-cpps/oclUtil.cpp" />
+		<Unit filename="libMLP/cpps/MLPChkPointingMgr.cpp" />
+		<Unit filename="libMLP/cpps/MLPCommon.cpp" />
+		<Unit filename="libMLP/cpps/MLPDataProvider.cpp" />
+		<Unit filename="libMLP/cpps/MLPMNistDataProvider.cpp" />
+		<Unit filename="libMLP/cpps/MLPNetProvider.cpp" />
+		<Unit filename="libMLP/cpps/MLPPredictor.cpp" />
+		<Unit filename="libMLP/cpps/MLPSimpleDataProvider.cpp" />
+		<Unit filename="libMLP/cpps/MLPTester.cpp" />
+		<Unit filename="libMLP/cpps/MLPTrainer.cpp" />
+		<Unit filename="libMLP/cpps/MLPTraining.cpp" />
+		<Unit filename="libMLP/cpps/MLPUtil.cpp" />
+		<Unit filename="libMLP/cpps/SingleDevClass.cpp" />
+		<Unit filename="libMLP/cpps/oclUtil.cpp" />
+		<Unit filename="libMLP/include/MLPApiExport.h" />
+		<Unit filename="libMLP/include/MLPChkPointState.h" />
+		<Unit filename="libMLP/include/MLPChkPointingMgr.h" />
+		<Unit filename="libMLP/include/MLPCommon.h" />
+		<Unit filename="libMLP/include/MLPConstants.h" />
+		<Unit filename="libMLP/include/MLPDataProvider.h" />
+		<Unit filename="libMLP/include/MLPMNistDataProvider.h" />
+		<Unit filename="libMLP/include/MLPNetProvider.h" />
+		<Unit filename="libMLP/include/MLPPredictor.h" />
+		<Unit filename="libMLP/include/MLPSimpleDataProvider.h" />
+		<Unit filename="libMLP/include/MLPTester.h" />
+		<Unit filename="libMLP/include/MLPTrainer.h" />
+		<Unit filename="libMLP/include/MLPUtil.h" />
+		<Unit filename="libMLP/include/SingleDevClass.h" />
+		<Unit filename="libMLP/include/oclUtil.h" />
+		<Unit filename="libMLP/kernels/kernels.cl" />
 		<Extensions>
 			<code_completion />
 			<debugger />

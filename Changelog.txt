@@ -1,3 +1,7 @@
+*  Fri Sep 05 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+   -  Implemented the backend data provider MLPPtcDataProvider to support printed-text characters recognition
+   -  Reorganized the sources by putting codes to implement backend data providers into separated directory mlpDataProviders/ 
+
 *  Thu Jul 31 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
    -  Changed the MLPDataProvider implementation to more clearly split the work between the base class and derived class, 
       made setupDataProvider()/resetDataProvider complete base class interfaces, added setupBackendProvider/resetBackendProvider
@@ -5,7 +9,7 @@
 
 *  Wed Jul 30 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  
    -  Modified MLPNetProvider.h MLPNetProvider.cpp to add one constructor to support read the training configuration from file
-   -  Added a  readme.txt
+   -  Added a readme.txt
 
 *  Thu Jul 24 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  - 1.4.0
    -  Changed the MLP neural network configuration method, renamed files "mlp_netarch.conf" and "mlp_netweights.dat" to 
