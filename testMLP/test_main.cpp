@@ -28,6 +28,13 @@ extern void ptc_en_batch_testing();
 extern void ptc_en_single_testing();
 extern void ptc_en_predicting();
 
+void vlp_ch_training();
+void vlp_ch_training2();
+void vlp_ch_training3();     // training with checkpointing support
+void vlp_ch_batch_testing();
+void vlp_ch_single_testing();
+void vlp_ch_predicting();
+
 extern void ptc_ch_training();
 extern void ptc_ch_training2();
 extern void ptc_ch_training3();     // training with checkpointing support
@@ -49,9 +56,10 @@ int main()
 
     //iflytek_training2();
 	//mnist_training();
-	//mnist_training3();
-    //ptc_ch_training3();
-	ptc_en_training3();
+	//mnist_training2();
+	ptc_ch_training3();
+	//ptc_en_training();
+	//vlp_ch_training();
 	//simple_training();
 
 	cout << "Press any key to continue ..." << endl;
@@ -60,11 +68,12 @@ int main()
 
 	//iflytek_batch_testing();
 	//iflytek_predicting();
-	mnist_batch_testing();
+	//mnist_batch_testing();
 	//mnist_single_testing();
-	//ptc_ch_batch_testing();
-	ptc_en_predicting();
-	//simple_testing();
+	ptc_ch_batch_testing();
+	//ptc_en_batch_testing();
+	//vlp_ch_batch_testing();
+	//simple_batch_testing();
 	//mnist_predicting();
 
 	cout << "Press any key to end ..." << endl;

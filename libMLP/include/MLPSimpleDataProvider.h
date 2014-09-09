@@ -16,12 +16,9 @@
 class MLPSimpleDataProvider:public MLPDataProvider
 {
 private:
-	float *featureData;
-	float *labelData;
+	int  batchNo;              // Accumulated number of batches that have been read from the data source, presenting the latest batch to see
+	                           // this is mainly used to determine a checkpointing location
 
-	int *permutations;
-
-    int  batchNo;                // Current batchNo of data it is providing
 public:
 	LIBMLPAPI MLPSimpleDataProvider();
 	LIBMLPAPI MLPSimpleDataProvider(MLP_DATA_MODE mode, int dataFeatureSize, int dataLabelSize, int batchSize, int shuffleBatches);
@@ -30,7 +27,7 @@ public:
 
     void setupBackendDataProvider();
 	void resetBackendDataProvider();
-    bool endofInputBatches();
+ 
     bool frameMatching(const float *frameOutput, const float *frameLabel, int len);
 
     // The following two interfaces are only used by the CheckPointing Function
@@ -38,11 +35,8 @@ public:
 	void setupBackendDataProvider(int startFrameNo, bool doChkPointing) {};      // Setup the DataProvider to provide data starting from this Frame Position
 
 private:
-	 void prepare_batch_data();          // implementation of base class virtual interface
-	 bool haveBatchToProvide();          // implementation of base class virtual interface
-
-	 void setup_data_source();
-	 void shuffle_data(int *index, int len);
+	 void setup_first_data_batches();            // first time read a group of batches from the source and setup them on the io buffers
+	 void setup_cont_data_batches();             // read a group of batches from the source and setup them on the io buffers
 };
 
 #endif

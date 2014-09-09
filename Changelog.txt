@@ -1,3 +1,14 @@
+*  Tue Sep 09 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+   -  Further moved some common codes from the backend data provider to MLPDataProvider base class, make it easier to implement
+      backend data provider
+   -  Added the codes for training and testing Printed-text Chinese Characters, Printed-text English Characters and Vehicle License
+      Plate Chinese Characters classifier
+
+*  Sat Sep 06 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+   -  Updated the MLPDataProvider to move many common codes from the backend data providers to the MLPDataProvider base class
+   -  Updated the backend data providers (eg. MLPMNistDataProvider) to provide less than "shuffleBatches" of batches at end of
+      the data set, enabling the total batches size be possible not a multiple of "shuffleBatches" 
+
 *  Fri Sep 05 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
    -  Implemented the backend data provider MLPPtcDataProvider to support printed-text characters recognition
    -  Reorganized the sources by putting codes to implement backend data providers into separated directory mlpDataProviders/ 
@@ -73,13 +84,11 @@
    -  Fixed many bugges including the incorrect calling of clAmdBlas API, bugges in kernels
    -  Training convergence is reached !!!!
 
-
 *  Wed Apr 23 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>
    -  Implemented complete support of various network configuration including various algorithms for activation, cost functions. 
    -  Move all OpenCL wrapper functions to MLPCommon.cpp
    -  Replace all C codes by C++ implementations
    
-
 *  Wed Apr 09 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>
    -  Spliting the functions for training, testing, predicting into three classes MLPTrainer/MLPTester/MLPPredictor
    -  Implemented the double-buffer service architecture of MLPDataProvider

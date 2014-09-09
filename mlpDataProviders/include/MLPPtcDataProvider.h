@@ -19,20 +19,11 @@ using namespace std;
 class MLPPtcDataProvider:public MLPDataProvider
 {
 private:
-	float *featureData;
-	float *labelData;
-
-	int *permutations;
-
 	ifstream dataFile;
 
 	int  batchNo;              // Current batchNo of data it is providing
 
 	int num_frames;            // total number of data frames
-	int stageBatchNo;          // batch number inside each loaded batches (eg. inside each [m_shufflebatches * rounds] batches
-
-	bool endOfDataSource;
-    bool batches_loaded;       // the batches of data just were loaded from the file to the buffer
 
     int imageWidth;            // width of the input image
 	int imageHeight;           // height of the input image
@@ -52,12 +43,8 @@ public:
     void setupBackendDataProvider(int startFrameNo, bool doChkPointing);      // implementation of public base class virtual interface
 
 private:
-	 void prepare_batch_data();                 // implementation of private base class virtual interface
-	 bool haveBatchToProvide();                 // implementation of private base class virtual interface
-
-	 void setup_first_data_batches();            // first time read data from the file and setup them on the memory
-	 void setup_cont_data_batches();             // continue to read data from the file and setup them on the memory
-	 void shuffle_data(int *index, int len);
+	 void setup_first_data_batches();            // first time read a group of batches from the source and setup them on the io buffers
+	 void setup_cont_data_batches();             // read a group of batches from the source and setup them on the io buffers
 
      void InitializeFromPtcSource(const char *dataPath);
 	 void gotoDataFrame(int frameNo);

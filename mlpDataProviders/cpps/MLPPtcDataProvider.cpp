@@ -5,7 +5,6 @@
  *
  */
 
-#include <algorithm>
 #include <iostream>
 
 #include "MLPUtil.h"
@@ -76,15 +75,13 @@ MLPPtcDataProvider::MLPPtcDataProvider()
  	this->m_batchSize = 512;
 
 	if ( this->dataMode == MLP_DATAMODE_TRAIN )
-		this->m_shuffleBatches = 50;          // for testing and predicting, we don't need to shuffle the data
+		this->m_shuffleBatches = 10;          // for testing and predicting, we don't need to shuffle the data
 	else
 	    this->m_shuffleBatches = 1;
 
     this->InitializeFromPtcSource(PTC_DB_PATH);
 
-	this->total_batches = ROUNDK(DIVUPK(this->num_frames,this->m_batchSize),this->m_shuffleBatches);
-	this->endOfDataSource = false;
-	this->batches_loaded = false;
+	this->total_batches = DIVUPK(this->num_frames,this->m_batchSize);
 };
 
 MLPPtcDataProvider::MLPPtcDataProvider(const char *dataPath, MLP_DATA_MODE mode, int batchSize, int shuffleBatches)
@@ -105,9 +102,7 @@ MLPPtcDataProvider::MLPPtcDataProvider(const char *dataPath, MLP_DATA_MODE mode,
 
 	this->InitializeFromPtcSource(dataPath);
 
-	this->total_batches = ROUNDK(DIVUPK(this->num_frames,this->m_batchSize),this->m_shuffleBatches);
-	this->endOfDataSource = false;
-	this->batches_loaded  = false;
+	this->total_batches = DIVUPK(this->num_frames,this->m_batchSize);
 };
 
 MLPPtcDataProvider::~MLPPtcDataProvider()
@@ -117,60 +112,8 @@ MLPPtcDataProvider::~MLPPtcDataProvider()
 	if ( this->dataFile.is_open() )
 	     this->dataFile.close();
 
-	delete [] this->permutations;
-	delete [] this->featureData;
-	if ( this->haveLabel )
-	     delete [] this->labelData;
-
-	this->release_buffers();
-};
-
-
-//////////////////////////////////////////////////////////////////////////////////////
-////                          private member functions                            ////
-//////////////////////////////////////////////////////////////////////////////////////
-
-
-void MLPPtcDataProvider::prepare_batch_data()
-{
-	if ( this->supportChkPointing)
-	     MLP_LOCK(&this->chkPointingLock);
-
-	// transfer one batch from the data source to the Double-buffer
-	this->load_feature_batch(this->featureData,this->permutations,this->m_batchSize*(this->batchNo % this->m_shuffleBatches));
-	if ( this->haveLabel )
-	     this->load_label_batch(this->labelData,this->permutations,this->m_batchSize*(this->batchNo % this->m_shuffleBatches));
-
-	this->batchNo++;
-	this->stageBatchNo++;
-
-	if ( this->supportChkPointing )
-		 MLP_UNLOCK(&this->chkPointingLock);
-
-	if ( this->stageBatchNo == this->m_shuffleBatches ) {
-
-		  this->batches_loaded = false;
-
-		  if ( !this->endOfDataSource )
-		        this->setup_cont_data_batches();
-
-		  if ( this->batches_loaded ) {
-		       this->shuffle_data(this->permutations, this->m_batchSize * this->m_shuffleBatches );
-		  };
-
-		  this->stageBatchNo = 0;
-	};
-};
-
-bool MLPPtcDataProvider::haveBatchToProvide()
-{
-	if ( !this->endOfDataSource )
-		 return(true);
-
-    if ( this->batches_loaded )
-		 return(true);
-
-	return(false);
+	this->release_io_buffers(); 
+	this->release_transfer_buffers();
 };
 
 
@@ -181,7 +124,7 @@ void MLPPtcDataProvider::setup_first_data_batches()
 	this->setup_cont_data_batches();
 
     if ( this->batches_loaded ) {
-	     this->shuffle_data(this->permutations, this->m_batchSize * this->m_shuffleBatches );
+	     this->shuffle_data(this->permutations, this->m_batchSize * this->batches_loaded );
     };
 };
 
@@ -189,10 +132,6 @@ void MLPPtcDataProvider::setup_cont_data_batches()
 {
 	int readCount=0;
 	int frame;
-
-	// initial permutations, permutated each round
-	for (int k=0; k < this->m_batchSize * this->m_shuffleBatches; k++)
-		    this->permutations[k] = k;
 
 	unsigned char *imagebuf;
 	unsigned short label;
@@ -236,14 +175,17 @@ void MLPPtcDataProvider::setup_cont_data_batches()
 		 };
 	};
 
-endf:    // duplicate the first "readCount" records to minibatch*shuffleBatches records
+endf:   
 
-    if ( readCount > 0 ) {
+	if ( readCount % this->m_batchSize > 0 ) {  // not one complete batch of frames are loaded
 	     int dst=readCount;
+		 int batches; 
 		 int src=0;
 
-		 // setup a new stage of batches using the left frames
-		 while ( dst < this->m_batchSize * this->m_shuffleBatches ) {
+		 batches = readCount/this->m_batchSize + 1; 
+
+		 // replicate to fill the left frame in last batch 
+		 while ( dst < this->m_batchSize * batches ) {
 				src = dst % readCount;
 
 		        for (int i=0; i < this->m_dataFeatureSize; i++)
@@ -255,18 +197,17 @@ endf:    // duplicate the first "readCount" records to minibatch*shuffleBatches 
 
 				dst++;
 		  };
+		  this->batches_loaded = batches; 
 	 }
+ 	 else {
+		  this->batches_loaded = (readCount == 0)? this->m_shuffleBatches: (readCount/this->m_batchSize); 
+	 }; 
 
-	 if ( frame > 0  || readCount > 0 )
-		  this->batches_loaded = true;
+	 this->batchNo += this->batches_loaded; 
 
 	 delete [] imagebuf;
 };
 
-void MLPPtcDataProvider::shuffle_data(int *index, int len)
-{
-	std::random_shuffle(index, index+len);
-};
 
 void MLPPtcDataProvider::gotoDataFrame(int frameNo)
 {
@@ -289,26 +230,14 @@ void MLPPtcDataProvider::setupBackendDataProvider()
 
 	this->batchNo = 0;
 
-    // allocate batches buffer
-	this->permutations = new int[this->m_batchSize * this->m_shuffleBatches];
-	this->featureData  = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataFeatureSize];
-	if ( this->haveLabel )
-         this->labelData = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataLabelSize];
-
 	this->setup_first_data_batches();
 };
 
 void MLPPtcDataProvider::setupBackendDataProvider(int startFrameNo, bool doChkPointing)
 {
-	this->gotoDataFrame(startFrameNo);
+	this->gotoDataFrame((startFrameNo/this->m_batchSize)*this->m_batchSize);
 
 	this->batchNo = (startFrameNo / this->m_batchSize);  // The new "batchNo" will start from this one
-
-    // allocate batches buffer
-	this->permutations = new int[this->m_batchSize * this->m_shuffleBatches];
-	this->featureData  = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataFeatureSize];
-	if ( this->haveLabel )
-         this->labelData = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataLabelSize];
 
 	this->setup_first_data_batches();
 };
@@ -316,9 +245,7 @@ void MLPPtcDataProvider::setupBackendDataProvider(int startFrameNo, bool doChkPo
 
 void MLPPtcDataProvider::resetBackendDataProvider()
 {
-    this->endOfDataSource = false;
 	this->batchNo = 0;
-	this->batches_loaded = false;
 
     this->dataFile.clear();
 	this->gotoDataFrame(0);
@@ -330,16 +257,15 @@ void MLPPtcDataProvider::resetBackendDataProvider()
 void MLPPtcDataProvider::getCheckPointFrame(int & frameNo)
 {
     int batch;
-	int stage;
 
 	MLP_LOCK(&this->chkPointingLock);
 
-	batch = this->batchNo - MLP_BATCH_RING_SIZE;    // This is the batchNo for the sequence of shuffled batche,  Consider there are batches on the buffer ring (may not be processed by the Trainer)
-
-	stage = batch / this->m_shuffleBatches;
+    // get the latest batch for which we are sure having been processed,  Consider there are batches on
+	// the transfer and io buffer that may not be processed by the Trainer
+	batch = this->batchNo - (this->batches_loaded - this->stageBatchNo) - MLP_BATCH_RING_SIZE;    
 
 	// We will start from the first frame of the "stage", since frames before this "stage" have been processed
-	frameNo = stage * this->m_shuffleBatches * this->m_batchSize;
+	frameNo = batch * this->m_batchSize;
 
 	MLP_UNLOCK(&this->chkPointingLock);
 };

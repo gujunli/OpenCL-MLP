@@ -14,7 +14,7 @@
 
 using namespace std;
 
-#define MLP_CHKPOINTING_PERIOD 1200                // checkpointing period in seconds, usually one hour
+#define MLP_CHKPOINTING_PERIOD 1800                // checkpointing period in seconds, usually one hour
 
 MLPCheckPointManager::MLPCheckPointManager()
 {

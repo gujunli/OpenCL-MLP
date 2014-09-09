@@ -308,3 +308,162 @@
 1409898271 source:/home/qfzhang/AMD-work2/MLP-Linux/testMLP/test_main.cpp
 	<iostream>
 
+1409902494 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/iflytek_test.cpp
+	<iostream>
+	"MLPUtil.h"
+	"MLPTrainer.h"
+	"MLPTester.h"
+	"MLPPredictor.h"
+	"MLPNetProvider.h"
+	"MLPIFlyDataProvider.h"
+	"MLPChkPointingMgr.h"
+
+1409729332 /home/qfzhang/AMD-work2/MLP-Linux-0909/libMLP/include/MLPUtil.h
+	<windows.h>
+	<pthread.h>
+	<signal.h>
+	<unistd.h>
+	<sstream>
+	<exception>
+	<stdexcept>
+	"MLPApiExport.h"
+
+1404288553 /home/qfzhang/AMD-work2/MLP-Linux-0909/libMLP/include/MLPApiExport.h
+
+1404288553 /home/qfzhang/AMD-work2/MLP-Linux-0909/libMLP/include/MLPTrainer.h
+	<Windows.h>
+	<pthread.h>
+	<CL/cl.h>
+	<CL/cl_ext.h>
+	"MLPApiExport.h"
+	"MLPConstants.h"
+	"MLPCommon.h"
+	"SingleDevClass.h"
+	"MLPNetProvider.h"
+	"MLPDataProvider.h"
+	"MLPChkPointState.h"
+
+1404288553 /home/qfzhang/AMD-work2/MLP-Linux-0909/libMLP/include/MLPConstants.h
+
+1404983799 /home/qfzhang/AMD-work2/MLP-Linux-0909/libMLP/include/MLPCommon.h
+	<CL/cl.h>
+	<iostream>
+	<fstream>
+
+1404288553 /home/qfzhang/AMD-work2/MLP-Linux-0909/libMLP/include/SingleDevClass.h
+	<CL/cl.h>
+
+1409799466 /home/qfzhang/AMD-work2/MLP-Linux-0909/libMLP/include/MLPNetProvider.h
+	"MLPApiExport.h"
+
+1410066638 /home/qfzhang/AMD-work2/MLP-Linux-0909/libMLP/include/MLPDataProvider.h
+	<Windows.h>
+	<pthread.h>
+	"MLPApiExport.h"
+	"MLPConstants.h"
+
+1407742701 /home/qfzhang/AMD-work2/MLP-Linux-0909/libMLP/include/MLPChkPointState.h
+
+1405006571 /home/qfzhang/AMD-work2/MLP-Linux-0909/libMLP/include/MLPTester.h
+	<CL/cl.h>
+	<CL/cl_ext.h>
+	"MLPApiExport.h"
+	"MLPConstants.h"
+	"MLPCommon.h"
+	"SingleDevClass.h"
+	"MLPNetProvider.h"
+	"MLPDataProvider.h"
+
+1405001107 /home/qfzhang/AMD-work2/MLP-Linux-0909/libMLP/include/MLPPredictor.h
+	<CL/cl.h>
+	<CL/cl_ext.h>
+	"MLPApiExport.h"
+	"MLPCommon.h"
+	"MLPConstants.h"
+	"SingleDevClass.h"
+	"MLPNetProvider.h"
+	"MLPDataProvider.h"
+
+1410064434 /home/qfzhang/AMD-work2/MLP-Linux-0909/mlpDataProviders/include/MLPIFlyDataProvider.h
+	<vector>
+	<fstream>
+	"MLPApiExport.h"
+	"MLPDataProvider.h"
+
+1404288553 /home/qfzhang/AMD-work2/MLP-Linux-0909/libMLP/include/MLPChkPointingMgr.h
+	<Windows.h>
+	<pthread.h>
+	<string>
+	"MLPApiExport.h"
+	"MLPTrainer.h"
+	"MLPChkPointState.h"
+
+1410246406 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/mnist_test.cpp
+	<iostream>
+	"MLPUtil.h"
+	"MLPTrainer.h"
+	"MLPTester.h"
+	"MLPPredictor.h"
+	"MLPNetProvider.h"
+	"MLPMNistDataProvider.h"
+	"MLPChkPointingMgr.h"
+
+1410064378 /home/qfzhang/AMD-work2/MLP-Linux-0909/libMLP/include/MLPMNistDataProvider.h
+	<fstream>
+	"MLPApiExport.h"
+	"MLPDataProvider.h"
+
+1410246657 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/ptc_ch_test.cpp
+	<iostream>
+	"MLPUtil.h"
+	"MLPTrainer.h"
+	"MLPTester.h"
+	"MLPPredictor.h"
+	"MLPNetProvider.h"
+	"MLPPtcDataProvider.h"
+	"MLPChkPointingMgr.h"
+
+1410064462 /home/qfzhang/AMD-work2/MLP-Linux-0909/mlpDataProviders/include/MLPPtcDataProvider.h
+	<fstream>
+	"MLPApiExport.h"
+	"MLPDataProvider.h"
+
+1410246516 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/ptc_en_test.cpp
+	<iostream>
+	"MLPUtil.h"
+	"MLPTrainer.h"
+	"MLPTester.h"
+	"MLPPredictor.h"
+	"MLPNetProvider.h"
+	"MLPPtcDataProvider.h"
+	"MLPChkPointingMgr.h"
+
+1409902494 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/simple_test.cpp
+	<iostream>
+	"MLPUtil.h"
+	"MLPTrainer.h"
+	"MLPTester.h"
+	"MLPPredictor.h"
+	"MLPNetProvider.h"
+	"MLPSimpleDataProvider.h"
+	"MLPMNistDataProvider.h"
+	"MLPIFlyDataProvider.h"
+	"MLPChkPointingMgr.h"
+
+1410064984 /home/qfzhang/AMD-work2/MLP-Linux-0909/libMLP/include/MLPSimpleDataProvider.h
+	"MLPApiExport.h"
+	"MLPDataProvider.h"
+
+1410246678 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/test_main.cpp
+	<iostream>
+
+1410245660 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/vlp_ch_test.cpp
+	<iostream>
+	"MLPUtil.h"
+	"MLPTrainer.h"
+	"MLPTester.h"
+	"MLPPredictor.h"
+	"MLPNetProvider.h"
+	"MLPPtcDataProvider.h"
+	"MLPChkPointingMgr.h"
+

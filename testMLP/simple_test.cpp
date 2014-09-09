@@ -85,7 +85,7 @@ void simple_batch_testing()
 	int dimensions[nLayers] = {429,2048,2048,2048,2048,2048,2048,8991};
 
 	int minibatch = 512;
-	int shuffleBatches = 10;
+	int shuffleBatches = 1;
 	// int totalbatches;
 
 	MLPNetProvider *netProviderp=NULL;

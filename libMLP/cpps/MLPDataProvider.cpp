@@ -5,6 +5,8 @@
  *
  */
 
+#include <algorithm>
+
 #include "MLPUtil.h"
 #include "MLPDataProvider.h"
 
@@ -30,7 +32,7 @@ MLPDataProvider::~MLPDataProvider()
 };
 
 // create the data buffers and initialize the locks and condition variable
-void MLPDataProvider::create_buffers(int batchSize)
+void MLPDataProvider::create_transfer_buffers(int batchSize)
 {
 
 	for (int i=0; i< MLP_BATCH_RING_SIZE; i++) {
@@ -60,7 +62,7 @@ void MLPDataProvider::create_buffers(int batchSize)
 };
 
 // release the data buffers
-void MLPDataProvider::release_buffers()
+void MLPDataProvider::release_transfer_buffers()
 {
 
 	for (int i=0; i< MLP_BATCH_RING_SIZE; i++) {
@@ -71,7 +73,7 @@ void MLPDataProvider::release_buffers()
 	};
 };
 
-void MLPDataProvider::reset_buffers()
+void MLPDataProvider::reset_transfer_buffers()
 {
 	this->rbuf_count = 0;
 	this->wbuf_count = MLP_BATCH_RING_SIZE;
@@ -86,6 +88,37 @@ void MLPDataProvider::reset_buffers()
 
 	MLP_LOCK_INIT(&this->bufferLock);
 };
+
+void MLPDataProvider::create_io_buffers()
+{
+    // allocate batches IO buffers used by the backend data provider
+	this->permutations = new int[this->m_batchSize * this->m_shuffleBatches];
+	this->featureData  = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataFeatureSize];
+	if ( this->haveLabel )
+         this->labelData = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataLabelSize];
+
+    for (int k=0; k < this->m_batchSize * this->m_shuffleBatches; k++)
+	     this->permutations[k] = k;
+
+	this->batches_loaded  = 0; 
+};
+
+void MLPDataProvider::release_io_buffers()
+{
+	delete [] this->featureData; 
+	if ( this->haveLabel ) 
+		delete [] this->labelData; 
+	delete [] this->permutations; 
+}; 
+
+void MLPDataProvider::reset_io_buffers()
+{
+	this->batches_loaded = 0;
+
+    for (int k=0; k < this->m_batchSize * this->m_shuffleBatches; k++)
+	     this->permutations[k] = k;
+}; 
+
 
 // create and start the worker thread
 int MLPDataProvider::startup_worker()
@@ -423,6 +456,59 @@ void MLPDataProvider::load_label_batch(float *srcp, int *indexBase, int indexOff
 };
 
 
+void MLPDataProvider::prepare_batch_data()
+{ 
+	if ( this->supportChkPointing)
+	     MLP_LOCK(&this->chkPointingLock);
+
+	// get one batch from the io buffer to the transfer buffer
+	this->load_feature_batch(this->featureData,this->permutations,this->m_batchSize*(this->stageBatchNo % this->m_shuffleBatches));
+	if ( this->haveLabel )
+	     this->load_label_batch(this->labelData,this->permutations,this->m_batchSize*(this->stageBatchNo % this->m_shuffleBatches));
+
+	this->stageBatchNo++;
+
+	if ( this->stageBatchNo == this->batches_loaded ) {
+
+		  this->batches_loaded = 0;
+
+		  if ( !this->endOfDataSource ) 
+		        this->setup_cont_data_batches();
+
+		  if ( this->batches_loaded ) {
+			  	// initial permutations, permutated each round
+	            for (int k=0; k < this->m_batchSize * this->m_shuffleBatches; k++)
+		             this->permutations[k] = k;
+
+		        this->shuffle_data(this->permutations, this->m_batchSize * this->batches_loaded );
+		        // cout << "Load new data from files and shuffling the frame sequences" << endl;
+		  };
+
+		  this->stageBatchNo = 0;
+	};
+
+	if ( this->supportChkPointing )
+		 MLP_UNLOCK(&this->chkPointingLock);
+};
+
+void MLPDataProvider::shuffle_data(int *index, int len)
+{
+	std::random_shuffle(index, index+len);
+};
+
+
+bool MLPDataProvider::haveBatchToProvide()
+{
+	if ( !this->endOfDataSource )
+		 return(true);
+
+    if ( this->batches_loaded )
+		 return(true);
+
+	return(false);
+};
+
+
 bool MLPDataProvider::batchAvailable()
 {
 	if ( this->haveBatchToProvide() )
@@ -437,10 +523,12 @@ bool MLPDataProvider::batchAvailable()
 void MLPDataProvider::setupDataProvider()
 {
 	this->supportChkPointing = false;
+	this->create_transfer_buffers(this->m_batchSize);
+	this->create_io_buffers(); 
 
-	this->create_buffers(this->m_batchSize);
+	this->endOfDataSource = false;
 
-    this->setupBackendDataProvider();
+    this->setupBackendDataProvider();   // call the back-end setup
 
 	this->initialized = true;
 
@@ -459,9 +547,12 @@ void MLPDataProvider::setupDataProvider(int startFrameNo, bool doChkPointing)
 	if ( this->supportChkPointing )
 		 MLP_LOCK_INIT(&this->chkPointingLock);
 
-	this->create_buffers(this->m_batchSize);
+	this->create_transfer_buffers(this->m_batchSize);
+	this->create_io_buffers(); 
 
-    this->setupBackendDataProvider(startFrameNo, doChkPointing);
+	this->endOfDataSource = false;
+
+    this->setupBackendDataProvider(startFrameNo, doChkPointing); 
 
 	this->initialized = true;
 
@@ -477,7 +568,10 @@ void MLPDataProvider::resetDataProvider()
 	};
 	MLP_CHECK(this->shutdown_worker());
 
-	this->reset_buffers();
+	this->reset_transfer_buffers();
+	this->reset_io_buffers(); 
+
+	this->endOfDataSource = false;
 
 	if ( this->supportChkPointing )
 		 MLP_LOCK_INIT(&this->chkPointingLock);

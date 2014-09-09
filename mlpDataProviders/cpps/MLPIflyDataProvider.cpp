@@ -5,8 +5,6 @@
  *
  */
 
-
-#include <algorithm>
 #include <iostream>
 
 #include "MLPUtil.h"
@@ -290,9 +288,7 @@ MLPIFlyDataProvider::MLPIFlyDataProvider()
 
     this->InitializeFromIFlySource(IFLY_PATH);
 
-	this->total_batches = ROUNDK(DIVUPK(this->mySetFrames,this->m_batchSize),this->m_shuffleBatches);
-	this->endOfDataSource = false;
-	this->batches_loaded = false;
+	this->total_batches = DIVUPK(this->mySetFrames,this->m_batchSize);
 	this->curSentence = -1; 
 };
 
@@ -314,9 +310,7 @@ MLPIFlyDataProvider::MLPIFlyDataProvider(const char *dataPath, MLP_DATA_MODE mod
 
 	this->InitializeFromIFlySource(dataPath);
 
-	this->total_batches = ROUNDK(DIVUPK(this->mySetFrames,this->m_batchSize),this->m_shuffleBatches);
-	this->endOfDataSource = false;
-	this->batches_loaded = false;
+	this->total_batches = DIVUPK(this->mySetFrames,this->m_batchSize);
 	this->curSentence = -1; 
 };
 
@@ -329,68 +323,16 @@ MLPIFlyDataProvider::~MLPIFlyDataProvider()
 	if ( this->labelFile.is_open() )
 	     this->labelFile.close();
 
-	delete [] this->permutations;
-	delete [] this->featureData;
-	if ( this->haveLabel )
-	     delete [] this->labelData;
-
 	for (int i=0; i< (int)this->sDataFrames.size(); i++)
 		 delete [] this->sDataFrames[i];
 
 	this->sDataFrames.clear();
 	this->sLabelFrames.clear();
 
-	this->release_buffers();
+	this->release_io_buffers(); 
+	this->release_transfer_buffers();
 };
 
-
-//////////////////////////////////////////////////////////////////////////////////////
-////                          private member functions                            ////
-//////////////////////////////////////////////////////////////////////////////////////
-
-
-void MLPIFlyDataProvider::prepare_batch_data()
-{
-	if ( this->supportChkPointing)
-	     MLP_LOCK(&this->chkPointingLock);
-
-	// transfer one batch from the data source to the Double-buffer
-	this->load_feature_batch(this->featureData,this->permutations,this->m_batchSize*(this->stageBatchNo % this->m_shuffleBatches));
-	if ( this->haveLabel )
-	     this->load_label_batch(this->labelData,this->permutations,this->m_batchSize*(this->stageBatchNo % this->m_shuffleBatches));
-
-	this->stageBatchNo++;
-
-	if ( this->supportChkPointing )
-		 MLP_UNLOCK(&this->chkPointingLock);
-
-	if ( this->stageBatchNo == this->m_shuffleBatches ) {
-
-		  this->batches_loaded = false;
-
-		  if ( !this->endOfDataSource )
-		        this->setup_cont_data_batches();
-
-		  if ( this->batches_loaded ) {
-		       this->shuffle_data(this->permutations, this->m_batchSize * this->m_shuffleBatches );
-		       // cout << "Load new data from files and shuffling the frame sequences" << endl;
-		  };
-
-		  this->stageBatchNo = 0;
-	};
-
-};
-
-bool MLPIFlyDataProvider::haveBatchToProvide()
-{
-	if ( ! this->endOfDataSource )
-		 return(true);
-
-    if ( this->batches_loaded )
-		 return(true);
-
-	return(false);
-};
 
 void MLPIFlyDataProvider::readOneSentence()
 {
@@ -480,8 +422,7 @@ void MLPIFlyDataProvider::setup_first_data_batches()
 	this->setup_cont_data_batches();
 
     if ( this->batches_loaded ) {
-	     this->shuffle_data(this->permutations, this->m_batchSize * this->m_shuffleBatches );
-	     //cout << "Load new data from files and shuffling the frame sequences" << endl;
+	     this->shuffle_data(this->permutations, this->m_batchSize * this->batches_loaded );
     };
 };
 
@@ -489,10 +430,6 @@ void MLPIFlyDataProvider::setup_cont_data_batches()
 {
 	int readCount=0;
 	int frame;
-
-	// Initial permutations, permutated each round
-	for (int k=0; k < this->m_batchSize * this->m_shuffleBatches; k++)
-		    this->permutations[k] = k;
 
 	// For CheckPoint
 
@@ -581,35 +518,37 @@ void MLPIFlyDataProvider::setup_cont_data_batches()
 		 };
 	};
 
-endf:    // duplicate the first "readCount" records to minibatch*shuffleBatches records
+endf:    
 
-    if ( readCount > 0 ) {
+	if ( readCount % this->m_batchSize > 0 ) {  // not one complete batch of frames are loaded
 	     int dst=readCount;
+		 int batches; 
 		 int src=0;
-		 while ( dst < this->m_batchSize * this->m_shuffleBatches ) {
+
+		 batches = readCount/this->m_batchSize + 1; 
+
+		 // replicate to fill the left frame in last batch 
+		 while ( dst < this->m_batchSize * batches ) {
 				src = dst % readCount;
 
 		        for (int i=0; i < this->m_dataFeatureSize; i++)
 			           this->featureData[dst*this->m_dataFeatureSize+i] = this->featureData[src*this->m_dataFeatureSize+i];
 
-				if ( this->haveLabel)
+				if ( this->haveLabel )
 		             for (int i=0; i < this->m_dataLabelSize; i++)
-				          this->labelData[dst*this->m_dataLabelSize+i] = this->labelData[src*this->m_dataLabelSize+i];
+				        this->labelData[dst*this->m_dataLabelSize+i] = this->labelData[src*this->m_dataLabelSize+i];
 
 				dst++;
 		  };
-	 };
-
-	 if ( frame > 0  || readCount > 0 )
-		  this->batches_loaded = true;
+		  this->batches_loaded = batches; 
+	 }
+ 	 else {
+		  this->batches_loaded = (readCount == 0)? this->m_shuffleBatches: (readCount/this->m_batchSize); 
+	 }; 
 
 	 delete [] tmpFeature;
 };
 
-void MLPIFlyDataProvider::shuffle_data(int *index, int len)
-{
-	std::random_shuffle(index, index+len);
-};
 
 void MLPIFlyDataProvider::gotoDataFrame(int frameNo)
 {
@@ -652,12 +591,6 @@ void MLPIFlyDataProvider::setupBackendDataProvider()
 
 	this->curStartFrame = this->curFrame;
 
-	// allocate batches buffer
-	this->permutations = new int[this->m_batchSize * this->m_shuffleBatches];
-	this->featureData  = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataFeatureSize];
-	if ( this->haveLabel )
-         this->labelData = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataLabelSize];
-
 	this->setup_first_data_batches();
 };
 
@@ -672,19 +605,11 @@ void MLPIFlyDataProvider::setupBackendDataProvider(int startFrameNo, bool doChkP
 
 	this->curChkPointFrame = this->lastChkPointFrame = this->curFrame;
 
-	this->permutations = new int[this->m_batchSize * this->m_shuffleBatches];
-	this->featureData  = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataFeatureSize];
-	if ( this->haveLabel )
-         this->labelData = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataLabelSize];
-
 	this->setup_first_data_batches();
 };
 
 void MLPIFlyDataProvider::resetBackendDataProvider()
 {
-    this->endOfDataSource = false;
-	this->batches_loaded = false;
-
 	this->dataFile.clear();
 	this->gotoDataFrame(this->mySetStart);
 	if ( this->haveLabel ) {

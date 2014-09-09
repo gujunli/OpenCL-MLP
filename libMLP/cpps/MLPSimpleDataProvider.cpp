@@ -24,11 +24,7 @@ MLPSimpleDataProvider::MLPSimpleDataProvider()
 	this->m_batchSize = 1024;
 	this->m_shuffleBatches = 50;
 
-	this->batchNo = 0;
-
-	this->total_batches = this->m_batchSize * this->m_shuffleBatches;
-
-    this->setup_data_source();
+	this->total_batches =this->m_shuffleBatches*10;
 };
 
 MLPSimpleDataProvider::MLPSimpleDataProvider(MLP_DATA_MODE mode, int dataFeatureSize, int dataLabelSize, int batchSize, int shuffleBatches)
@@ -46,66 +42,29 @@ MLPSimpleDataProvider::MLPSimpleDataProvider(MLP_DATA_MODE mode, int dataFeature
 	this->m_batchSize = batchSize;
 	this->m_shuffleBatches = shuffleBatches;
 
-	this->batchNo = 0;
-
-	this->total_batches = this->m_shuffleBatches;
-
-	this->setup_data_source();
+	this->total_batches = this->m_shuffleBatches*10;
 };
 
 MLPSimpleDataProvider::~MLPSimpleDataProvider()
 {
-	this->shutdown_worker();
+    MLP_CHECK(this->shutdown_worker());
 
-	delete [] this->permutations;
-	delete [] this->featureData;
-
-	if ( this->haveLabel )
-		delete [] this->labelData;
-
-	this->release_buffers();
+	this->release_io_buffers(); 
+	this->release_transfer_buffers();
 };
 
-
-//////////////////////////////////////////////////////////////////////////////////////
-////                          private member functions                            ////
-//////////////////////////////////////////////////////////////////////////////////////
-
-
-// fetch a batch of data from the source and get it ready on the data buffer for reading
-void MLPSimpleDataProvider::prepare_batch_data()
+void MLPSimpleDataProvider::setup_first_data_batches()
 {
-	this->load_feature_batch(this->featureData,this->permutations,this->m_batchSize*(this->batchNo % this->m_shuffleBatches));
-	this->load_label_batch(this->labelData,this->permutations,this->m_batchSize*(this->batchNo % this->m_shuffleBatches));
+	this->stageBatchNo = 0;
+	this->setup_cont_data_batches();
 
-	this->batchNo++;
-
-	if ( (this->batchNo % this->m_shuffleBatches) == 0 ) {
-		  this->shuffle_data(this->permutations, this->m_batchSize * this->m_shuffleBatches );
-	};
+    if ( this->batches_loaded ) {
+	     this->shuffle_data(this->permutations, this->m_batchSize * this->batches_loaded );
+    };
 };
 
-bool MLPSimpleDataProvider::haveBatchToProvide()
+void MLPSimpleDataProvider::setup_cont_data_batches()
 {
-	if ( this->batchNo == this->total_batches )
-		 return(false);
-	else
-	     return(true);
-};
-
-
-// set up the data source of MLPSimpleDataProvider
-void MLPSimpleDataProvider::setup_data_source()
-{
-	this->permutations = new int[this->m_batchSize * this->m_shuffleBatches];
-	this->featureData  = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataFeatureSize];
-	if ( this->haveLabel )
-		 this->labelData = new float[this->m_batchSize * this->m_shuffleBatches * this->m_dataLabelSize];
-
-	// initial permutations, permutated each epoch
-	for (int k=0; k < this->m_batchSize * this->m_shuffleBatches; k++)
-		    this->permutations[k] = k;
-
 	struct mlp_tv tv;
 
 	getCurrentTime(&tv);
@@ -134,12 +93,14 @@ void MLPSimpleDataProvider::setup_data_source()
              this->labelData[k*this->m_dataLabelSize + pos] = 1.0f;   // use the position of the maximum value in the input vector as the label of the vector
 		 };
 	};
+
+	this->batches_loaded = this->m_shuffleBatches; 
+	this->batchNo += this->batches_loaded; 
+
+	if ( this->batchNo == this->total_batches ) 
+		 this->endOfDataSource = true; 
 };
 
-void MLPSimpleDataProvider::shuffle_data(int *index, int len)
-{
-	std::random_shuffle(index, index+len);
-};
 
 //////////////////////////////////////////////////////////////////////////////////////
 ////                          public member functions                             ////
@@ -147,24 +108,18 @@ void MLPSimpleDataProvider::shuffle_data(int *index, int len)
 
 void MLPSimpleDataProvider::setupBackendDataProvider()
 {
+	this->batchNo = 0;
+
+	this->setup_first_data_batches();
 };
 
 void MLPSimpleDataProvider::resetBackendDataProvider()
 {
 	this->batchNo = 0;
 
-	// initial permutations, permutated each epoch
-	for (int k=0; k < this->m_batchSize * this->m_shuffleBatches; k++)
-		    this->permutations[k] = k;
+	this->setup_first_data_batches();
 };
 
-bool MLPSimpleDataProvider::endofInputBatches()
-{
-	if ( this->batchNo < this->total_batches )
-		 return(false);
-	else
-		 return(true);
-};
 
 // if the output for the frame matches its label, return true to indicate a successful mapping of this
 // frame by the neural network.  This interface will be called by the MLPTester class when calculating

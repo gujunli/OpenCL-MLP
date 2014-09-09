@@ -21,11 +21,6 @@ using namespace std;
 class MLPIFlyDataProvider:public MLPDataProvider
 {
 private:
-	float *featureData;
-	float *labelData;
-
-	int *permutations;
-
 	ifstream dataFile;
 	ifstream labelFile;
 
@@ -39,11 +34,6 @@ private:
 
     int mySetStart;            // Starting frame number of the currently used dataset (TrainDataSet or TestDataSet)
 	int mySetFrames;           // Total number of frames for TrainDataSet or TestDataSet we are current using, one file is splitted into training set and testing set
-
-    int stageBatchNo;          // Batch number inside each loaded batches (eg. inside each [this->m_shufflebatches * this->rounds] batches  )
-
-	bool endOfDataSource;
-    bool batches_loaded;       // the batches of data just were loaded from the file to the buffer
 
 	int curSentence;           // Sentence ID of the frames we are currently accessing
 	int curFrame;              // Global frame sequence number of the frame we are currently accessin
@@ -75,12 +65,8 @@ public:
     void setupBackendDataProvider(int startFrameNo, bool doChkPointing);   // Implementation of public base class virtual interface
 
 private:
-	 void prepare_batch_data();                // Implementation of private base class virtual interface
-	 bool haveBatchToProvide();                // Implementation of private base class virtual interface
-
-	 void setup_first_data_batches();           // First time read data from the file and setup them on the memory
-	 void setup_cont_data_batches();            // Continue to read data from the file and setup them on the memory
-	 void shuffle_data(int *index, int len);
+	 void setup_first_data_batches();            // first time read a group of batches from the source and setup them on the io buffers
+	 void setup_cont_data_batches();             // read a group of batches from the source and setup them on the io buffers
 
      void InitializeFromIFlySource(const char *dataPath);
 	 void gotoDataFrame(int frameNo);
