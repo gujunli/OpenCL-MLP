@@ -356,7 +356,7 @@
 1409799466 /home/qfzhang/AMD-work2/MLP-Linux-0909/libMLP/include/MLPNetProvider.h
 	"MLPApiExport.h"
 
-1410066638 /home/qfzhang/AMD-work2/MLP-Linux-0909/libMLP/include/MLPDataProvider.h
+1410765330 /home/qfzhang/AMD-work2/MLP-Linux-0909/libMLP/include/MLPDataProvider.h
 	<Windows.h>
 	<pthread.h>
 	"MLPApiExport.h"
@@ -398,7 +398,7 @@
 	"MLPTrainer.h"
 	"MLPChkPointState.h"
 
-1410246406 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/mnist_test.cpp
+1410584640 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/mnist_test.cpp
 	<iostream>
 	"MLPUtil.h"
 	"MLPTrainer.h"
@@ -413,7 +413,7 @@
 	"MLPApiExport.h"
 	"MLPDataProvider.h"
 
-1410246657 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/ptc_ch_test.cpp
+1410749100 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/ptc_ch_test.cpp
 	<iostream>
 	"MLPUtil.h"
 	"MLPTrainer.h"
@@ -428,15 +428,15 @@
 	"MLPApiExport.h"
 	"MLPDataProvider.h"
 
-1410246516 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/ptc_en_test.cpp
+1410699412 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/ptc_en_test.cpp
 	<iostream>
 	"MLPUtil.h"
 	"MLPTrainer.h"
 	"MLPTester.h"
 	"MLPPredictor.h"
 	"MLPNetProvider.h"
-	"MLPPtcDataProvider.h"
 	"MLPChkPointingMgr.h"
+	"MLPPtcDataProvider.h"
 
 1409902494 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/simple_test.cpp
 	<iostream>
@@ -457,7 +457,7 @@
 1410246678 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/test_main.cpp
 	<iostream>
 
-1410245660 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/vlp_ch_test.cpp
+1410403952 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/vlp_ch_test.cpp
 	<iostream>
 	"MLPUtil.h"
 	"MLPTrainer.h"
@@ -466,4 +466,24 @@
 	"MLPNetProvider.h"
 	"MLPPtcDataProvider.h"
 	"MLPChkPointingMgr.h"
+
+1410708828 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/ptc_digital_test.cpp
+	<iostream>
+	"MLPUtil.h"
+	"MLPTrainer.h"
+	"MLPTester.h"
+	"MLPPredictor.h"
+	"MLPNetProvider.h"
+	"MLPChkPointingMgr.h"
+	"MLPPtcDataProvider.h"
+
+1410709958 source:/home/qfzhang/AMD-work2/MLP-Linux-0909/testMLP/ptc_symbol_test.cpp
+	<iostream>
+	"MLPUtil.h"
+	"MLPTrainer.h"
+	"MLPTester.h"
+	"MLPPredictor.h"
+	"MLPNetProvider.h"
+	"MLPChkPointingMgr.h"
+	"MLPPtcDataProvider.h"
 

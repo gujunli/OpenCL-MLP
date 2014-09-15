@@ -42,7 +42,7 @@ void mnist_training()
 {
 	struct mlp_tv startv, endv;
 
-    /*
+	/*
 	MLP_NETTYPE nettype = NETTYPE_MULTI_CLASSIFICATION;
 	const int nLayers = 3;
 	int dimensions[nLayers] = {784, 800, 10};
@@ -65,8 +65,8 @@ void mnist_training()
 	// Training the neural network using MNist labelled dataset
     MLPTrainer *trainerp;
 
-	//dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
-	dataProviderp = new MLPMNistDataProvider(MNIST_PATH3, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	//dataProviderp = new MLPMNistDataProvider(MNIST_PATH3, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
 
 	/*
@@ -106,8 +106,8 @@ void mnist_training2()
 {
 	struct mlp_tv startv, endv;
 
-	int minibatch = 1000;
-	int shuffleBatches = 10;
+	int minibatch = 1024;
+	int shuffleBatches = 20;
 	int batches;
 	int totalbatches;
 	int epoches=400;
@@ -119,7 +119,7 @@ void mnist_training2()
 	// Training the neural network using MNist labelled dataset
     MLPTrainer *trainerp;
 
-	dataProviderp = new MLPMNistDataProvider(MNIST_PATH2, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	//dataProviderp = new MLPMNistDataProvider(MNIST_PATH3, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
 	totalbatches = dataProviderp->getTotalBatches();
@@ -151,8 +151,8 @@ void mnist_training3()
 {
 	struct mlp_tv startv, endv;
 
-	int minibatch = 1000;
-	int shuffleBatches = 10;
+	int minibatch = 1024;
+	int shuffleBatches = 20;
 	int batches;
 	int totalbatches;
 	int epoches = 400;
@@ -186,6 +186,7 @@ void mnist_training3()
 		 cout << "No old checkpoint found, start new checkpointing any way" << endl;
 
          netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
+		 //netProviderp = new MLPNetProvider("./", "mlp_training_init.conf",true);
 
 	     //dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	     dataProviderp = new MLPMNistDataProvider(MNIST_PATH3, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);

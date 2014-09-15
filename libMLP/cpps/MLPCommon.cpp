@@ -14,7 +14,7 @@
 #include <fstream>
 #include <cmath>
 
-const char MLP_version[] = "MLP version 1.4.1 developed by AMD China DNN Team";
+const char MLP_version[] = "MLP version 1.5.0 developed by AMD China DNN Team";
 
 // the simpleast method for transposition, the width can be any value
 void cmn_transpose_matrix_simple(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl_mem &A_cl, cl_mem &At_cl, int width, int height)

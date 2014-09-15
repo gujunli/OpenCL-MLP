@@ -255,7 +255,7 @@ void *MLPDataProvider::worker_fun(void *argp)
 	 objp->rbuf_index = 0;
 	 objp->wbuf_index = 0;
 
-	 objp->prepare_batch_data();    // first time to prepare the data onto the buffer
+	 objp->prepare_batch_data_top_half();    // first time to prepare the data onto the buffer
 
 	 EnterCriticalSection(&objp->bufferLock);
 
@@ -268,6 +268,8 @@ void *MLPDataProvider::worker_fun(void *argp)
 
 	 LeaveCriticalSection(&objp->bufferLock);
 
+     objp->prepare_batch_data_bottom_half();
+
 	 while ( objp->running ) {
             EnterCriticalSection(&objp->bufferLock);
 
@@ -278,7 +280,7 @@ void *MLPDataProvider::worker_fun(void *argp)
 				 if ( ! objp->haveBatchToProvide() )
 						break;
 
-				 objp->prepare_batch_data();   // load a batch of data
+				 objp->prepare_batch_data_top_half();   // load a batch of data
 
 	             EnterCriticalSection(&objp->bufferLock);
 
@@ -289,6 +291,8 @@ void *MLPDataProvider::worker_fun(void *argp)
 			     WakeConditionVariable(&objp->readReady);
 
                  LeaveCriticalSection(&objp->bufferLock);
+
+				 objp->prepare_batch_data_bottom_half();   // load a batch of data
 			}
 			else {
 			     SleepConditionVariableCS(&objp->writeReady, &objp->bufferLock, INFINITE);
@@ -392,7 +396,7 @@ void *MLPDataProvider::worker_fun(void *argp)
 	 objp->rbuf_index = 0;
 	 objp->wbuf_index = 0;
 
-	 objp->prepare_batch_data();    // first time to prepare the data onto the buffer
+	 objp->prepare_batch_data_top_half();    // first time to prepare the data onto the buffer
 
 	 pthread_mutex_lock(&objp->bufferLock);
 
@@ -405,6 +409,8 @@ void *MLPDataProvider::worker_fun(void *argp)
 
 	 pthread_mutex_unlock(&objp->bufferLock);
 
+	 objp->prepare_batch_data_bottom_half();  
+
 	 while ( objp->running ) {
             pthread_mutex_lock(&objp->bufferLock);
 
@@ -415,7 +421,7 @@ void *MLPDataProvider::worker_fun(void *argp)
 				 if ( ! objp->haveBatchToProvide() )
 						break;
 
-				 objp->prepare_batch_data();   // load a batch of data
+				 objp->prepare_batch_data_top_half();   // load a batch of data
 
 	             pthread_mutex_lock(&objp->bufferLock);
 
@@ -426,6 +432,8 @@ void *MLPDataProvider::worker_fun(void *argp)
 			     pthread_cond_signal(&objp->readReady);
 
                  pthread_mutex_unlock(&objp->bufferLock);
+
+				 objp->prepare_batch_data_bottom_half();  
 			}
 			else {
 			     pthread_cond_wait(&objp->writeReady, &objp->bufferLock);
@@ -456,15 +464,18 @@ void MLPDataProvider::load_label_batch(float *srcp, int *indexBase, int indexOff
 };
 
 
-void MLPDataProvider::prepare_batch_data()
+void MLPDataProvider::prepare_batch_data_top_half()
 { 
-	if ( this->supportChkPointing)
-	     MLP_LOCK(&this->chkPointingLock);
-
 	// get one batch from the io buffer to the transfer buffer
 	this->load_feature_batch(this->featureData,this->permutations,this->m_batchSize*(this->stageBatchNo % this->m_shuffleBatches));
 	if ( this->haveLabel )
 	     this->load_label_batch(this->labelData,this->permutations,this->m_batchSize*(this->stageBatchNo % this->m_shuffleBatches));
+}; 
+
+void MLPDataProvider::prepare_batch_data_bottom_half()
+{
+	if ( this->supportChkPointing)
+	     MLP_LOCK(&this->chkPointingLock);
 
 	this->stageBatchNo++;
 

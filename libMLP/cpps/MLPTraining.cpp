@@ -158,6 +158,7 @@ int MLPTrainer::batchTrainingWithCheckPointing(int maxBatches, int epoches, int 
 
  			 this->calculateError(this->output, this->target, this->dimensions[this->nLayers-1], this->minibatch, costval);
 
+			 cout.precision(8); 
 			 cout << std::showpoint << std::fixed << endl;
 			 cout << "Error Value for Batch  " << myBatch << " of Epoch " << myEpoch << ": " << costval << endl;
 

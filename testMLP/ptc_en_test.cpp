@@ -12,8 +12,8 @@
 #include "MLPTester.h"
 #include "MLPPredictor.h"
 #include "MLPNetProvider.h"
-#include "MLPPtcDataProvider.h"
 #include "MLPChkPointingMgr.h"
+#include "MLPPtcDataProvider.h"
 
 using namespace std;
 
@@ -93,8 +93,8 @@ void ptc_en_training2()
 {
 	struct mlp_tv startv, endv;
 
-	int minibatch = 1000;
-	int shuffleBatches = 10;
+	int minibatch = 1024;
+	int shuffleBatches = 20;
 	int batches;
 	int totalbatches;
 	int epoches=400;
@@ -113,12 +113,12 @@ void ptc_en_training2()
 
 	netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
 
-    trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);
+    trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);   
 
 	cout << totalbatches << " batches of data to be trained with " << epoches << " epoches, just waiting..." << endl;
 
 	getCurrentTime(&startv);
-	batches = trainerp->batchTraining(0, epoches);
+	batches = trainerp->batchTraining(0, epoches);                                       
 	getCurrentTime(&endv);
 
 	cout << batches << " batches of data were trained actually" << endl;
@@ -138,8 +138,8 @@ void ptc_en_training3()
 {
 	struct mlp_tv startv, endv;
 
-	int minibatch = 1000;
-	int shuffleBatches = 10;
+	int minibatch = 1024;
+	int shuffleBatches = 20;
 	int batches;
 	int totalbatches;
 	int epoches = 400;
@@ -218,7 +218,8 @@ void ptc_en_batch_testing()
 {
 	struct mlp_tv startv, endv;
 
-	int minibatch = 500;
+	// 724 * 10 = 7240 to match the number of samples in the testing set
+	int minibatch = 724;
 	int shuffleBatches = 10;
 	int totalbatches;
 

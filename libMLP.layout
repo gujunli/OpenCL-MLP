@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
+	<File name="libMLP/cpps/MLPCommon.cpp" open="1" top="1" tabpos="9">
+		<Cursor position="295" topLine="0" />
+	</File>
 	<File name="libMLP/cpps/MLPDataProvider.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="0" topLine="5" />
+		<Cursor position="0" topLine="385" />
 	</File>
 	<File name="libMLP/cpps/MLPMNistDataProvider.cpp" open="1" top="0" tabpos="8">
 		<Cursor position="0" topLine="209" />
 	</File>
 	<File name="libMLP/cpps/MLPTrainer.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="958" topLine="22" />
+		<Cursor position="958" topLine="401" />
+	</File>
+	<File name="libMLP/cpps/MLPTraining.cpp" open="1" top="0" tabpos="11">
+		<Cursor position="0" topLine="240" />
 	</File>
 	<File name="libMLP/cpps/MLPUtil.cpp" open="1" top="0" tabpos="6">
 		<Cursor position="0" topLine="101" />
@@ -24,5 +30,8 @@
 	</File>
 	<File name="libMLP/include/MLPUtil.h" open="1" top="0" tabpos="7">
 		<Cursor position="0" topLine="34" />
+	</File>
+	<File name="libMLP/kernels/kernels.cl" open="1" top="0" tabpos="10">
+		<Cursor position="0" topLine="526" />
 	</File>
 </CodeBlocks_layout_file>

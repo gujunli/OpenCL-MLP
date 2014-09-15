@@ -50,9 +50,12 @@
 		<Unit filename="testMLP/iflytek_test.cpp" />
 		<Unit filename="testMLP/mnist_test.cpp" />
 		<Unit filename="testMLP/ptc_ch_test.cpp" />
+		<Unit filename="testMLP/ptc_digital_test.cpp" />
 		<Unit filename="testMLP/ptc_en_test.cpp" />
+		<Unit filename="testMLP/ptc_symbol_test.cpp" />
 		<Unit filename="testMLP/simple_test.cpp" />
 		<Unit filename="testMLP/test_main.cpp" />
+		<Unit filename="testMLP/vlp_ch_test.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

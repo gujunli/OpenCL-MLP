@@ -90,7 +90,8 @@ private:
 
 	int startup_worker();
 
-    void prepare_batch_data();
+    void prepare_batch_data_top_half();
+	void prepare_batch_data_bottom_half(); 
 
 	bool haveBatchToProvide();
 

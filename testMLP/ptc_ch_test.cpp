@@ -31,6 +31,7 @@ void ptc_ch_training()
 {
 	struct mlp_tv startv, endv;
 
+	/*
 	MLP_NETTYPE nettype = NETTYPE_MULTI_CLASSIFICATION;
 	const int nLayers = 4;
 	int dimensions[nLayers] = {2304, 2048, 2048, 3755};
@@ -38,9 +39,10 @@ void ptc_ch_training()
 	float momentum = 0.4f;
 	ACT_FUNC actFuncs[nLayers] = {ANOFUNC, AFUNC_SIGMOID, AFUNC_SIGMOID, AFUNC_SOFTMAX};
 	COST_FUNC costFunc = CFUNC_CE;
+	*/
 
-	int minibatch = 1000;
-	int shuffleBatches = 10;
+	int minibatch = 1024;
+	int shuffleBatches = 50;
 	int batches;
 	int totalbatches;
 	int epoches = 400;
@@ -56,15 +58,15 @@ void ptc_ch_training()
 	dataProviderp = new MLPPtcDataProvider(PTC_CH_DB_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
 
-	dimensions[0] = dataProviderp->getFeatureSize();
-	dimensions[nLayers-1] = dataProviderp->getLabelSize();
+	//dimensions[0] = dataProviderp->getFeatureSize();
+	//dimensions[nLayers-1] = dataProviderp->getLabelSize();
 
 
 	totalbatches = dataProviderp->getTotalBatches();
 
 
-    netProviderp = new MLPNetProvider(nettype, nLayers, dimensions, etas, momentum, actFuncs, costFunc, true);
-    //netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", true);
+    //netProviderp = new MLPNetProvider(nettype, nLayers, dimensions, etas, momentum, actFuncs, costFunc, true);
+    netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", true);
 
     trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);    // set up the trainer
 
@@ -91,8 +93,8 @@ void ptc_ch_training2()
 {
 	struct mlp_tv startv, endv;
 
-	int minibatch = 1000;
-	int shuffleBatches = 10;
+	int minibatch = 1024;
+	int shuffleBatches = 50;
 	int batches;
 	int totalbatches;
 	int epoches=400;
@@ -111,12 +113,12 @@ void ptc_ch_training2()
 
 	netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
 
-    trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);
+    trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);   
 
 	cout << totalbatches << " batches of data to be trained with " << epoches << " epoches, just waiting..." << endl;
 
 	getCurrentTime(&startv);
-	batches = trainerp->batchTraining(0, epoches);
+	batches = trainerp->batchTraining(0, epoches);                                       
 	getCurrentTime(&endv);
 
 	cout << batches << " batches of data were trained actually" << endl;
@@ -136,8 +138,8 @@ void ptc_ch_training3()
 {
 	struct mlp_tv startv, endv;
 
-	int minibatch = 1000;
-	int shuffleBatches = 10;
+	int minibatch = 1024;
+	int shuffleBatches = 50;
 	int batches;
 	int totalbatches;
 	int epoches = 400;
@@ -170,8 +172,8 @@ void ptc_ch_training3()
 	else {
 		 cout << "No old checkpoint found, start new checkpointing any way" << endl;
 
-         // netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
-         netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", true);
+         netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
+         //netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", true);
 
 	     //dataProviderp = new MLPPtcDataProvider(ptc_ch_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	     dataProviderp = new MLPPtcDataProvider(PTC_CH_DB_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
@@ -217,7 +219,7 @@ void ptc_ch_batch_testing()
 	struct mlp_tv startv, endv;
 
 	int minibatch = 500;
-	int shuffleBatches = 10;
+	int shuffleBatches = 20;
 	int totalbatches;
 
 	MLPNetProvider *netProviderp=NULL;

@@ -1,3 +1,7 @@
+*  Mon Sep 15 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  - 1.5.0
+   -  Split priviate member function prepare_batch_data() of MLPDataprovider into two parts prepare_batch_data_top_half() and 
+      prepare_batch_data_bottom_half() to provide better concurrency between MLPTrainer and MLPDataProvider running paths
+
 *  Tue Sep 09 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
    -  Further moved some common codes from the backend data provider to MLPDataProvider base class, make it easier to implement
       backend data provider
