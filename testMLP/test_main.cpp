@@ -79,9 +79,9 @@ int main()
 	//vlp_ch_training2();
 	//simple_training();
 
-	cout << "Press any key to continue ..." << endl;
+	//cout << "Press any key to continue ..." << endl;
 
-	cin >> anykey;
+	//cin >> anykey;
 
 	//iflytek_batch_testing();
 	//iflytek_predicting();

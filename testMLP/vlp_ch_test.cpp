@@ -8,9 +8,9 @@
 #include <iostream>
 
 #include "MLPUtil.h"
-#include "MLPTrainer.h"
-#include "MLPTester.h"
-#include "MLPPredictor.h"
+#include "MLPTrainerOCL.h"
+#include "MLPTesterOCL.h"
+#include "MLPPredictorOCL.h"
 #include "MLPNetProvider.h"
 #include "MLPPtcDataProvider.h"
 #include "MLPChkPointingMgr.h"
@@ -52,7 +52,7 @@ void vlp_ch_training()
 
 
 	// Training the neural network using VLP_CH labelled dataset
-    MLPTrainer *trainerp;
+    MLPTrainerBase *trainerp;
 
 	//dataProviderp = new MLPVLP_CHDataProvider(VLP_CH_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	dataProviderp = new MLPPtcDataProvider(VLP_CH_DB_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
@@ -68,7 +68,7 @@ void vlp_ch_training()
     //netProviderp = new MLPNetProvider(nettype, nLayers, dimensions, etas, momentum, actFuncs, costFunc, true);
     netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", true);
 
-    trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);    // set up the trainer
+    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);    // set up the trainer
 
 	cout << totalbatches << " batches of data to be trained with " << epoches << " epoches, just waiting..." << endl;
 
@@ -104,7 +104,7 @@ void vlp_ch_training2()
 
 
 	// Training the neural network using VLP_CH labelled dataset
-    MLPTrainer *trainerp;
+    MLPTrainerBase *trainerp;
 
 	dataProviderp = new MLPPtcDataProvider(VLP_CH_DB_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	//dataProviderp = new MLPVLP_CHDataProvider(VLP_CH_PATH3, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
@@ -113,7 +113,7 @@ void vlp_ch_training2()
 
 	netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
 
-    trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);
+    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);
 
 	cout << totalbatches << " batches of data to be trained with " << epoches << " epoches, just waiting..." << endl;
 
@@ -184,9 +184,9 @@ void vlp_ch_training3()
 	};
 
 	// Training the neural network using VLP_CH labelled dataset
-    MLPTrainer *trainerp;
+    MLPTrainerBase *trainerp;
 
-    trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);
+    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);
 
 	cpManager.enableCheckPointing(*trainerp, "./tmp/");
 	MLP_CHECK( cpManager.startCheckPointing() );
@@ -227,13 +227,13 @@ void vlp_ch_batch_testing()
     MLPDataProvider *dataProviderp=NULL;
 
 	// Testing the VLP_CH labelled dataset on the trained neural network
-	MLPTester *testerp=NULL;
+	MLPTesterBase *testerp=NULL;
 
 	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
 	dataProviderp =	new MLPPtcDataProvider(VLP_CH_DB_PATH, MLP_DATAMODE_TEST, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
-	testerp = new MLPTester(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU,minibatch);
+	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU,minibatch);
 
     totalbatches = dataProviderp->getTotalBatches();
 
@@ -282,13 +282,13 @@ void vlp_ch_single_testing()
     MLPDataProvider *dataProviderp=NULL;
 
 	// Testing the VLP_CH labelled dataset on the trained neural network
-	MLPTester *testerp=NULL;
+	MLPTesterBase *testerp=NULL;
 
 	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
 	dataProviderp =	new MLPPtcDataProvider(VLP_CH_DB_PATH, MLP_DATAMODE_TEST, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
-	testerp = new MLPTester(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU,minibatch);
+	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU,minibatch);
 
     totalbatches = dataProviderp->getTotalBatches();
     totalbatches = min<int>(totalbatches, 2);
@@ -349,7 +349,7 @@ void vlp_ch_predicting()
     MLPDataProvider *dataProviderp=NULL;
 
 	// Using VLP_CH testing dataset to do batch predicting on the trained neural network
-	MLPPredictor *predictorp=NULL;
+	MLPPredictorBase *predictorp=NULL;
 	float *inputVectors;
 	float *outputVectors;
 
@@ -357,7 +357,7 @@ void vlp_ch_predicting()
 	dataProviderp =	new MLPPtcDataProvider(VLP_CH_DB_PATH, MLP_DATAMODE_PREDICT, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
-	predictorp = new MLPPredictor(*netProviderp,MLP_OCL_DI_GPU, minibatch);
+	predictorp = new MLPPredictorOCL(*netProviderp,MLP_OCL_DI_GPU, minibatch);
 	outputVectors = new float[predictorp->getOutputVectorSize()*minibatch];
 
     totalbatches = dataProviderp->getTotalBatches();

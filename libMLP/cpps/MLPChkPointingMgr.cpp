@@ -180,7 +180,7 @@ struct MLPCheckPointState * MLPCheckPointManager::getChkPointState()
 	 return(&this->chkPointState);
 };
 
-void MLPCheckPointManager::enableCheckPointing(MLPTrainer & trainer, const char *dirPath)
+void MLPCheckPointManager::enableCheckPointing(MLPTrainerBase & trainer, const char *dirPath)
 {
 	this->trainerp = &trainer;
 	this->useChkPointing = true;

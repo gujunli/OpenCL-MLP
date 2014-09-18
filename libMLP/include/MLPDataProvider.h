@@ -24,6 +24,9 @@ class MLPDataProvider
 	friend class MLPTrainer;
 	friend class MLPTester;
 	friend class MLPPredictor;
+	friend class MLPTrainerOCL;
+	friend class MLPTesterOCL;
+	friend class MLPPredictorOCL;
 protected:
 	MLP_DATA_MODE  dataMode;     // TRAIN, TEST, PREDICT standing for three different usages of the neural network
 	int  total_batches;          // Total number of batches provided by the data source and provider (shuffled batches also counted)
@@ -79,19 +82,19 @@ protected:
 
 private:
 	void create_transfer_buffers(int batchSize);
-	void create_io_buffers(); 
+	void create_io_buffers();
 	void reset_transfer_buffers();
-	void reset_io_buffers(); 
+	void reset_io_buffers();
 
 	// Load one batch of feature frames from the backend io buffer to the front-end transfer buffer
-    void load_feature_batch(float *srcp, int *indexBase, int indexOffset); 
+    void load_feature_batch(float *srcp, int *indexBase, int indexOffset);
 	// Load one batch of label frames from the backend io buffer to the front-end transfer buffer
-    void load_label_batch(float *srcp, int *indexBase, int indexOffset);      
+    void load_label_batch(float *srcp, int *indexBase, int indexOffset);
 
 	int startup_worker();
 
     void prepare_batch_data_top_half();
-	void prepare_batch_data_bottom_half(); 
+	void prepare_batch_data_bottom_half();
 
 	bool haveBatchToProvide();
 
@@ -102,10 +105,10 @@ private:
 	virtual void setup_cont_data_batches()=0;             // read group of batches from data source to the io buffers
 
 protected:
-	LIBMLPAPI int shutdown_worker(); 
+	LIBMLPAPI int shutdown_worker();
 	LIBMLPAPI void release_transfer_buffers();
-	LIBMLPAPI void release_io_buffers(); 
-  
+	LIBMLPAPI void release_io_buffers();
+
     LIBMLPAPI void shuffle_data(int *index, int len);
 
 private:

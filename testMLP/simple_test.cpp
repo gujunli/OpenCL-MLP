@@ -9,9 +9,9 @@
 #include <iostream>
 
 #include "MLPUtil.h"
-#include "MLPTrainer.h"
-#include "MLPTester.h"
-#include "MLPPredictor.h"
+#include "MLPTrainerOCL.h"
+#include "MLPTesterOCL.h"
+#include "MLPPredictorOCL.h"
 #include "MLPNetProvider.h"
 #include "MLPSimpleDataProvider.h"
 #include "MLPMNistDataProvider.h"
@@ -49,7 +49,7 @@ void simple_training()
 
 
     // Training the neural network using Simple labelled dataset
-	MLPTrainer *trainerp=NULL;
+	MLPTrainerBase *trainerp=NULL;
 
 	nettype = NETTYPE_MULTI_CLASSIFICATION;
 	netProviderp = new MLPNetProvider(nettype,nLayers,dimensions,etas, momentum, actFuncs,costFunc, true);
@@ -57,7 +57,7 @@ void simple_training()
 	dataProviderp->setupDataProvider();                            // set up the data provider
     totalbatches = dataProviderp->getTotalBatches();
 
-    trainerp = new MLPTrainer;
+    trainerp = new MLPTrainerOCL();
 	trainerp->setupMLP(*netProviderp,*dataProviderp,minibatch);    // set up the trainer
 
 	cout << totalbatches << " batches of data to be trained with " << epoches << " epoches, just waiting..." << endl;
@@ -92,13 +92,13 @@ void simple_batch_testing()
     MLPDataProvider *dataProviderp=NULL;
 
 	// Testing the Simple labelled dataset on the trained neural network
-	MLPTester *testerp=NULL;
+	MLPTesterBase *testerp=NULL;
 
 	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
 	dataProviderp =	new MLPSimpleDataProvider(MLP_DATAMODE_TEST,dimensions[0],dimensions[nLayers-1],minibatch,shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
-	testerp = new MLPTester(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU, minibatch);
+	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU, minibatch);
 
 	// totalbatches = dataProviderp->getTotalBatches();
 
@@ -133,7 +133,7 @@ void simple_predicting()
     MLPDataProvider *dataProviderp=NULL;
 
 	// Using Simple testing dataset to do batch predicting on the trained neural network
-	MLPPredictor *predictorp=NULL;
+	MLPPredictorBase *predictorp=NULL;
 	float *inputVectors;
 	float *outputVectors;
 
@@ -141,7 +141,7 @@ void simple_predicting()
     dataProviderp =	new MLPSimpleDataProvider(MLP_DATAMODE_PREDICT,dimensions[0],dimensions[nLayers-1],minibatch,0);
 	dataProviderp->setupDataProvider();                               // set up the data provider
 
-	predictorp = new MLPPredictor(*netProviderp,MLP_OCL_DI_GPU, minibatch);
+	predictorp = new MLPPredictorOCL(*netProviderp,MLP_OCL_DI_GPU, minibatch);
 	outputVectors = new float[predictorp->getOutputVectorSize() * minibatch];
 
 	getCurrentTime(&startv);

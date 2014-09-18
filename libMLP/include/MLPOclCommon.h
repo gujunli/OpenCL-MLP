@@ -48,26 +48,26 @@ extern void cmn_activate_tanh(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl_m
 extern void cmn_activate_softmax(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl_mem &x, cl_mem &y, int width, int height );
 extern void cmn_activate_identity(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl_mem &x, cl_mem &y, int width, int height );
 
-void cmn_calculateError_SSE(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl_mem &output, cl_mem &target, cl_mem &reduceMem, float *reduceBuf, int width, int height, float &ret );
-void cmn_calculateError_CE(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl_mem &output, cl_mem &target, cl_mem &reduceMem, float *reduceBuf, int width, int height, float &ret );
+extern void cmn_calculateError_SSE(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl_mem &output, cl_mem &target, cl_mem &reduceMem, float *reduceBuf, int width, int height, float &ret );
+extern void cmn_calculateError_CE(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl_mem &output, cl_mem &target, cl_mem &reduceMem, float *reduceBuf, int width, int height, float &ret );
 
-void cmn_calculateDelta_SSE_Sigmoid(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl_mem &output, cl_mem &target, cl_mem &delta, int width, int height);
-void cmn_calculateDelta_CE_Softmax(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl_mem &output, cl_mem &target, cl_mem &delta, int width, int height);
+extern void cmn_calculateDelta_SSE_Sigmoid(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl_mem &output, cl_mem &target, cl_mem &delta, int width, int height);
+extern void cmn_calculateDelta_CE_Softmax(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl_mem &output, cl_mem &target, cl_mem &delta, int width, int height);
 
-void cmn_derivative_sigmoid(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl_mem &delta1, cl_mem &y, cl_mem &delta2, int width, int height);
-void cmn_derivative_tanh(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl_mem &delta1, cl_mem &y, cl_mem &delta2, int width, int height);
+extern void cmn_derivative_sigmoid(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl_mem &delta1, cl_mem &y, cl_mem &delta2, int width, int height);
+extern void cmn_derivative_tanh(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl_mem &delta1, cl_mem &y, cl_mem &delta2, int width, int height);
 
 
-void print_dev_data(char *header, cl_command_queue &cmdQueue, cl_mem devBuf, int width, int height);
-void fprint_dev_data(ofstream &ofile, char *header, cl_command_queue &cmdQueue, cl_mem devBuf, int width, int height);
+extern void print_dev_data(char *header, cl_command_queue &cmdQueue, cl_mem devBuf, int width, int height);
+extern void fprint_dev_data(ofstream &ofile, char *header, cl_command_queue &cmdQueue, cl_mem devBuf, int width, int height);
 
 
 typedef bool (*CHECK_FLOAT)(float x);
 
-bool check_zero(float x);
-bool check_nan(float x);
-bool check_inf(float x);
-void check_memory(char *header, cl_command_queue &cmdQueue, cl_mem devBuf, int length, CHECK_FLOAT checkFunc);
+extern bool check_zero(float x);
+extern bool check_nan(float x);
+extern bool check_inf(float x);
+extern void check_memory(char *header, cl_command_queue &cmdQueue, cl_mem devBuf, int length, CHECK_FLOAT checkFunc);
 
 
 #endif

@@ -9,9 +9,9 @@
 #include <iostream>
 
 #include "MLPUtil.h"
-#include "MLPTrainer.h"
-#include "MLPTester.h"
-#include "MLPPredictor.h"
+#include "MLPTrainerOCL.h"
+#include "MLPTesterOCL.h"
+#include "MLPPredictorOCL.h"
 #include "MLPNetProvider.h"
 #include "MLPIFlyDataProvider.h"
 #include "MLPChkPointingMgr.h"
@@ -46,7 +46,7 @@ void iflytek_training()
     MLPDataProvider *dataProviderp=NULL;
 
 	// Training the neural network using MNist labelled dataset
-    MLPTrainer *trainerp;
+    MLPTrainerBase *trainerp;
 
 	dataProviderp = new MLPIFlyDataProvider(IFLY_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
@@ -57,7 +57,7 @@ void iflytek_training()
 	nettype = NETTYPE_MULTI_CLASSIFICATION;
     netProviderp = new MLPNetProvider(nettype, nLayers, dimensions, etas, momentum, actFuncs, costFunc, true);
 
-    trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);    // set up the trainer
+    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);    // set up the trainer
 
 	cout << totalbatches << " batches of data to be trained with " << epoches << " epoches, just waiting..." << endl;
 
@@ -92,7 +92,7 @@ void iflytek_training2()
 	MLPCheckPointManager cpManager;
 	MLPNetProvider *netProviderp=NULL;
     MLPDataProvider *dataProviderp=NULL;
-    MLPTrainer *trainerp;
+    MLPTrainerBase *trainerp;
 
 	cpManager.cpFindAndLoad("./tmp/");
 	if ( cpManager.cpAvailable() ) {
@@ -126,7 +126,7 @@ void iflytek_training2()
 		 startEpoch = 0;
 	};
 
-    trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);
+    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);
 
 	cpManager.enableCheckPointing(*trainerp, "./tmp/");
 	MLP_CHECK( cpManager.startCheckPointing() );
@@ -179,7 +179,7 @@ void iflytek_training3()
 	MLPCheckPointManager cpManager;
 	MLPNetProvider *netProviderp=NULL;
     MLPDataProvider *dataProviderp=NULL;
-    MLPTrainer *trainerp;
+    MLPTrainerBase *trainerp;
 
 	cpManager.cpFindAndLoad("./tmp/");
 	if ( cpManager.cpAvailable() ) {
@@ -213,7 +213,7 @@ void iflytek_training3()
 		 startEpoch = 0;
 	};
 
-    trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);
+    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);
 
 	cpManager.enableCheckPointing(*trainerp, "./tmp/");
 	MLP_CHECK( cpManager.startCheckPointing() );
@@ -254,13 +254,13 @@ void iflytek_batch_testing()
     MLPDataProvider *dataProviderp=NULL;
 
 	// Testing the MNist labelled dataset on the trained neural network
-	MLPTester *testerp=NULL;
+	MLPTesterBase *testerp=NULL;
 
 	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
 	dataProviderp =	new MLPIFlyDataProvider(IFLY_PATH, MLP_DATAMODE_TEST, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
-	testerp = new MLPTester(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU, minibatch);
+	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU, minibatch);
 
     totalbatches = dataProviderp->getTotalBatches();
 
@@ -294,7 +294,7 @@ void iflytek_predicting()
     MLPDataProvider *dataProviderp=NULL;
 
 	// Using MNist testing dataset to do batch predicting on the trained neural network
-	MLPPredictor *predictorp=NULL;
+	MLPPredictorBase *predictorp=NULL;
 	float *inputVectors;
 	float *outputVectors;
 
@@ -302,7 +302,7 @@ void iflytek_predicting()
 	dataProviderp =	new MLPIFlyDataProvider(".", MLP_DATAMODE_PREDICT, minibatch, 0);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
-	predictorp = new MLPPredictor(*netProviderp,MLP_OCL_DI_GPU, minibatch);
+	predictorp = new MLPPredictorOCL(*netProviderp,MLP_OCL_DI_GPU, minibatch);
 	outputVectors = new float[predictorp->getOutputVectorSize()*minibatch];
 
     totalbatches = dataProviderp->getTotalBatches();

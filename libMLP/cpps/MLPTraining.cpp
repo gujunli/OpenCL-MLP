@@ -16,11 +16,6 @@
 #include "oclUtil.h"
 #include "MLPTrainer.h"
 
-int MLPTrainer::batchTraining(int maxBatches, int epoches)
-{
-	return(this->batchTrainingWithCheckPointing(maxBatches, epoches, 0, 0, NULL));
-};
-
 
 int MLPTrainer::batchTrainingWithCheckPointing(int maxBatches, int epoches, int startBatch, int startEpoch,  bool doChkPointing)
 {
@@ -158,7 +153,7 @@ int MLPTrainer::batchTrainingWithCheckPointing(int maxBatches, int epoches, int 
 
  			 this->calculateError(this->output, this->target, this->dimensions[this->nLayers-1], this->minibatch, costval);
 
-			 cout.precision(8); 
+			 cout.precision(8);
 			 cout << std::showpoint << std::fixed << endl;
 			 cout << "Error Value for Batch  " << myBatch << " of Epoch " << myEpoch << ": " << costval << endl;
 

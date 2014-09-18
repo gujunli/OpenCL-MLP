@@ -9,9 +9,9 @@
 #include <iostream>
 
 #include "MLPUtil.h"
-#include "MLPTrainer.h"
-#include "MLPTester.h"
-#include "MLPPredictor.h"
+#include "MLPTrainerOCL.h"
+#include "MLPTesterOCL.h"
+#include "MLPPredictorOCL.h"
 #include "MLPNetProvider.h"
 #include "MLPMNistDataProvider.h"
 #include "MLPChkPointingMgr.h"
@@ -63,7 +63,7 @@ void mnist_training()
 
 
 	// Training the neural network using MNist labelled dataset
-    MLPTrainer *trainerp;
+    MLPTrainerBase *trainerp;
 
 	dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	//dataProviderp = new MLPMNistDataProvider(MNIST_PATH3, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
@@ -81,7 +81,7 @@ void mnist_training()
     //netProviderp = new MLPNetProvider(nettype, nLayers, dimensions, etas, momentum, actFuncs, costFunc, true);
     netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", true);
 
-    trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);    // set up the trainer
+    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);    // set up the trainer
 
 	cout << totalbatches << " batches of data to be trained with " << epoches << " epoches, just waiting..." << endl;
 
@@ -117,7 +117,7 @@ void mnist_training2()
 
 
 	// Training the neural network using MNist labelled dataset
-    MLPTrainer *trainerp;
+    MLPTrainerBase *trainerp;
 
 	dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	//dataProviderp = new MLPMNistDataProvider(MNIST_PATH3, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
@@ -126,7 +126,7 @@ void mnist_training2()
 
 	netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
 
-    trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);    // set up the trainer
+    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);    // set up the trainer
 
 	cout << totalbatches << " batches of data to be trained with " << epoches << " epoches, just waiting..." << endl;
 
@@ -197,9 +197,9 @@ void mnist_training3()
 	};
 
 	// Training the neural network using MNist labelled dataset
-    MLPTrainer *trainerp;
+    MLPTrainerBase *trainerp;
 
-    trainerp = new MLPTrainer(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);
+    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);
 
 	cpManager.enableCheckPointing(*trainerp, "./tmp/");
 	MLP_CHECK( cpManager.startCheckPointing() );
@@ -239,13 +239,13 @@ void mnist_batch_testing()
     MLPDataProvider *dataProviderp=NULL;
 
 	// Testing the MNist labelled dataset on the trained neural network
-	MLPTester *testerp=NULL;
+	MLPTesterBase *testerp=NULL;
 
 	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
 	dataProviderp =	new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TEST, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
-	testerp = new MLPTester(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU,minibatch);
+	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU,minibatch);
 
     totalbatches = dataProviderp->getTotalBatches();
 
@@ -294,13 +294,13 @@ void mnist_single_testing()
     MLPDataProvider *dataProviderp=NULL;
 
 	// Testing the MNist labelled dataset on the trained neural network
-	MLPTester *testerp=NULL;
+	MLPTesterBase *testerp=NULL;
 
 	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
 	dataProviderp =	new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TEST, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
-	testerp = new MLPTester(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU,minibatch);
+	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU,minibatch);
 
     totalbatches = dataProviderp->getTotalBatches();
     totalbatches = min<int>(totalbatches, 2);
@@ -361,7 +361,7 @@ void mnist_predicting()
     MLPDataProvider *dataProviderp=NULL;
 
 	// Using MNist testing dataset to do batch predicting on the trained neural network
-	MLPPredictor *predictorp=NULL;
+	MLPPredictorBase *predictorp=NULL;
 	float *inputVectors;
 	float *outputVectors;
 
@@ -369,7 +369,7 @@ void mnist_predicting()
 	dataProviderp =	new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_PREDICT, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
-	predictorp = new MLPPredictor(*netProviderp,MLP_OCL_DI_GPU, minibatch);
+	predictorp = new MLPPredictorOCL(*netProviderp,MLP_OCL_DI_GPU, minibatch);
 	outputVectors = new float[predictorp->getOutputVectorSize()*minibatch];
 
     totalbatches = dataProviderp->getTotalBatches();

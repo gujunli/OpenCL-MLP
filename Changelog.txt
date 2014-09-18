@@ -1,3 +1,9 @@
+
+*  Thu Sep 18 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  - 1.6.0 
+   -  Split the implementation of class MLPTrainer/MLPTester/MLPPredictor into base class MLPTrainerBase/MLPTesterBase/MLPPredictorBase
+      and OpenCL specific class MLPTrainerOCL/MLPTesterOCL/MLPPredictorOCL to make MLP can be more easily ported to other API like
+      AMD ACML and Intel MKL 
+
 *  Mon Sep 15 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  - 1.5.0
    -  Split priviate member function prepare_batch_data() of MLPDataprovider into two parts prepare_batch_data_top_half() and 
       prepare_batch_data_bottom_half() to provide better concurrency between MLPTrainer and MLPDataProvider running paths

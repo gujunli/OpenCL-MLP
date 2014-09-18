@@ -53,9 +53,12 @@ struct mlp_nnet_data_header {
 // Implements the MLP network used by the MLPTrainer/MLPTester/MLPPredictor
 class MLPNetProvider
 {
-	friend class MLPTrainer;   // add more friend class here
-	friend class MLPTester;
-	friend class MLPPredictor;
+	friend class MLPTrainerBase;   // add more friend class here
+	friend class MLPTesterBase;
+	friend class MLPPredictorBase;
+	friend class MLPTrainerOCL;
+	friend class MLPTesterOCL;
+	friend class MLPPredictorOCL;
 private:
 	MLP_NETTYPE netType;
 	int nLayers;
@@ -88,8 +91,8 @@ public:
 
 	void showConfig();
 
-	int getInputLayerSize(); 
-	int getOutputLayerSize(); 
+	int getInputLayerSize();
+	int getOutputLayerSize();
 };
 
 #define MLP_NP_TRAINING_CONF "mlp_training.conf"

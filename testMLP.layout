@@ -2,24 +2,30 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
 	<File name="testMLP/iflytek_test.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="5880" topLine="345" />
+		<Cursor position="244" topLine="0" />
 	</File>
 	<File name="testMLP/mnist_test.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="2143" topLine="49" />
+		<Cursor position="14117" topLine="407" />
 	</File>
 	<File name="testMLP/ptc_ch_test.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="1896" topLine="62" />
+		<Cursor position="13953" topLine="402" />
+	</File>
+	<File name="testMLP/ptc_digital_test.cpp" open="1" top="0" tabpos="8">
+		<Cursor position="2396" topLine="53" />
 	</File>
 	<File name="testMLP/ptc_en_test.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="1191" topLine="44" />
+		<Cursor position="14023" topLine="403" />
+	</File>
+	<File name="testMLP/ptc_symbol_test.cpp" open="1" top="0" tabpos="9">
+		<Cursor position="13834" topLine="395" />
 	</File>
 	<File name="testMLP/simple_test.cpp" open="1" top="0" tabpos="6">
-		<Cursor position="2780" topLine="79" />
+		<Cursor position="1869" topLine="0" />
 	</File>
 	<File name="testMLP/test_main.cpp" open="1" top="1" tabpos="1">
-		<Cursor position="2340" topLine="62" />
+		<Cursor position="2620" topLine="72" />
 	</File>
 	<File name="testMLP/vlp_ch_test.cpp" open="1" top="0" tabpos="7">
-		<Cursor position="2870" topLine="77" />
+		<Cursor position="14017" topLine="403" />
 	</File>
 </CodeBlocks_layout_file>
