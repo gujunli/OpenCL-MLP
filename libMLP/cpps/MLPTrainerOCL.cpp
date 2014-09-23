@@ -44,7 +44,7 @@ MLPTrainerOCL::MLPTrainerOCL()
 	this->initialized = false;
 };
 
-MLPTrainerOCL::MLPTrainerOCL(MLPNetProvider & netProvider, MLPDataProvider & dataProvider, MLP_OCL_DEVTYPE dType, int _minibatch)
+MLPTrainerOCL::MLPTrainerOCL(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, MLP_OCL_DEVTYPE dType, int _minibatch)
 {
    	this->devType = dType;
 
@@ -63,7 +63,7 @@ MLPTrainerOCL::MLPTrainerOCL(MLPNetProvider & netProvider, MLPDataProvider & dat
 }
 
 
-void MLPTrainerOCL::setupMLP(MLPNetProvider & netProvider, MLPDataProvider & dataProvider, int _minibatch)
+void MLPTrainerOCL::setupMLP(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, int _minibatch)
 {
  	if (  ( netProvider.getInputLayerSize() != dataProvider.getFeatureSize() ) ||
 		  ( netProvider.getOutputLayerSize() != dataProvider.getLabelSize() )   ) {
@@ -71,7 +71,7 @@ void MLPTrainerOCL::setupMLP(MLPNetProvider & netProvider, MLPDataProvider & dat
 		   MLP_Exception("");
 	};
 
-	if (  (_minibatch != dataProvider.m_batchSize) || dataProvider.dataMode != MLP_DATAMODE_TRAIN) {
+	if (  (_minibatch != dataProvider.getBatchSize()) || dataProvider.getDataMode() != DNN_DATAMODE_TRAIN) {
 		   mlp_log("MLPTrainer", "The setting of the MLPDataProvider doesn't match the need of the MLPTrainer");
 		   MLP_Exception("");
 	};
@@ -543,7 +543,7 @@ int MLPTrainerOCL::batchTrainingWithCheckPointing(int maxBatches, int epoches, i
 	         CL_CHECK( clFinish(this->CLContext->m_cmd_queues[0]) );
 
 			 if ( doChkPointing)
-			      MLP_LOCK(&this->chkPointingLock);
+			      DNN_LOCK(&this->chkPointingLock);
 
 			 for ( int i = nLayers-1; i > 0; i-- ) {
 				  float coef = this->etas[i];
@@ -580,7 +580,7 @@ int MLPTrainerOCL::batchTrainingWithCheckPointing(int maxBatches, int epoches, i
 			 };
 
 			 if ( doChkPointing )
-			     MLP_UNLOCK(&this->chkPointingLock);
+			     DNN_UNLOCK(&this->chkPointingLock);
 
 			 // swap the curVarWeight and lastVarWeight pointers
 			 cl_mem *tmpPointer;
@@ -600,10 +600,10 @@ int MLPTrainerOCL::batchTrainingWithCheckPointing(int maxBatches, int epoches, i
 			 myBatch++;
 
 			 if ( doChkPointing ) {
-                  MLP_LOCK(&this->chkPointingLock);
+                  DNN_LOCK(&this->chkPointingLock);
 			      this->currBatchNo = myBatch;
 				  this->currEpoch = myEpoch;
-                  MLP_UNLOCK(&this->chkPointingLock);
+                  DNN_UNLOCK(&this->chkPointingLock);
 			 };
 	    } // end of all baches
 
@@ -612,10 +612,10 @@ int MLPTrainerOCL::batchTrainingWithCheckPointing(int maxBatches, int epoches, i
 		this->dataProviderp->resetDataProvider();
 
 		if ( doChkPointing ) {
-             MLP_LOCK(&this->chkPointingLock);
+             DNN_LOCK(&this->chkPointingLock);
 			 this->currBatchNo = myBatch;
 		     this->currEpoch = myEpoch;
-             MLP_UNLOCK(&this->chkPointingLock);
+             DNN_UNLOCK(&this->chkPointingLock);
 		};
 	};  // end of all epoches
 

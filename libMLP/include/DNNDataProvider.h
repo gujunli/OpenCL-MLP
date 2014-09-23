@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef _MLP_DATA_PROVIDER_H_
-#define _MLP_DATA_PROVIDER_H_
+#ifndef _DNNDATA_PROVIDER_H_
+#define _DNNDATA_PROVIDER_H_
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -14,21 +14,15 @@
 #include <pthread.h>
 #endif
 
-#include "MLPApiExport.h"
-#include "MLPConstants.h"
+#include "DNNApiExport.h"
+#include "DNNConstants.h"
 
-#define MLP_BATCH_RING_SIZE 8
+#define DNN_BATCH_RING_SIZE 8
 
-class MLPDataProvider
+class DNNDataProvider
 {
-	friend class MLPTrainer;
-	friend class MLPTester;
-	friend class MLPPredictor;
-	friend class MLPTrainerOCL;
-	friend class MLPTesterOCL;
-	friend class MLPPredictorOCL;
 protected:
-	MLP_DATA_MODE  dataMode;     // TRAIN, TEST, PREDICT standing for three different usages of the neural network
+	DNN_DATA_MODE  dataMode;     // TRAIN, TEST, PREDICT standing for three different usages of the neural network
 	int  total_batches;          // Total number of batches provided by the data source and provider (shuffled batches also counted)
 
 	int m_batchSize;             // Number of input frames in each minibatch
@@ -38,8 +32,8 @@ protected:
 	int m_dataLabelSize;         // Size of label frame as input to neural network, in units of float, same as the dimension of the output layer
 	bool haveLabel;              // Indicates if we need use label frames, label frames are needed for training and testing, but not for predicting
 
-	float *features[MLP_BATCH_RING_SIZE];      // ring buffer for feature frames batches, which will be directly delivered to the neural network
-	float *labels[MLP_BATCH_RING_SIZE];        // ring buffer for label frames batches, which will be directly delivered to the neural network
+	float *features[DNN_BATCH_RING_SIZE];      // ring buffer for feature frames batches, which will be directly delivered to the neural network
+	float *labels[DNN_BATCH_RING_SIZE];        // ring buffer for label frames batches, which will be directly delivered to the neural network
 	int rbuf_index,wbuf_index;
 
 	int rbuf_count;              // Used to implement a producer-consumer like synchronization between the neural network side and the data provider side
@@ -105,38 +99,40 @@ private:
 	virtual void setup_cont_data_batches()=0;             // read group of batches from data source to the io buffers
 
 protected:
-	LIBMLPAPI int shutdown_worker();
-	LIBMLPAPI void release_transfer_buffers();
-	LIBMLPAPI void release_io_buffers();
+	LIBDNNAPI int shutdown_worker();
+	LIBDNNAPI void release_transfer_buffers();
+	LIBDNNAPI void release_io_buffers();
 
-    LIBMLPAPI void shuffle_data(int *index, int len);
+    LIBDNNAPI void shuffle_data(int *index, int len);
 
 private:
 	static void * worker_fun(void *argp);
 
 public:
-	LIBMLPAPI MLPDataProvider();
+	LIBDNNAPI DNNDataProvider();
 
-	LIBMLPAPI int getBatchData(int batchSize, float * & pFeatures, bool blocking);
-	LIBMLPAPI int getBatchData(int batchSize, float * & pFeatures, float * & pLabels, bool blocking);
-	LIBMLPAPI int nextBatch();
+	LIBDNNAPI int getBatchData(int batchSize, float * & pFeatures, bool blocking);
+	LIBDNNAPI int getBatchData(int batchSize, float * & pFeatures, float * & pLabels, bool blocking);
+	LIBDNNAPI int nextBatch();
 
-	LIBMLPAPI int getFeatureSize();
-	LIBMLPAPI int getLabelSize();
-	LIBMLPAPI int getTotalBatches();
+	LIBDNNAPI int getFeatureSize();               // get the size of the feature frame in basic type units (eg. float) of the DNN
+	LIBDNNAPI int getLabelSize();                 // get the size of the label frame in basic type units (eg. float) of the DNN
+	LIBDNNAPI int getTotalBatches();              // get the total number of batches available from the data source
+	LIBDNNAPI int getBatchSize();                 // get the size of the batch (the number of frames in one batch)
+	LIBDNNAPI DNN_DATA_MODE getDataMode();        // get the work mode of the data provider
 
-	LIBMLPAPI void setupDataProvider();
-	LIBMLPAPI void resetDataProvider();
+	LIBDNNAPI void setupDataProvider();
+	LIBDNNAPI void resetDataProvider();
 
-	LIBMLPAPI virtual bool frameMatching(const float *frameOutput, const float *frameLabel, int len)=0;
+	LIBDNNAPI virtual bool frameMatching(const float *frameOutput, const float *frameLabel, int len)=0;
 
     // The following two interfaces are only used by the CheckPointing Function
-    LIBMLPAPI virtual void getCheckPointFrame(int & frameNo)=0;                   // Use to get the Frame Position the DataProvider should start from
-    LIBMLPAPI void setupDataProvider(int startFrameNo, bool doChkPointing);       // Setup the DataProvider to provide data start from this Frame Position
+    LIBDNNAPI virtual void getCheckPointFrame(int & frameNo)=0;                   // Use to get the Frame Position the DataProvider should start from
+    LIBDNNAPI void setupDataProvider(int startFrameNo, bool doChkPointing);       // Setup the DataProvider to provide data start from this Frame Position
 
-	LIBMLPAPI bool batchAvailable();
+	LIBDNNAPI bool batchAvailable();
 
-	LIBMLPAPI virtual ~MLPDataProvider()=0;
+	LIBDNNAPI virtual ~DNNDataProvider()=0;
 };
 
 

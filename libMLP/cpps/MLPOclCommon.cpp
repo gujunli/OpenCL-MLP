@@ -5,9 +5,8 @@
  *
  */
 
-
+#include "DNNConstants.h"
 #include "MLPUtil.h"
-#include "MLPConstants.h"
 #include "MLPOclCommon.h"
 
 #include <iostream>
@@ -430,34 +429,14 @@ void cmn_derivative_tanh(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl_mem &d
 };
 
 
-
-
 // the following functions are only used for debugging
 
 void print_dev_data(char *header, cl_command_queue &cmdQueue, cl_mem devBuf, int width, int height)
 {
-    float *hostBuf;
-
-    hostBuf = new float[width * height];
-
-    CL_CHECK(clEnqueueReadBuffer(cmdQueue,devBuf,CL_TRUE,0,sizeof(cl_float)*width*height,hostBuf,0,NULL,NULL ));
-
-
-	cout << header << endl;
-
-	for (int i=0; i< height; i++ ) {
-		 cout << "Row " << i << ":" ;
-
-		 for (int j=0; j< width; j++)
-			  cout << hostBuf[i*width+j] << " " ;
-
-		 cout << endl;
-	};
-
-	delete [] hostBuf;
+    fprint_dev_data(cout, header, cmdQueue, devBuf, width, height);
 };
 
-void fprint_dev_data(ofstream &ofile, char *header, cl_command_queue &cmdQueue, cl_mem devBuf, int width, int height)
+void fprint_dev_data(ostream &ofile, char *header, cl_command_queue &cmdQueue, cl_mem devBuf, int width, int height)
 {
     float *hostBuf;
 

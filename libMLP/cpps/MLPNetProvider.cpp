@@ -16,6 +16,7 @@
 
 #include "MLPUtil.h"
 #include "MLPNetProvider.h"
+#include "conv_endian.h"
 
 using namespace std;
 
@@ -584,7 +585,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
         this->weightsInitialize();
         this->biasesInitialize();
     };
-}; 
+};
 
 
 
@@ -716,7 +717,7 @@ void MLPNetProvider::weightsInitialize()
 {
     float *datap;
 
-    struct mlp_tv tv;
+    struct dnn_tv tv;
 
     getCurrentTime(&tv);
     srand(tv.tv_usec); // use current time as random seed
@@ -749,13 +750,13 @@ void MLPNetProvider::actFuncsInitialize()
 
 int MLPNetProvider::getInputLayerSize()
 {
-	return(this->dimensions[0]); 
-}; 
+	return(this->dimensions[0]);
+};
 
 int MLPNetProvider::getOutputLayerSize()
 {
-	return(this->dimensions[this->nLayers-1]); 
-}; 
+	return(this->dimensions[this->nLayers-1]);
+};
 
 
 void MLPNetProvider::saveConfig(const char *dir, const char *trainingConfigFile, const char *nnetDataFile)

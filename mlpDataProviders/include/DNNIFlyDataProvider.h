@@ -6,19 +6,19 @@
  */
 
 
-#ifndef _MLP_IFLY_DATA_PROVIDER_H_
-#define _MLP_IFLY_DATA_PROVIDER_H_
+#ifndef _DNN_IFLY_DATA_PROVIDER_H_
+#define _DNN_IFLY_DATA_PROVIDER_H_
 
 #include <vector>
 #include <fstream>
 
-#include "MLPApiExport.h"
-#include "MLPDataProvider.h"
+#include "DNNApiExport.h"
+#include "DNNDataProvider.h"
 
 using namespace std;
 
 // for voice data from Iflytek
-class MLPIFlyDataProvider:public MLPDataProvider
+class DNNIFlyDataProvider:public DNNDataProvider
 {
 private:
 	ifstream dataFile;
@@ -51,10 +51,10 @@ private:
 	vector<float> covariance_v;        //  Vector to store the covariance calculated from all frames of the dataset, used to normalize the raw input frames
 
 public:
-	LIBMLPAPI MLPIFlyDataProvider();
-	LIBMLPAPI MLPIFlyDataProvider(const char *dataPath, MLP_DATA_MODE mode, int batchSize, int shuffleBatches);
+	LIBDNNAPI DNNIFlyDataProvider();
+	LIBDNNAPI DNNIFlyDataProvider(const char *dataPath, DNN_DATA_MODE mode, int batchSize, int shuffleBatches);
 
-    ~MLPIFlyDataProvider();
+    ~DNNIFlyDataProvider();
 
     void setupBackendDataProvider();                                                   // Implementation of public base class virtual interface
 	void resetBackendDataProvider();                                                   // Implementation of public base class virtual interface

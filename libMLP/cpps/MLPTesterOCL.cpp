@@ -42,7 +42,7 @@ MLPTesterOCL::MLPTesterOCL()
 	this->initialized = false;
 };
 
-MLPTesterOCL::MLPTesterOCL(MLPNetProvider & netProvider, MLPDataProvider & dataProvider, MLP_OCL_DEVTYPE dType, int _batchSize)
+MLPTesterOCL::MLPTesterOCL(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, MLP_OCL_DEVTYPE dType, int _batchSize)
 {
 	this->devType = dType;
 
@@ -58,7 +58,7 @@ MLPTesterOCL::MLPTesterOCL(MLPNetProvider & netProvider, MLPDataProvider & dataP
     this->setupMLP(netProvider, dataProvider, _batchSize);
 };
 
-void MLPTesterOCL::setupMLP(MLPNetProvider & netProvider, MLPDataProvider & dataProvider, int _batchSize)
+void MLPTesterOCL::setupMLP(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, int _batchSize)
 {
  	if (  ( netProvider.getInputLayerSize() != dataProvider.getFeatureSize() ) ||
 		  ( netProvider.getOutputLayerSize() != dataProvider.getLabelSize() )   ) {
@@ -66,7 +66,7 @@ void MLPTesterOCL::setupMLP(MLPNetProvider & netProvider, MLPDataProvider & data
 		   MLP_Exception("");
 	};
 
-	if (  (_batchSize != dataProvider.m_batchSize) || dataProvider.dataMode != MLP_DATAMODE_TEST ) {
+	if (  (_batchSize != dataProvider.getBatchSize()) || dataProvider.getDataMode() != DNN_DATAMODE_TEST ) {
 		   mlp_log("MLPTester", "The setting of the MLPDataProvider doesn't match the need of the MLPTester");
 		   MLP_Exception("");
 	};

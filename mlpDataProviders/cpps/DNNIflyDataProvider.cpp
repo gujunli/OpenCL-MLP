@@ -7,8 +7,9 @@
 
 #include <iostream>
 
-#include "MLPUtil.h"
-#include "MLPIFlyDataProvider.h"
+#include "DNNUtil.h"
+#include "DNNIFlyDataProvider.h"
+#include "conv_endian.h"
 
 using namespace std;
 
@@ -126,7 +127,7 @@ static void getMaxLabelValue(ifstream &labfile, int numFrames, unsigned int &max
 */
 
 // only called by the constructor
-void MLPIFlyDataProvider::InitializeFromIFlySource(const char *dataPath)
+void DNNIFlyDataProvider::InitializeFromIFlySource(const char *dataPath)
 {
 	unsigned long filelen;
 	unsigned long expectlen;    // expected len of the file
@@ -140,8 +141,8 @@ void MLPIFlyDataProvider::InitializeFromIFlySource(const char *dataPath)
 
 	this->dataFile.open(trainfname.c_str(),fstream::in|fstream::binary);
     if ( ! this->dataFile.is_open() ) {
-		   mlp_log("MLPIFlyDataProvider", "Failed to open the file plp.pfile");
-		   MLP_Exception("");
+		   dnn_log("DNNIFlyDataProvider", "Failed to open the file plp.pfile");
+		   DNN_Exception("");
 	};
 	int numSentences1, numFrames1, lenFeature1, lenLabel1;
 
@@ -151,8 +152,8 @@ void MLPIFlyDataProvider::InitializeFromIFlySource(const char *dataPath)
 	filelen = (unsigned long)this->dataFile.tellg();
 	expectlen = PHEADER_SIZE + numFrames1*(lenFeature1+2)*sizeof(float) + PCHKSUM_LEN + numSentences1*sizeof(int);
 	if ( (filelen <= PHEADER_SIZE) || (filelen != expectlen) || (lenLabel1 !=0)  ) {
-		 mlp_log("MLPIFlyDataProvider", "The plp.file seems not correct");
-		 MLP_Exception("");
+		 dnn_log("DNNIFlyDataProvider", "The plp.file seems not correct");
+		 DNN_Exception("");
 	};
 
 	this->numSentences = numSentences1;
@@ -165,8 +166,8 @@ void MLPIFlyDataProvider::InitializeFromIFlySource(const char *dataPath)
 
 	this->labelFile.open(labelfname.c_str(),fstream::in|fstream::binary);
     if ( ! this->dataFile.is_open() ) {
-		   mlp_log("MLPIFlyDataProvider", "Failed to open the file lab.pfile");
-		   MLP_Exception("");
+		   dnn_log("DNNIFlyDataProvider", "Failed to open the file lab.pfile");
+		   DNN_Exception("");
 	};
 
 	if ( this->haveLabel ) {
@@ -177,14 +178,14 @@ void MLPIFlyDataProvider::InitializeFromIFlySource(const char *dataPath)
 	     filelen = (unsigned long)this->labelFile.tellg();
 	     expectlen = PHEADER_SIZE + numFrames1*(lenLabel2+2)*sizeof(int) + PCHKSUM_LEN + numSentences2*sizeof(int);
          if ( (filelen <= PHEADER_SIZE) || (filelen != expectlen) || (lenFeature2 !=0)  ) {
-		       mlp_log("MLPIFlyDataProvider", "The lab.file seems not correct");
-		       MLP_Exception("");
+		       dnn_log("DNNIFlyDataProvider", "The lab.file seems not correct");
+		       DNN_Exception("");
 	     };
 
 	     // combined check
 	     if ( (numSentences1 != numSentences2) || (numFrames1 != numFrames2) ) {
-		       mlp_log("MLPIFlyDataProvider", "The IFly data files seem not correct");
-		       MLP_Exception("");
+		       dnn_log("DNNIFlyDataProvider", "The IFly data files seem not correct");
+		       DNN_Exception("");
 	     };
 
 	     this->labelFrameLen = lenLabel2;
@@ -224,7 +225,7 @@ void MLPIFlyDataProvider::InitializeFromIFlySource(const char *dataPath)
 	};
 	this->TestSetStart = frameNo;
 
-	if ( this->dataMode == MLP_DATAMODE_TRAIN )    {        // first 95% frames as training set
+	if ( this->dataMode == DNN_DATAMODE_TRAIN )    {        // first 95% frames as training set
 		 this->mySetFrames = this->TestSetStart;
 		 this->mySetStart = 0;
 	}
@@ -240,8 +241,8 @@ void MLPIFlyDataProvider::InitializeFromIFlySource(const char *dataPath)
 	normfname.append("plp.norm");
 	normFile.open(normfname.c_str(), fstream::in);
     if ( ! normFile.is_open() ) {
-		   mlp_log("MLPIFlyDataProvider", "Failed to open the file plp.norm");
-		   MLP_Exception("");
+		   dnn_log("DNNIFlyDataProvider", "Failed to open the file plp.norm");
+		   DNN_Exception("");
 	};
 
 	string myline;
@@ -275,13 +276,13 @@ void MLPIFlyDataProvider::InitializeFromIFlySource(const char *dataPath)
 	normFile.close();
 };
 
-MLPIFlyDataProvider::MLPIFlyDataProvider()
+DNNIFlyDataProvider::DNNIFlyDataProvider()
 {
-	this->dataMode = MLP_DATAMODE_TRAIN;
+	this->dataMode = DNN_DATAMODE_TRAIN;
 	this->haveLabel = true;
  	this->m_batchSize = 512;
 
-	if ( this->dataMode == MLP_DATAMODE_TRAIN )
+	if ( this->dataMode == DNN_DATAMODE_TRAIN )
 		this->m_shuffleBatches = 10;          // for testing and predicting, we don't need to shuffle the data
 	else
 	    this->m_shuffleBatches = 1;
@@ -289,21 +290,21 @@ MLPIFlyDataProvider::MLPIFlyDataProvider()
     this->InitializeFromIFlySource(IFLY_PATH);
 
 	this->total_batches = DIVUPK(this->mySetFrames,this->m_batchSize);
-	this->curSentence = -1; 
+	this->curSentence = -1;
 };
 
-MLPIFlyDataProvider::MLPIFlyDataProvider(const char *dataPath, MLP_DATA_MODE mode, int batchSize, int shuffleBatches)
+DNNIFlyDataProvider::DNNIFlyDataProvider(const char *dataPath, DNN_DATA_MODE mode, int batchSize, int shuffleBatches)
 {
-	if ( (mode < 0) || (mode >= MLP_DATAMODE_ERROR) ) {
-		  mlp_log("MLPIFlyDataProvider", "Data mode for constructing MLPIFlyDataProvider is not correct");
-		  MLP_Exception("");
+	if ( (mode < 0) || (mode >= DNN_DATAMODE_ERROR) ) {
+		  dnn_log("DNNIFlyDataProvider", "Data mode for constructing DNNIFlyDataProvider is not correct");
+		  DNN_Exception("");
 	};
 
 	this->dataMode = mode;
-	this->haveLabel = (mode==MLP_DATAMODE_PREDICT)?false:true;
+	this->haveLabel = (mode==DNN_DATAMODE_PREDICT)?false:true;
 	this->m_batchSize = batchSize;
 
-	if ( this->dataMode == MLP_DATAMODE_TRAIN )
+	if ( this->dataMode == DNN_DATAMODE_TRAIN )
 		 this->m_shuffleBatches = shuffleBatches;    // for testing and predicting, we don't need to shuffle the data
 	else
 	     this->m_shuffleBatches = 1;
@@ -311,12 +312,12 @@ MLPIFlyDataProvider::MLPIFlyDataProvider(const char *dataPath, MLP_DATA_MODE mod
 	this->InitializeFromIFlySource(dataPath);
 
 	this->total_batches = DIVUPK(this->mySetFrames,this->m_batchSize);
-	this->curSentence = -1; 
+	this->curSentence = -1;
 };
 
-MLPIFlyDataProvider::~MLPIFlyDataProvider()
+DNNIFlyDataProvider::~DNNIFlyDataProvider()
 {
-	MLP_CHECK(this->shutdown_worker());
+	DNN_CHECK(this->shutdown_worker());
 
 	if ( this->dataFile.is_open() )
 	     this->dataFile.close();
@@ -329,12 +330,12 @@ MLPIFlyDataProvider::~MLPIFlyDataProvider()
 	this->sDataFrames.clear();
 	this->sLabelFrames.clear();
 
-	this->release_io_buffers(); 
+	this->release_io_buffers();
 	this->release_transfer_buffers();
 };
 
 
-void MLPIFlyDataProvider::readOneSentence()
+void DNNIFlyDataProvider::readOneSentence()
 {
 	float *dataRecord=NULL;
 	unsigned int *frameHeader=NULL;
@@ -415,8 +416,8 @@ void MLPIFlyDataProvider::readOneSentence()
 	     this->gotoLabelFrame(this->curFrame);
 };
 
-// set up the data source of MLPIFlyDataProvider
-void MLPIFlyDataProvider::setup_first_data_batches()
+// set up the data source of DNNIFlyDataProvider
+void DNNIFlyDataProvider::setup_first_data_batches()
 {
 	this->stageBatchNo = 0;
 	this->setup_cont_data_batches();
@@ -426,7 +427,7 @@ void MLPIFlyDataProvider::setup_first_data_batches()
     };
 };
 
-void MLPIFlyDataProvider::setup_cont_data_batches()
+void DNNIFlyDataProvider::setup_cont_data_batches()
 {
 	int readCount=0;
 	int frame;
@@ -434,7 +435,7 @@ void MLPIFlyDataProvider::setup_cont_data_batches()
 	// For CheckPoint
 
 	if ( this->supportChkPointing ) {
-		 MLP_LOCK(&this->chkPointingLock);
+		 DNN_LOCK(&this->chkPointingLock);
 
 	     this->lastChkPointFrame =  this->curChkPointFrame;
 	     if ( this->sDataFrames.empty() )
@@ -442,7 +443,7 @@ void MLPIFlyDataProvider::setup_cont_data_batches()
 	     else
 		      this->curChkPointFrame = this->curStartFrame;   // The current sentence extended to the new stage of batches
 
-		 MLP_UNLOCK(&this->chkPointingLock);
+		 DNN_UNLOCK(&this->chkPointingLock);
 	};
 
 	float *tmpFeature;
@@ -518,16 +519,16 @@ void MLPIFlyDataProvider::setup_cont_data_batches()
 		 };
 	};
 
-endf:    
+endf:
 
 	if ( readCount % this->m_batchSize > 0 ) {  // not one complete batch of frames are loaded
 	     int dst=readCount;
-		 int batches; 
+		 int batches;
 		 int src=0;
 
-		 batches = readCount/this->m_batchSize + 1; 
+		 batches = readCount/this->m_batchSize + 1;
 
-		 // replicate to fill the left frame in last batch 
+		 // replicate to fill the left frame in last batch
 		 while ( dst < this->m_batchSize * batches ) {
 				src = dst % readCount;
 
@@ -540,17 +541,17 @@ endf:
 
 				dst++;
 		  };
-		  this->batches_loaded = batches; 
+		  this->batches_loaded = batches;
 	 }
  	 else {
-		  this->batches_loaded = (readCount == 0)? this->m_shuffleBatches: (readCount/this->m_batchSize); 
-	 }; 
+		  this->batches_loaded = (readCount == 0)? this->m_shuffleBatches: (readCount/this->m_batchSize);
+	 };
 
 	 delete [] tmpFeature;
 };
 
 
-void MLPIFlyDataProvider::gotoDataFrame(int frameNo)
+void DNNIFlyDataProvider::gotoDataFrame(int frameNo)
 {
 	//this->dataFile.seekg(PHEADER_SIZE+frameNo*(2+this->dataFrameLen)*sizeof(float));
 
@@ -563,7 +564,7 @@ void MLPIFlyDataProvider::gotoDataFrame(int frameNo)
 };
 
 
-void MLPIFlyDataProvider::gotoLabelFrame(int frameNo)
+void DNNIFlyDataProvider::gotoLabelFrame(int frameNo)
 {
 	//this->labelFile.seekg(PHEADER_SIZE+frameNo*(2+this->labelFrameLen)*sizeof(int));
 
@@ -581,7 +582,7 @@ void MLPIFlyDataProvider::gotoLabelFrame(int frameNo)
 //////////////////////////////////////////////////////////////////////////////////////
 
 
-void MLPIFlyDataProvider::setupBackendDataProvider()
+void DNNIFlyDataProvider::setupBackendDataProvider()
 {
 	this->gotoDataFrame(this->mySetStart);
 	if ( this->haveLabel )
@@ -595,7 +596,7 @@ void MLPIFlyDataProvider::setupBackendDataProvider()
 };
 
 // This one is called when we want the data provider first to recover from a checkpointed start, and the may start checkpointing or not
-void MLPIFlyDataProvider::setupBackendDataProvider(int startFrameNo, bool doChkPointing)
+void DNNIFlyDataProvider::setupBackendDataProvider(int startFrameNo, bool doChkPointing)
 {
 	this->gotoDataFrame(startFrameNo);
 	this->gotoLabelFrame(startFrameNo);
@@ -608,7 +609,7 @@ void MLPIFlyDataProvider::setupBackendDataProvider(int startFrameNo, bool doChkP
 	this->setup_first_data_batches();
 };
 
-void MLPIFlyDataProvider::resetBackendDataProvider()
+void DNNIFlyDataProvider::resetBackendDataProvider()
 {
 	this->dataFile.clear();
 	this->gotoDataFrame(this->mySetStart);
@@ -630,26 +631,26 @@ void MLPIFlyDataProvider::resetBackendDataProvider()
 	this->setup_first_data_batches();
 };
 
-void MLPIFlyDataProvider::getCheckPointFrame(int & frameNo)
+void DNNIFlyDataProvider::getCheckPointFrame(int & frameNo)
 {
 	 int stageBatch;
 
-	 MLP_LOCK(&this->chkPointingLock);
+	 DNN_LOCK(&this->chkPointingLock);
 
 	 stageBatch = this->stageBatchNo;
-	 if ( stageBatch > MLP_BATCH_RING_SIZE )
-		  frameNo = this->curChkPointFrame;   // Even with the batches on buffer considered considered, this position still ensure no frame being skipped by the MLPTrainer
+	 if ( stageBatch > DNN_BATCH_RING_SIZE )
+		  frameNo = this->curChkPointFrame;   // Even with the batches on buffer considered considered, this position still ensure no frame being skipped by the DNNTrainer
 	 else
 	      frameNo = this->lastChkPointFrame;  // Use "lastChkPointFrame" as checkpoint position to ensure no frame will be skipped for processing
 
-	 MLP_UNLOCK(&this->chkPointingLock);
+	 DNN_UNLOCK(&this->chkPointingLock);
 };
 
 
 // if the output for the frame matches its label, return true to indicate a successful mapping of this
-// frame by the neural network.  This interface will be called by the MLPTester class when calculating
+// frame by the neural network.  This interface will be called by the DNNTester class when calculating
 // the success ratio of the neural network on this type of data
-bool MLPIFlyDataProvider::frameMatching(const float *frameOutput, const float *frameLabel, int len)
+bool DNNIFlyDataProvider::frameMatching(const float *frameOutput, const float *frameLabel, int len)
 {
 	float element;
 

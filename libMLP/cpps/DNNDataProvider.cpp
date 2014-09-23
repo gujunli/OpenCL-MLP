@@ -7,17 +7,17 @@
 
 #include <algorithm>
 
-#include "MLPUtil.h"
-#include "MLPDataProvider.h"
+#include "DNNUtil.h"
+#include "DNNDataProvider.h"
 
-MLPDataProvider::MLPDataProvider()
+DNNDataProvider::DNNDataProvider()
 {
 	this->haveLabel = false;
 	this->m_dataFeatureSize = 0;
 	this->m_dataLabelSize = 0;
 	this->m_batchSize = 0;
 
-	for (int i=0; i< MLP_BATCH_RING_SIZE; i++) {
+	for (int i=0; i< DNN_BATCH_RING_SIZE; i++) {
 	     this->features[i] = NULL;
 	     this->labels[i] = NULL;
 	};
@@ -27,15 +27,15 @@ MLPDataProvider::MLPDataProvider()
 	this->initialized = false;
 };
 
-MLPDataProvider::~MLPDataProvider()
+DNNDataProvider::~DNNDataProvider()
 {
 };
 
 // create the data buffers and initialize the locks and condition variable
-void MLPDataProvider::create_transfer_buffers(int batchSize)
+void DNNDataProvider::create_transfer_buffers(int batchSize)
 {
 
-	for (int i=0; i< MLP_BATCH_RING_SIZE; i++) {
+	for (int i=0; i< DNN_BATCH_RING_SIZE; i++) {
 
         this->features[i] = new float[batchSize*this->m_dataFeatureSize*sizeof(float)];
 
@@ -48,7 +48,7 @@ void MLPDataProvider::create_transfer_buffers(int batchSize)
 	this->m_batchSize = batchSize;
 
 	this->rbuf_count = 0;
-	this->wbuf_count = MLP_BATCH_RING_SIZE;
+	this->wbuf_count = DNN_BATCH_RING_SIZE;
 
 #ifdef _WIN32      // for Windows
 	InitializeConditionVariable(&this->readReady);
@@ -58,14 +58,14 @@ void MLPDataProvider::create_transfer_buffers(int batchSize)
 	pthread_cond_init(&this->writeReady, NULL);
 #endif
 
-	MLP_LOCK_INIT(&this->bufferLock);
+	DNN_LOCK_INIT(&this->bufferLock);
 };
 
 // release the data buffers
-void MLPDataProvider::release_transfer_buffers()
+void DNNDataProvider::release_transfer_buffers()
 {
 
-	for (int i=0; i< MLP_BATCH_RING_SIZE; i++) {
+	for (int i=0; i< DNN_BATCH_RING_SIZE; i++) {
 	     delete [] this->features[i];
 
 	     if ( this->haveLabel )
@@ -73,10 +73,10 @@ void MLPDataProvider::release_transfer_buffers()
 	};
 };
 
-void MLPDataProvider::reset_transfer_buffers()
+void DNNDataProvider::reset_transfer_buffers()
 {
 	this->rbuf_count = 0;
-	this->wbuf_count = MLP_BATCH_RING_SIZE;
+	this->wbuf_count = DNN_BATCH_RING_SIZE;
 
 #ifdef _WIN32      // for Windows
 	InitializeConditionVariable(&this->readReady);
@@ -86,10 +86,10 @@ void MLPDataProvider::reset_transfer_buffers()
 	pthread_cond_init(&this->writeReady, NULL);
 #endif
 
-	MLP_LOCK_INIT(&this->bufferLock);
+	DNN_LOCK_INIT(&this->bufferLock);
 };
 
-void MLPDataProvider::create_io_buffers()
+void DNNDataProvider::create_io_buffers()
 {
     // allocate batches IO buffers used by the backend data provider
 	this->permutations = new int[this->m_batchSize * this->m_shuffleBatches];
@@ -100,28 +100,28 @@ void MLPDataProvider::create_io_buffers()
     for (int k=0; k < this->m_batchSize * this->m_shuffleBatches; k++)
 	     this->permutations[k] = k;
 
-	this->batches_loaded  = 0; 
+	this->batches_loaded  = 0;
 };
 
-void MLPDataProvider::release_io_buffers()
+void DNNDataProvider::release_io_buffers()
 {
-	delete [] this->featureData; 
-	if ( this->haveLabel ) 
-		delete [] this->labelData; 
-	delete [] this->permutations; 
-}; 
+	delete [] this->featureData;
+	if ( this->haveLabel )
+		delete [] this->labelData;
+	delete [] this->permutations;
+};
 
-void MLPDataProvider::reset_io_buffers()
+void DNNDataProvider::reset_io_buffers()
 {
 	this->batches_loaded = 0;
 
     for (int k=0; k < this->m_batchSize * this->m_shuffleBatches; k++)
 	     this->permutations[k] = k;
-}; 
+};
 
 
 // create and start the worker thread
-int MLPDataProvider::startup_worker()
+int DNNDataProvider::startup_worker()
 {
 	if ( !this->initialized )
 		 return(-1);
@@ -130,32 +130,32 @@ int MLPDataProvider::startup_worker()
 		 return(-2);
 
 	this->running = true;
-	MLP_CREATE_THREAD(&this->worker,MLPDataProvider::worker_fun,(void*)this);
+	DNN_CREATE_THREAD(&this->worker,DNNDataProvider::worker_fun,(void*)this);
 
 	return(0);
 };
 
 // shutdown the worker thread
-int MLPDataProvider::shutdown_worker()
+int DNNDataProvider::shutdown_worker()
 {
-    MLP_KILL_THREAD(this->worker);
-	MLP_JOIN_THREAD(this->worker);
+    DNN_KILL_THREAD(this->worker);
+	DNN_JOIN_THREAD(this->worker);
 	this->running = false;
 
 	return(0);
 };
 
-int MLPDataProvider::getTotalBatches()
+int DNNDataProvider::getTotalBatches()
 {
 	return(this->total_batches);
 };
 
-int MLPDataProvider::getFeatureSize()
+int DNNDataProvider::getFeatureSize()
 {
 	return(this->m_dataFeatureSize);
 };
 
-int MLPDataProvider::getLabelSize()
+int DNNDataProvider::getLabelSize()
 {
 	return(this->m_dataLabelSize);
 };
@@ -165,7 +165,7 @@ int MLPDataProvider::getLabelSize()
 #ifdef _WIN32             // for Windows
 
 // get the pointer of the new batch of data
-int MLPDataProvider::getBatchData(int batchSize, float * & pFeatures, bool blocking)
+int DNNDataProvider::getBatchData(int batchSize, float * & pFeatures, bool blocking)
 {
 	if ( !this->running )
 		 return(-1);
@@ -197,7 +197,7 @@ int MLPDataProvider::getBatchData(int batchSize, float * & pFeatures, bool block
 };
 
 // get the pointer of the new batch of data
-int MLPDataProvider::getBatchData(int batchSize, float * & pFeatures, float * & pLabels, bool blocking)
+int DNNDataProvider::getBatchData(int batchSize, float * & pFeatures, float * & pLabels, bool blocking)
 {
 	if ( !this->running )
 		 return(-1);
@@ -231,13 +231,13 @@ int MLPDataProvider::getBatchData(int batchSize, float * & pFeatures, float * & 
 };
 
 // tell the worker thread that the using of the current batch of data is finished
-int MLPDataProvider::nextBatch()
+int DNNDataProvider::nextBatch()
 {
 	 EnterCriticalSection(&this->bufferLock);
 
 	 this->rbuf_count--;
 	 this->wbuf_count++;
-	 this->rbuf_index = (this->rbuf_index+1) % MLP_BATCH_RING_SIZE;
+	 this->rbuf_index = (this->rbuf_index+1) % DNN_BATCH_RING_SIZE;
 
 	 WakeConditionVariable(&this->writeReady);
 
@@ -247,11 +247,11 @@ int MLPDataProvider::nextBatch()
 };
 
 // the worker thread which read batches of data asynchronously
-void *MLPDataProvider::worker_fun(void *argp)
+void *DNNDataProvider::worker_fun(void *argp)
 {
-	 MLPDataProvider *objp;
+	 DNNDataProvider *objp;
 
-	 objp = (MLPDataProvider *)argp;
+	 objp = (DNNDataProvider *)argp;
 	 objp->rbuf_index = 0;
 	 objp->wbuf_index = 0;
 
@@ -259,10 +259,10 @@ void *MLPDataProvider::worker_fun(void *argp)
 
 	 EnterCriticalSection(&objp->bufferLock);
 
-     objp->wbuf_index = (objp->wbuf_index+1) % MLP_BATCH_RING_SIZE;
+     objp->wbuf_index = (objp->wbuf_index+1) % DNN_BATCH_RING_SIZE;
 
 	 objp->rbuf_count = 1;
-	 objp->wbuf_count = MLP_BATCH_RING_SIZE-1;
+	 objp->wbuf_count = DNN_BATCH_RING_SIZE-1;
 
 	 WakeConditionVariable(&objp->readReady);
 
@@ -284,7 +284,7 @@ void *MLPDataProvider::worker_fun(void *argp)
 
 	             EnterCriticalSection(&objp->bufferLock);
 
-                 objp->wbuf_index = (objp->wbuf_index+1) % MLP_BATCH_RING_SIZE;
+                 objp->wbuf_index = (objp->wbuf_index+1) % DNN_BATCH_RING_SIZE;
 				 objp->wbuf_count--;
 				 objp->rbuf_count++;
 
@@ -306,7 +306,7 @@ void *MLPDataProvider::worker_fun(void *argp)
 #else            // for linux
 
 // get the pointer of the new batch of data
-int MLPDataProvider::getBatchData(int batchSize, float * & pFeatures, bool blocking)
+int DNNDataProvider::getBatchData(int batchSize, float * & pFeatures, bool blocking)
 {
 	if ( !this->running )
 		 return(-1);
@@ -338,7 +338,7 @@ int MLPDataProvider::getBatchData(int batchSize, float * & pFeatures, bool block
 };
 
 // get the pointer of the new batch of data
-int MLPDataProvider::getBatchData(int batchSize, float * & pFeatures, float * & pLabels, bool blocking)
+int DNNDataProvider::getBatchData(int batchSize, float * & pFeatures, float * & pLabels, bool blocking)
 {
 	if ( !this->running )
 		 return(-1);
@@ -371,13 +371,13 @@ int MLPDataProvider::getBatchData(int batchSize, float * & pFeatures, float * & 
 };
 
 // tell the worker thread that the using of the current batch of data is finished
-int MLPDataProvider::nextBatch()
+int DNNDataProvider::nextBatch()
 {
 	 pthread_mutex_lock(&this->bufferLock);
 
 	 this->rbuf_count--;
 	 this->wbuf_count++;
-	 this->rbuf_index = (this->rbuf_index+1) % MLP_BATCH_RING_SIZE;
+	 this->rbuf_index = (this->rbuf_index+1) % DNN_BATCH_RING_SIZE;
 
 	 pthread_cond_signal(&this->writeReady);
 
@@ -388,11 +388,11 @@ int MLPDataProvider::nextBatch()
 
 
 // the worker thread which read batches of data asynchronously
-void *MLPDataProvider::worker_fun(void *argp)
+void *DNNDataProvider::worker_fun(void *argp)
 {
-	 MLPDataProvider *objp;
+	 DNNDataProvider *objp;
 
-	 objp = (MLPDataProvider *)argp;
+	 objp = (DNNDataProvider *)argp;
 	 objp->rbuf_index = 0;
 	 objp->wbuf_index = 0;
 
@@ -400,16 +400,16 @@ void *MLPDataProvider::worker_fun(void *argp)
 
 	 pthread_mutex_lock(&objp->bufferLock);
 
-     objp->wbuf_index = (objp->wbuf_index+1) % MLP_BATCH_RING_SIZE;
+     objp->wbuf_index = (objp->wbuf_index+1) % DNN_BATCH_RING_SIZE;
 
 	 objp->rbuf_count = 1;
-	 objp->wbuf_count = MLP_BATCH_RING_SIZE-1;
+	 objp->wbuf_count = DNN_BATCH_RING_SIZE-1;
 
 	 pthread_cond_signal(&objp->readReady);
 
 	 pthread_mutex_unlock(&objp->bufferLock);
 
-	 objp->prepare_batch_data_bottom_half();  
+	 objp->prepare_batch_data_bottom_half();
 
 	 while ( objp->running ) {
             pthread_mutex_lock(&objp->bufferLock);
@@ -425,7 +425,7 @@ void *MLPDataProvider::worker_fun(void *argp)
 
 	             pthread_mutex_lock(&objp->bufferLock);
 
-                 objp->wbuf_index = (objp->wbuf_index+1) % MLP_BATCH_RING_SIZE;
+                 objp->wbuf_index = (objp->wbuf_index+1) % DNN_BATCH_RING_SIZE;
 				 objp->wbuf_count--;
 				 objp->rbuf_count++;
 
@@ -433,7 +433,7 @@ void *MLPDataProvider::worker_fun(void *argp)
 
                  pthread_mutex_unlock(&objp->bufferLock);
 
-				 objp->prepare_batch_data_bottom_half();  
+				 objp->prepare_batch_data_bottom_half();
 			}
 			else {
 			     pthread_cond_wait(&objp->writeReady, &objp->bufferLock);
@@ -448,7 +448,7 @@ void *MLPDataProvider::worker_fun(void *argp)
 
 
 // load one batch of features data from source to data buffer
-void MLPDataProvider::load_feature_batch(float *srcp, int *indexBase, int indexOffset)
+void DNNDataProvider::load_feature_batch(float *srcp, int *indexBase, int indexOffset)
 {
      for(int i = 0; i < this->m_batchSize; i++)
 		for(int j = 0; j < this->m_dataFeatureSize; j++)
@@ -456,7 +456,7 @@ void MLPDataProvider::load_feature_batch(float *srcp, int *indexBase, int indexO
 };
 
 // load one batch of labels data from source to data buffer
-void MLPDataProvider::load_label_batch(float *srcp, int *indexBase, int indexOffset)
+void DNNDataProvider::load_label_batch(float *srcp, int *indexBase, int indexOffset)
 {
      for(int i = 0; i < this->m_batchSize; i++)
 		for(int j = 0; j < this->m_dataLabelSize; j++)
@@ -464,18 +464,18 @@ void MLPDataProvider::load_label_batch(float *srcp, int *indexBase, int indexOff
 };
 
 
-void MLPDataProvider::prepare_batch_data_top_half()
-{ 
+void DNNDataProvider::prepare_batch_data_top_half()
+{
 	// get one batch from the io buffer to the transfer buffer
 	this->load_feature_batch(this->featureData,this->permutations,this->m_batchSize*(this->stageBatchNo % this->m_shuffleBatches));
 	if ( this->haveLabel )
 	     this->load_label_batch(this->labelData,this->permutations,this->m_batchSize*(this->stageBatchNo % this->m_shuffleBatches));
-}; 
+};
 
-void MLPDataProvider::prepare_batch_data_bottom_half()
+void DNNDataProvider::prepare_batch_data_bottom_half()
 {
 	if ( this->supportChkPointing)
-	     MLP_LOCK(&this->chkPointingLock);
+	     DNN_LOCK(&this->chkPointingLock);
 
 	this->stageBatchNo++;
 
@@ -483,7 +483,7 @@ void MLPDataProvider::prepare_batch_data_bottom_half()
 
 		  this->batches_loaded = 0;
 
-		  if ( !this->endOfDataSource ) 
+		  if ( !this->endOfDataSource )
 		        this->setup_cont_data_batches();
 
 		  if ( this->batches_loaded ) {
@@ -499,16 +499,16 @@ void MLPDataProvider::prepare_batch_data_bottom_half()
 	};
 
 	if ( this->supportChkPointing )
-		 MLP_UNLOCK(&this->chkPointingLock);
+		 DNN_UNLOCK(&this->chkPointingLock);
 };
 
-void MLPDataProvider::shuffle_data(int *index, int len)
+void DNNDataProvider::shuffle_data(int *index, int len)
 {
 	std::random_shuffle(index, index+len);
 };
 
 
-bool MLPDataProvider::haveBatchToProvide()
+bool DNNDataProvider::haveBatchToProvide()
 {
 	if ( !this->endOfDataSource )
 		 return(true);
@@ -520,7 +520,7 @@ bool MLPDataProvider::haveBatchToProvide()
 };
 
 
-bool MLPDataProvider::batchAvailable()
+bool DNNDataProvider::batchAvailable()
 {
 	if ( this->haveBatchToProvide() )
 		 return(true);
@@ -531,11 +531,11 @@ bool MLPDataProvider::batchAvailable()
 	return(false);
 };
 
-void MLPDataProvider::setupDataProvider()
+void DNNDataProvider::setupDataProvider()
 {
 	this->supportChkPointing = false;
 	this->create_transfer_buffers(this->m_batchSize);
-	this->create_io_buffers(); 
+	this->create_io_buffers();
 
 	this->endOfDataSource = false;
 
@@ -543,52 +543,62 @@ void MLPDataProvider::setupDataProvider()
 
 	this->initialized = true;
 
-	MLP_CHECK(this->startup_worker());
+	DNN_CHECK(this->startup_worker());
 };
 
-void MLPDataProvider::setupDataProvider(int startFrameNo, bool doChkPointing)
+void DNNDataProvider::setupDataProvider(int startFrameNo, bool doChkPointing)
 {
- 	if ( this->dataMode != MLP_DATAMODE_TRAIN ) {
-		 mlp_log("MLPDataProvider", "This interface can only be called with the TRAIN mode");
-		 MLP_Exception("");
+ 	if ( this->dataMode != DNN_DATAMODE_TRAIN ) {
+		 dnn_log("DNNDataProvider", "This interface can only be called with the TRAIN mode");
+		 DNN_Exception("");
 	};
 
 	// For CheckPoint
 	this->supportChkPointing = doChkPointing;
 	if ( this->supportChkPointing )
-		 MLP_LOCK_INIT(&this->chkPointingLock);
+		 DNN_LOCK_INIT(&this->chkPointingLock);
 
 	this->create_transfer_buffers(this->m_batchSize);
-	this->create_io_buffers(); 
+	this->create_io_buffers();
 
 	this->endOfDataSource = false;
 
-    this->setupBackendDataProvider(startFrameNo, doChkPointing); 
+    this->setupBackendDataProvider(startFrameNo, doChkPointing);
 
 	this->initialized = true;
 
-	MLP_CHECK(this->startup_worker());
+	DNN_CHECK(this->startup_worker());
 };
 
 
-void MLPDataProvider::resetDataProvider()
+void DNNDataProvider::resetDataProvider()
 {
  	if ( !this->initialized ) {
-		 mlp_log("MLPDataProvider", "The DataProvider is still not started yet, no reset should be called");
-		 MLP_Exception("");
+		 dnn_log("DNNDataProvider", "The DataProvider is still not started yet, no reset should be called");
+		 DNN_Exception("");
 	};
-	MLP_CHECK(this->shutdown_worker());
+	DNN_CHECK(this->shutdown_worker());
 
 	this->reset_transfer_buffers();
-	this->reset_io_buffers(); 
+	this->reset_io_buffers();
 
 	this->endOfDataSource = false;
 
 	if ( this->supportChkPointing )
-		 MLP_LOCK_INIT(&this->chkPointingLock);
+		 DNN_LOCK_INIT(&this->chkPointingLock);
 
 	this->resetBackendDataProvider();
 
-	MLP_CHECK(this->startup_worker());
+	DNN_CHECK(this->startup_worker());
+};
+
+int DNNDataProvider::getBatchSize()
+{
+    return(this->m_batchSize);
+};
+
+DNN_DATA_MODE DNNDataProvider::getDataMode()
+{
+    return(this->dataMode);
 };
 

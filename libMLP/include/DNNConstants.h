@@ -5,19 +5,19 @@
  *
  */
 
-#ifndef _MLP_CONSTANTS_H
-#define _MLP_CONSTANTS_H
+#ifndef _DNN_CONSTANTS_H
+#define _DNN_CONSTANTS_H
 
 #define ROUNDK(val,K)  ((((val)+K-1)/(K))*(K))
 #define DIVUPK(val,K) (((val)+K-1)/(K))
 
-enum  MLP_DATA_MODE 
+enum  DNN_DATA_MODE
 {
-    MLP_DATAMODE_TRAIN,
-	MLP_DATAMODE_TEST,
-	MLP_DATAMODE_PREDICT,
-	MLP_DATAMODE_ERROR
-}; 
+    DNN_DATAMODE_TRAIN,
+	DNN_DATAMODE_TEST,
+	DNN_DATAMODE_PREDICT,
+	DNN_DATAMODE_ERROR
+};
 
 #endif
 

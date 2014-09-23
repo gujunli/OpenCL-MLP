@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef _MLP_COMMON_H_
-#define _MLP_COMMON_H_
+#ifndef _MLP_OCL_COMMON_H_
+#define _MLP_OCL_COMMON_H_
 
 #include <CL/cl.h>
 #include <iostream>
@@ -59,7 +59,7 @@ extern void cmn_derivative_tanh(cl_command_queue &cmdQueue, MLP_Kerns &kerns, cl
 
 
 extern void print_dev_data(char *header, cl_command_queue &cmdQueue, cl_mem devBuf, int width, int height);
-extern void fprint_dev_data(ofstream &ofile, char *header, cl_command_queue &cmdQueue, cl_mem devBuf, int width, int height);
+extern void fprint_dev_data(ostream &ofile, char *header, cl_command_queue &cmdQueue, cl_mem devBuf, int width, int height);
 
 
 typedef bool (*CHECK_FLOAT)(float x);

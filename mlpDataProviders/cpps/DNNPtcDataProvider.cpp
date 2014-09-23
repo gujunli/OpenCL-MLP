@@ -7,31 +7,32 @@
 
 #include <iostream>
 
-#include "MLPUtil.h"
-#include "MLPPtcDataProvider.h"
+#include "DNNUtil.h"
+#include "DNNPtcDataProvider.h"
+#include "conv_endian.h"
 
 //////////////////////////////////////////////////////////////////////////////////////
 ////                          constructors and destructor                         ////
 //////////////////////////////////////////////////////////////////////////////////////
 
 // only called by the constructors
-void MLPPtcDataProvider::InitializeFromPtcSource(const char *dataPath)
+void DNNPtcDataProvider::InitializeFromPtcSource(const char *dataPath)
 {
 	unsigned long filelen;
-	unsigned long expectlen; 
+	unsigned long expectlen;
 
 	string datafname(dataPath);
 
-	if ( this->dataMode == MLP_DATAMODE_TRAIN )
+	if ( this->dataMode == DNN_DATAMODE_TRAIN )
  	     datafname.append("ptc_training_db.dat");
-	else 
-		 datafname.append("ptc_testing_db.dat"); 
-	
+	else
+		 datafname.append("ptc_testing_db.dat");
+
 	this->dataFile.open(datafname.c_str(),ios_base::in|ios_base::binary);
 
 	if ( ! this->dataFile.is_open() ) {
-		   mlp_log("MLPPtc", "Failed to open PTC data file");
-		   MLP_Exception("");
+		   dnn_log("DNNPtc", "Failed to open PTC data file");
+		   DNN_Exception("");
 	};
 
 	struct ptc_db_header header;
@@ -45,8 +46,8 @@ void MLPPtcDataProvider::InitializeFromPtcSource(const char *dataPath)
 	LEtoHostl(header.sHeight);
 
 	if ( header.tag[0] != 'P' || header.tag[1] != 'T' || header.tag[2] != 'C' || header.tag[3] != '!' ) {
-		 mlp_log("MLPPtc", "Incorrect PTC data set file tag is detected, the data set file may be not correct one");
-		 MLP_Exception("");
+		 dnn_log("DNNPtc", "Incorrect PTC data set file tag is detected, the data set file may be not correct one");
+		 DNN_Exception("");
 	};
 	this->m_dataFeatureSize = header.sWidth * header.sHeight;
 
@@ -56,8 +57,8 @@ void MLPPtcDataProvider::InitializeFromPtcSource(const char *dataPath)
 
 	expectlen = 16 + sizeof(struct ptc_db_header) + header.numSamples * (sizeof(struct ptc_sample_header) + header.sWidth*header.sHeight);
 	if ( filelen != expectlen )  {
-		 mlp_log("MLPPtc", "The ptc file length is inconsistent with the number of samples recorded in file header");
-		 MLP_Exception("");
+		 dnn_log("DNNPtc", "The ptc file length is inconsistent with the number of samples recorded in file header");
+		 DNN_Exception("");
 	};
 
 	this->m_dataLabelSize = header.numChars;
@@ -68,13 +69,13 @@ void MLPPtcDataProvider::InitializeFromPtcSource(const char *dataPath)
 	this->imageHeight = header.sHeight;
 };
 
-MLPPtcDataProvider::MLPPtcDataProvider()
+DNNPtcDataProvider::DNNPtcDataProvider()
 {
-	this->dataMode = MLP_DATAMODE_TRAIN;
+	this->dataMode = DNN_DATAMODE_TRAIN;
 	this->haveLabel = true;
  	this->m_batchSize = 512;
 
-	if ( this->dataMode == MLP_DATAMODE_TRAIN )
+	if ( this->dataMode == DNN_DATAMODE_TRAIN )
 		this->m_shuffleBatches = 10;          // for testing and predicting, we don't need to shuffle the data
 	else
 	    this->m_shuffleBatches = 1;
@@ -84,18 +85,18 @@ MLPPtcDataProvider::MLPPtcDataProvider()
 	this->total_batches = DIVUPK(this->num_frames,this->m_batchSize);
 };
 
-MLPPtcDataProvider::MLPPtcDataProvider(const char *dataPath, MLP_DATA_MODE mode, int batchSize, int shuffleBatches)
+DNNPtcDataProvider::DNNPtcDataProvider(const char *dataPath, DNN_DATA_MODE mode, int batchSize, int shuffleBatches)
 {
-	if ( (mode < 0) || (mode >= MLP_DATAMODE_ERROR) ) {
-		  mlp_log("MLPPtcDataProvider", "Data mode for constructing MLPPtcDataProvider is not correct");
-		  MLP_Exception("");
+	if ( (mode < 0) || (mode >= DNN_DATAMODE_ERROR) ) {
+		  dnn_log("DNNPtcDataProvider", "Data mode for constructing DNNPtcDataProvider is not correct");
+		  DNN_Exception("");
 	};
 
 	this->dataMode = mode;
-	this->haveLabel = (mode==MLP_DATAMODE_PREDICT)?false:true;
+	this->haveLabel = (mode==DNN_DATAMODE_PREDICT)?false:true;
 	this->m_batchSize = batchSize;
 
-	if ( this->dataMode == MLP_DATAMODE_TRAIN )
+	if ( this->dataMode == DNN_DATAMODE_TRAIN )
 		 this->m_shuffleBatches = shuffleBatches;    // for testing and predicting, we don't need to shuffle the data
 	else
 	     this->m_shuffleBatches = 1;
@@ -105,20 +106,20 @@ MLPPtcDataProvider::MLPPtcDataProvider(const char *dataPath, MLP_DATA_MODE mode,
 	this->total_batches = DIVUPK(this->num_frames,this->m_batchSize);
 };
 
-MLPPtcDataProvider::~MLPPtcDataProvider()
+DNNPtcDataProvider::~DNNPtcDataProvider()
 {
-    MLP_CHECK(this->shutdown_worker());
+    DNN_CHECK(this->shutdown_worker());
 
 	if ( this->dataFile.is_open() )
 	     this->dataFile.close();
 
-	this->release_io_buffers(); 
+	this->release_io_buffers();
 	this->release_transfer_buffers();
 };
 
 
-// set up the data source of MLPPtcDataProvider
-void MLPPtcDataProvider::setup_first_data_batches()
+// set up the data source of DNNPtcDataProvider
+void DNNPtcDataProvider::setup_first_data_batches()
 {
 	this->stageBatchNo = 0;
 	this->setup_cont_data_batches();
@@ -128,7 +129,7 @@ void MLPPtcDataProvider::setup_first_data_batches()
     };
 };
 
-void MLPPtcDataProvider::setup_cont_data_batches()
+void DNNPtcDataProvider::setup_cont_data_batches()
 {
 	int readCount=0;
 	int frame;
@@ -138,11 +139,11 @@ void MLPPtcDataProvider::setup_cont_data_batches()
 
 	imagebuf = new unsigned char[this->m_dataFeatureSize];
     for (frame=0; frame < this->m_batchSize * this->m_shuffleBatches; frame++) {  // read the data frame by frame
-		 struct ptc_sample_header sheader; 
+		 struct ptc_sample_header sheader;
 
-		 this->dataFile.read(reinterpret_cast<char*>(&sheader),sizeof(struct ptc_sample_header)); 
+		 this->dataFile.read(reinterpret_cast<char*>(&sheader),sizeof(struct ptc_sample_header));
          this->dataFile.read(reinterpret_cast<char*>(imagebuf),this->m_dataFeatureSize);
-	
+
 		 if ( this->dataFile.eof() ) {
 			  readCount = frame;
 		      this->endOfDataSource = true;   // no data can read from the data source any more
@@ -150,18 +151,18 @@ void MLPPtcDataProvider::setup_cont_data_batches()
 		 };
 
 		 if ( this->dataFile.fail() ) {
-			  mlp_log("MLPPtcDataProvider", "Failed to access data set file");
-			  MLP_Exception("");
+			  dnn_log("DNNPtcDataProvider", "Failed to access data set file");
+			  DNN_Exception("");
 		 };
 
-		 LEtoHosts(sheader.wCode); 
-		 LEtoHosts(sheader.index); 
-		 label = sheader.index; 
+		 LEtoHosts(sheader.wCode);
+		 LEtoHosts(sheader.index);
+		 label = sheader.index;
 
 		 if ( this->haveLabel ) {
 		      if ( ! ( label>=0 && label < this->m_dataLabelSize ) ) {
-				   mlp_log("MLPPtcDataProvider", "label value from the label file is not correct");
-				   MLP_Exception("");
+				   dnn_log("DNNPtcDataProvider", "label value from the label file is not correct");
+				   DNN_Exception("");
 			  };
 		 };
 
@@ -175,16 +176,16 @@ void MLPPtcDataProvider::setup_cont_data_batches()
 		 };
 	};
 
-endf:   
+endf:
 
 	if ( readCount % this->m_batchSize > 0 ) {  // not one complete batch of frames are loaded
 	     int dst=readCount;
-		 int batches; 
+		 int batches;
 		 int src=0;
 
-		 batches = readCount/this->m_batchSize + 1; 
+		 batches = readCount/this->m_batchSize + 1;
 
-		 // replicate to fill the left frame in last batch 
+		 // replicate to fill the left frame in last batch
 		 while ( dst < this->m_batchSize * batches ) {
 				src = dst % readCount;
 
@@ -197,19 +198,19 @@ endf:
 
 				dst++;
 		  };
-		  this->batches_loaded = batches; 
+		  this->batches_loaded = batches;
 	 }
  	 else {
-		  this->batches_loaded = (readCount == 0)? this->m_shuffleBatches: (readCount/this->m_batchSize); 
-	 }; 
+		  this->batches_loaded = (readCount == 0)? this->m_shuffleBatches: (readCount/this->m_batchSize);
+	 };
 
-	 this->batchNo += this->batches_loaded; 
+	 this->batchNo += this->batches_loaded;
 
 	 delete [] imagebuf;
 };
 
 
-void MLPPtcDataProvider::gotoDataFrame(int frameNo)
+void DNNPtcDataProvider::gotoDataFrame(int frameNo)
 {
 	this->dataFile.seekg(16 + sizeof(struct ptc_db_header));
 
@@ -224,7 +225,7 @@ void MLPPtcDataProvider::gotoDataFrame(int frameNo)
 ////                          public member functions                             ////
 //////////////////////////////////////////////////////////////////////////////////////
 
-void MLPPtcDataProvider::setupBackendDataProvider()
+void DNNPtcDataProvider::setupBackendDataProvider()
 {
 	this->gotoDataFrame(0);
 
@@ -233,7 +234,7 @@ void MLPPtcDataProvider::setupBackendDataProvider()
 	this->setup_first_data_batches();
 };
 
-void MLPPtcDataProvider::setupBackendDataProvider(int startFrameNo, bool doChkPointing)
+void DNNPtcDataProvider::setupBackendDataProvider(int startFrameNo, bool doChkPointing)
 {
 	this->gotoDataFrame((startFrameNo/this->m_batchSize)*this->m_batchSize);
 
@@ -243,7 +244,7 @@ void MLPPtcDataProvider::setupBackendDataProvider(int startFrameNo, bool doChkPo
 };
 
 
-void MLPPtcDataProvider::resetBackendDataProvider()
+void DNNPtcDataProvider::resetBackendDataProvider()
 {
 	this->batchNo = 0;
 
@@ -254,28 +255,28 @@ void MLPPtcDataProvider::resetBackendDataProvider()
 };
 
 
-void MLPPtcDataProvider::getCheckPointFrame(int & frameNo)
+void DNNPtcDataProvider::getCheckPointFrame(int & frameNo)
 {
     int batch;
 
-	MLP_LOCK(&this->chkPointingLock);
+	DNN_LOCK(&this->chkPointingLock);
 
     // get the latest batch for which we are sure having been processed,  Consider there are batches on
 	// the transfer and io buffer that may not be processed by the Trainer
-	batch = this->batchNo - (this->batches_loaded - this->stageBatchNo) - MLP_BATCH_RING_SIZE;    
+	batch = this->batchNo - (this->batches_loaded - this->stageBatchNo) - DNN_BATCH_RING_SIZE;
 
 	// We will start from the first frame of the "stage", since frames before this "stage" have been processed
 	frameNo = batch * this->m_batchSize;
 
-	MLP_UNLOCK(&this->chkPointingLock);
+	DNN_UNLOCK(&this->chkPointingLock);
 };
 
 
 
 // if the output for the frame matches its label, return true to indicate a successful mapping of this
-// frame by the neural network.  This interface will be called by the MLPTester class when calculating
+// frame by the neural network.  This interface will be called by the DNNTester class when calculating
 // the success ratio of the neural network on this type of data
-bool MLPPtcDataProvider::frameMatching(const float *frameOutput, const float *frameLabel, int len)
+bool DNNPtcDataProvider::frameMatching(const float *frameOutput, const float *frameLabel, int len)
 {
 	float element;
 

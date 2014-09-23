@@ -7,11 +7,6 @@
  */
 
 
-#include <algorithm>
-#include <clAmdBlas.h>
-
-#include "MLPUtil.h"
-#include "MLPOclCommon.h"
 #include "MLPTesterBase.h"
 
 
@@ -58,7 +53,7 @@ void MLPTesterBase::_dispose()
 }
 
 
-MLPDataProvider *MLPTesterBase::getDataProvider()
+DNNDataProvider *MLPTesterBase::getDataProvider()
 {
 	return(this->dataProviderp);
 };

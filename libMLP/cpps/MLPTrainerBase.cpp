@@ -6,9 +6,6 @@
  *   Written by  Junli Gu@amd.com ( Dec 2013 )
  */
 
-#include <algorithm>
-#include <clAmdBlas.h>
-
 #include "MLPUtil.h"
 #include "MLPTrainerBase.h"
 #include "MLPChkPointState.h"
@@ -26,7 +23,7 @@ MLPTrainerBase::MLPTrainerBase()
 
 	this->currBatchNo = 0;
 
-	MLP_LOCK_INIT(&this->chkPointingLock);
+	DNN_LOCK_INIT(&this->chkPointingLock);
 
 	this->dataProviderp = NULL;
 
@@ -47,7 +44,7 @@ void MLPTrainerBase::_initialize(MLPNetProvider & provider, int _minibatch)
 	this->minibatch = _minibatch;
 	this->dimensions = new int[this->nLayers];
 
-	this->etas = new cl_float[this->nLayers];         // learning rate for each layer
+	this->etas = new float[this->nLayers];         // learning rate for each layer
 	this->actFuncs = new ACT_FUNC[this->nLayers];     // activating function for each layer
 
 	for ( int i = 0; i < this->nLayers; i++ )
@@ -75,7 +72,7 @@ void MLPTrainerBase::_dispose()
 }
 
 
-MLPDataProvider *MLPTrainerBase::getDataProvider()
+DNNDataProvider *MLPTrainerBase::getDataProvider()
 {
 	return(this->dataProviderp);
 };
@@ -103,7 +100,7 @@ void MLPTrainerBase::showNetConfig()
 void MLPTrainerBase::checkPointing(struct MLPCheckPointState &cpState)
 {
 
-	 MLP_LOCK(&this->chkPointingLock);          // need be lock protected from the Training of MLPTrainer
+	 DNN_LOCK(&this->chkPointingLock);          // need be lock protected from the Training of MLPTrainer
 
      // Snapshot one value of BatchNo as the state checkpointed from the MLPTrainer
      cpState.cpBatchNo = (unsigned int) this->currBatchNo;
@@ -119,7 +116,7 @@ void MLPTrainerBase::checkPointing(struct MLPCheckPointState &cpState)
      this->synchronizeNetConfig(netProvider);
      netProvider.saveConfig(cpState.netConfPath, cpState.ncTrainingConfigFname, cpState.ncNNetDataFname);
 
-     MLP_UNLOCK(&this->chkPointingLock);
+     DNN_UNLOCK(&this->chkPointingLock);
 }
 
 int MLPTrainerBase::batchTraining(int maxBatches, int epoches)

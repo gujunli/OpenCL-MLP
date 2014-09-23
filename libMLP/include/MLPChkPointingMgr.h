@@ -16,7 +16,7 @@
 
 #include <string>
 
-#include "MLPApiExport.h"
+#include "DNNApiExport.h"
 #include "MLPTrainerBase.h"
 #include "MLPChkPointState.h"
 
@@ -51,18 +51,18 @@ private:
 	static void * timer_fun(void *argp);
 
 public:
-	LIBMLPAPI MLPCheckPointManager();
-	LIBMLPAPI ~MLPCheckPointManager();
-	LIBMLPAPI void cpFindAndLoad(const char *dirPath);    // Search the assigned directory to find a valid and latest checkpoint state and loat it into the manager
-	LIBMLPAPI bool cpAvailable();                         // If the manager found an checkpoint state and have it loaded
-	LIBMLPAPI void cpUnload();                            // Unload and release the checkpoint state from the manager
-	LIBMLPAPI void cpCleanUp(const char *dirPath);        // Have all the files related to checkpoint states removed from the assigned directory
+	LIBDNNAPI MLPCheckPointManager();
+	LIBDNNAPI ~MLPCheckPointManager();
+	LIBDNNAPI void cpFindAndLoad(const char *dirPath);    // Search the assigned directory to find a valid and latest checkpoint state and loat it into the manager
+	LIBDNNAPI bool cpAvailable();                         // If the manager found an checkpoint state and have it loaded
+	LIBDNNAPI void cpUnload();                            // Unload and release the checkpoint state from the manager
+	LIBDNNAPI void cpCleanUp(const char *dirPath);        // Have all the files related to checkpoint states removed from the assigned directory
 
-	LIBMLPAPI struct MLPCheckPointState *getChkPointState();
+	LIBDNNAPI struct MLPCheckPointState *getChkPointState();
 
-	LIBMLPAPI void enableCheckPointing(MLPTrainerBase & trainer, const char *dirPath);     // Ask the CheckPoint Manager to do checkpointing for the MLPTrainer
-	LIBMLPAPI int startCheckPointing();
-	LIBMLPAPI int endCheckPointing();
+	LIBDNNAPI void enableCheckPointing(MLPTrainerBase & trainer, const char *dirPath);     // Ask the CheckPoint Manager to do checkpointing for the MLPTrainer
+	LIBDNNAPI int startCheckPointing();
+	LIBDNNAPI int endCheckPointing();
 };
 
 #endif

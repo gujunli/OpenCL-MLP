@@ -11,6 +11,7 @@
 
 #include "MLPUtil.h"
 #include "MLPChkPointingMgr.h"
+#include "conv_endian.h"
 
 using namespace std;
 
@@ -215,7 +216,7 @@ int MLPCheckPointManager::startCheckPointing()
 		 return(-2);
 
 	this->running = true;
-	MLP_CREATE_THREAD(&this->chkPointingTimer,MLPCheckPointManager::timer_fun,(void*)this);
+	DNN_CREATE_THREAD(&this->chkPointingTimer,MLPCheckPointManager::timer_fun,(void*)this);
 
 	return(0);
 };
@@ -228,8 +229,8 @@ int MLPCheckPointManager::endCheckPointing()
 	if ( ! this->running )
 		 return(-2);
 
-    MLP_KILL_THREAD(this->chkPointingTimer);
-	MLP_JOIN_THREAD(this->chkPointingTimer);
+    DNN_KILL_THREAD(this->chkPointingTimer);
+	DNN_JOIN_THREAD(this->chkPointingTimer);
 	this->running = false;
 
 	return(0);
@@ -250,7 +251,7 @@ void *MLPCheckPointManager::timer_fun(void *argp)
 		   fstream stateFile, infoFile;
 		   int len;
 
-		   MLP_SLEEP(MLP_CHKPOINTING_PERIOD);        // do checkpointing every one hour
+		   DNN_SLEEP(MLP_CHKPOINTING_PERIOD);        // do checkpointing every one hour
 
 		   // Produce the names of the network configuration files
            // Use the checkpoint directory itself to save the network configuration files

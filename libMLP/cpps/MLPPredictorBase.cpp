@@ -7,13 +7,7 @@
  */
 
 
-#include <algorithm>
-#include <clAmdBlas.h>
-
-#include "MLPUtil.h"
-#include "MLPOclCommon.h"
 #include "MLPPredictorBase.h"
-
 
 MLPPredictorBase::MLPPredictorBase()
 {

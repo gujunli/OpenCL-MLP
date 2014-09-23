@@ -13,12 +13,13 @@
 #include <CL/cl.h>
 #include <CL/cl_ext.h>
 
-#include "MLPApiExport.h"
-#include "MLPConstants.h"
+#include "DNNApiExport.h"
+#include "DNNConstants.h"
+#include "DNNDataProvider.h"
+
 #include "MLPOclCommon.h"
 #include "SingleDevClass.h"
 #include "MLPNetProvider.h"
-#include "MLPDataProvider.h"
 #include "MLPChkPointState.h"
 #include "MLPTrainerBase.h"
 
@@ -60,18 +61,12 @@ private:
 	void derivative(int layer, cl_mem delta1, cl_mem y, cl_mem delta2, int width, int height);
 
 public:
-	LIBMLPAPI MLPTrainerOCL();
-	LIBMLPAPI MLPTrainerOCL(MLPNetProvider & netProvider, MLPDataProvider & dataProvider, MLP_OCL_DEVTYPE devType, int _minibatch);
+	LIBDNNAPI MLPTrainerOCL();
+	LIBDNNAPI MLPTrainerOCL(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, MLP_OCL_DEVTYPE devType, int _minibatch);
     ~MLPTrainerOCL();
 
 public:
-    /*
-	LIBMLPAPI static SingleDevClass* getCLContext()
-	{
-		return CLContext;
-	}
-	*/
-	void setupMLP(MLPNetProvider & netProvider, MLPDataProvider & dataProvider, int _minipatch);
+	void setupMLP(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, int _minipatch);
 
 	int batchTrainingWithCheckPointing(int maxBatches, int epoches, int startBatch, int startEpoch, bool doChkPointing);
 	void synchronizeNetConfig(MLPNetProvider &netProvider);

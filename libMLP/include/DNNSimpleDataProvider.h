@@ -6,32 +6,32 @@
  */
 
 
-#ifndef _MLP_SIMPLE_DATA_PROVIDER_H_
-#define _MLP_SIMPLE_DATA_PROVIDER_H_
+#ifndef _DNN_SIMPLE_DATA_PROVIDER_H_
+#define _DNN_SIMPLE_DATA_PROVIDER_H_
 
-#include "MLPApiExport.h"
-#include "MLPDataProvider.h"
+#include "DNNApiExport.h"
+#include "DNNDataProvider.h"
 
 // For simple data randomly produced on the memory buffer
-class MLPSimpleDataProvider:public MLPDataProvider
+class DNNSimpleDataProvider:public DNNDataProvider
 {
 private:
 	int  batchNo;              // Accumulated number of batches that have been read from the data source, presenting the latest batch to see
 	                           // this is mainly used to determine a checkpointing location
 
 public:
-	LIBMLPAPI MLPSimpleDataProvider();
-	LIBMLPAPI MLPSimpleDataProvider(MLP_DATA_MODE mode, int dataFeatureSize, int dataLabelSize, int batchSize, int shuffleBatches);
+	LIBDNNAPI DNNSimpleDataProvider();
+	LIBDNNAPI DNNSimpleDataProvider(DNN_DATA_MODE mode, int dataFeatureSize, int dataLabelSize, int batchSize, int shuffleBatches);
 
-    ~MLPSimpleDataProvider();
+    ~DNNSimpleDataProvider();
 
     void setupBackendDataProvider();
 	void resetBackendDataProvider();
- 
+
     bool frameMatching(const float *frameOutput, const float *frameLabel, int len);
 
     // The following two interfaces are only used by the CheckPointing Function
-	void getCheckPointFrame(int & frameNo) {};                            // Use to get the Frame Position the DataProvider should start from
+	void getCheckPointFrame(int & frameNo) {};                                   // Use to get the Frame Position the DataProvider should start from
 	void setupBackendDataProvider(int startFrameNo, bool doChkPointing) {};      // Setup the DataProvider to provide data starting from this Frame Position
 
 private:

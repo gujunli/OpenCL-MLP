@@ -13,12 +13,12 @@
 #include <CL/cl.h>
 #include <CL/cl_ext.h>
 
-#include "MLPApiExport.h"
-#include "MLPConstants.h"
+#include "DNNApiExport.h"
+#include "DNNConstants.h"
+#include "DNNDataProvider.h"
 #include "MLPOclCommon.h"
 #include "SingleDevClass.h"
 #include "MLPNetProvider.h"
-#include "MLPDataProvider.h"
 #include "MLPTesterBase.h"
 
 
@@ -52,18 +52,12 @@ private:
 	void activate(int layer, cl_mem x, cl_mem y, int width, int height);
 
 public:
-	LIBMLPAPI MLPTesterOCL();
-	LIBMLPAPI MLPTesterOCL(MLPNetProvider & netProvider, MLPDataProvider & dataProvider, MLP_OCL_DEVTYPE devType, int _batchSize);
+	LIBDNNAPI MLPTesterOCL();
+	LIBDNNAPI MLPTesterOCL(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, MLP_OCL_DEVTYPE devType, int _batchSize);
 	~MLPTesterOCL();
 
 public:
-    /*
-	LIBMLPAPI static SingleDevClass* getCLContext()
-	{
-		return CLContext;
-	}
-	*/
-	void setupMLP(MLPNetProvider & netProvider, MLPDataProvider & dataProvider, int minipatch);
+	void setupMLP(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, int minipatch);
 	void batchTesting(int maxBatches);
 	bool singleTesting(float *inputVector, float *labelVector, VECTOR_MATCH matchFunc);
 };

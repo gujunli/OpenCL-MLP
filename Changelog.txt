@@ -1,122 +1,126 @@
+*  Tue Sep 23 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com> 
+   -  Renamed the class MLPDataProvider and its derived classes into DNNDataProvider and DNNxxxDataProvider to make the data provider codes
+      more portable (used by other DNN implementation), some file names are changed accordingly
+   -  Moved the codes for endianness conversion to file conv_endian.h 
 
-*  Thu Sep 18 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  - 1.6.0 
+*  Thu Sep 18 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>  - 1.6.0 
    -  Split the implementation of class MLPTrainer/MLPTester/MLPPredictor into base class MLPTrainerBase/MLPTesterBase/MLPPredictorBase
       and OpenCL specific class MLPTrainerOCL/MLPTesterOCL/MLPPredictorOCL to make MLP can be more easily ported to other API like
       AMD ACML and Intel MKL 
 
-*  Mon Sep 15 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  - 1.5.0
+*  Mon Sep 15 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>  - 1.5.0
    -  Split priviate member function prepare_batch_data() of MLPDataprovider into two parts prepare_batch_data_top_half() and 
       prepare_batch_data_bottom_half() to provide better concurrency between MLPTrainer and MLPDataProvider running paths
 
-*  Tue Sep 09 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+*  Tue Sep 09 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>
    -  Further moved some common codes from the backend data provider to MLPDataProvider base class, make it easier to implement
       backend data provider
    -  Added the codes for training and testing Printed-text Chinese Characters, Printed-text English Characters and Vehicle License
       Plate Chinese Characters classifier
 
-*  Sat Sep 06 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+*  Sat Sep 06 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>
    -  Updated the MLPDataProvider to move many common codes from the backend data providers to the MLPDataProvider base class
    -  Updated the backend data providers (eg. MLPMNistDataProvider) to provide less than "shuffleBatches" of batches at end of
       the data set, enabling the total batches size be possible not a multiple of "shuffleBatches" 
 
-*  Fri Sep 05 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+*  Fri Sep 05 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>
    -  Implemented the backend data provider MLPPtcDataProvider to support printed-text characters recognition
    -  Reorganized the sources by putting codes to implement backend data providers into separated directory mlpDataProviders/ 
 
-*  Thu Jul 31 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+*  Thu Jul 31 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>
    -  Changed the MLPDataProvider implementation to more clearly split the work between the base class and derived class, 
       made setupDataProvider()/resetDataProvider complete base class interfaces, added setupBackendProvider/resetBackendProvider
       for derived class 
 
-*  Wed Jul 30 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  
+*  Wed Jul 30 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>  
    -  Modified MLPNetProvider.h MLPNetProvider.cpp to add one constructor to support read the training configuration from file
    -  Added a readme.txt
 
-*  Thu Jul 24 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  - 1.4.0
+*  Thu Jul 24 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>  - 1.4.0
    -  Changed the MLP neural network configuration method, renamed files "mlp_netarch.conf" and "mlp_netweights.dat" to 
       "mlp_training.conf" and "mlp_nnet.dat" respectively
    -  Improved the information included by "mlp_nnet.dat", Added a contructor for MLPNetProvider so that the MLPTester and 
       MLPPredictor only need to use mlp_nnet.dat for neural network initialization
    -  Many other codes changes related to the variation of MLPNetProvider
    
-*  Mon Jul 21 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+*  Mon Jul 21 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>
    -  Fixed a memory leek bug in MLPIFlytekDataProvider.cpp that "labelRecord" is not released in ::readOneSentence()
    -  Fixed a memory leek bug in MLPTester.cpp that "OutVector" is not released in ::SingleTesting()
    -  Some other misc changes of the codes
 
-*  Mon Jul 14 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  
+*  Mon Jul 14 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>  
    -  Update the iflytek_test.cpp, add iflytek_training2() which has been leeked from previous submmit
 
-*  Fri Jul 11 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>  -  1.3.0
+*  Fri Jul 11 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>  -  1.3.0
    -  Fixed a bug with the SinglePredicting() interface of MLPPredictor  
    -  Added the SingleTesting() interface for MLPTester to support single frame based MLP validating
    -  Added a MLP version string to MLPCommon.cpp
 
-*  Thu Jul 03 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+*  Thu Jul 03 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>
    -  Added support to store the weights of MLP neural network in Little Endian bytes sequence
 
-*  Tue Jul 01 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+*  Tue Jul 01 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>
    -  Replaced the MLPDataProvider's implementation of batch buffers from double-buffer to a buffer ring (eg. 8 buffers), more
       number of buffers will let the IO of the back-end data provider be completely hidden by the batch processing of the trainer.  
 
-*  Fri Jun 27 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+*  Fri Jun 27 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>
    -  Fixed a bug in gotoLabelFrame() of MLPMNistDataProvider()
    -  Big hack to MLPDataProvider()/MLPMNistDataProvider()/MLPIFlyDataProvider(), removed the concept of "rounds", replaced 
        it by "epoch", resetDataProvider() added to restart the data provider between each epoches
 
-*  Thu Jun 12 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+*  Thu Jun 12 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>
    -  Adjusted the API of MLPDataProvider, make batchAvailable() a public interface and add separate virtual private interface
       haveBatchToProvide() to be implemented by its derived class
    -  Fixed a bug in batchAvailable() and corresponding codes
 
-*  Sun Jun 09 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+*  Sun Jun 09 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>
    -  Implemented an asynchronous checkpointing facility through a new class MLPCheckPointManager and some codes added
       in the MLPTrainer, MLPDataProvider
 
-*  Fri Jun 06 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+*  Fri Jun 06 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>
    -  Made some change to the MLPNetProvider so that the configuration file names can be assigned by the user
    -  Removed the definition of "WIN32" and "Linux" from the project profile, using the compiler predefined definition
       "_WIN32" and "__linux" 
 
-*  Sat May 31 2014  Qianfeng Zhang <qfzhanglinux@gmail.com>
+*  Sat May 31 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>
    -  Implemented the MLP trainer/tester/dataprovider codes into a dynamic library on Windows 
 
-*  Fri May 30 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>
+*  Fri May 30 2014  Qianfeng Zhang  <Qianfeng.Zhang@amd.com>
    -  Verified the validity of IFlytek dataset
    -  Implemented MLPIFlyDataProvider class, made MLP Trainer work on IFlytek dataset
    -  Reached convergence on IFlytek dataset, provided a referrence network tuning parameters for IFlytek dataset
 
-*  Wed May 14 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>
+*  Wed May 14 2014  Qianfeng Zhang  <Qianfeng.Zhang@amd.com>
    -  Fixed a bug in calling clAmdBlasSegmv(),  make MLP completely work on both Windows and Linux for MNIST dataset
 
-*  Wed Apr 30 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>
+*  Wed Apr 30 2014  Qianfeng Zhang  <Qianfeng.Zhang@amd.com>
    -  Implemented the support for "momentum" in the training algorithm
    -  Fixed many bugges including the incorrect calling of clAmdBlas API, bugges in kernels
    -  Training convergence is reached !!!!
 
-*  Wed Apr 23 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>
+*  Wed Apr 23 2014  Qianfeng Zhang  <Qianfeng.Zhang@amd.com>
    -  Implemented complete support of various network configuration including various algorithms for activation, cost functions. 
    -  Move all OpenCL wrapper functions to MLPCommon.cpp
    -  Replace all C codes by C++ implementations
    
-*  Wed Apr 09 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>
+*  Wed Apr 09 2014  Qianfeng Zhang  <Qianfeng.Zhang@amd.com>
    -  Spliting the functions for training, testing, predicting into three classes MLPTrainer/MLPTester/MLPPredictor
    -  Implemented the double-buffer service architecture of MLPDataProvider
 
-*  Wed Apr 03 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>
+*  Wed Apr 03 2014  Qianfeng Zhang  <Qianfeng.Zhang@amd.com>
    -  Add the MLPDataProvider class and implement two derived class MLPSimpleDataProvider and MLPMNistDataProvider 
       to support emulated training data and MNIST image data
    -  Changed the MLPTrainer class to be initialized with both MLPDataProvider and MLPNetProvider objects
 
-*  Mon Mar 24 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>
+*  Mon Mar 24 2014  Qianfeng Zhang  <Qianfeng.Zhang@amd.com>
    -  Add a MLPNetProvider class to implement support for MLP Neural network architecture (layers, weights, biases)
    -  Rename MLP class to MLPTrainer class
    -  Reimplement the constructor of MLPTrainer to use MLPNetProvider object as parameter
 
-*  Sun Mar 23 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>
+*  Sun Mar 23 2014  Qianfeng Zhang  <Qianfeng.Zhang@amd.com>
    -   Implement the Bias data as isolated data structure separated from the Weight matrixes
 
-*  Mon Mar 17 2014  Qianfeng Zhang  <qfzhanglinux@gmail.com>  
+*  Mon Mar 17 2014  Qianfeng Zhang  <Qianfeng.Zhang@amd.com>  
    -  Clean the codes by identifying the member variables and functions with "this->"
    -  Add the MLPUtil.cpp+MLPUtil.h to provide some utilies needed by the application (eg. time measure, error reporting)
    -  Add the oclutil.cpp+oclutil.h to provide OpenCL device and platform interface functions

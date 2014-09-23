@@ -10,10 +10,10 @@
 #ifndef _MPL_TESTER_BASE_H_
 #define _MPL_TESTER_BASE_H_
 
-#include "MLPApiExport.h"
-#include "MLPConstants.h"
+#include "DNNApiExport.h"
+#include "DNNConstants.h"
+#include "DNNDataProvider.h"
 #include "MLPNetProvider.h"
-#include "MLPDataProvider.h"
 
 
 typedef bool (*VECTOR_MATCH)(float *inVector, float *labelVector, int len);
@@ -29,7 +29,7 @@ protected:
 	int  *dimensions;
 	ACT_FUNC *actFuncs;
 
-	MLPDataProvider *dataProviderp;
+	DNNDataProvider *dataProviderp;
 
 	int succTestFrames;
 	int totalTestFrames;
@@ -41,22 +41,22 @@ private:
 	void _dispose();
 
 public:
-	LIBMLPAPI MLPTesterBase();
-	LIBMLPAPI virtual ~MLPTesterBase()=0;
+	LIBDNNAPI MLPTesterBase();
+	LIBDNNAPI virtual ~MLPTesterBase()=0;
 
 public:
-	LIBMLPAPI virtual void setupMLP(MLPNetProvider & netProvider, MLPDataProvider & dataProvider, int minipatch)=0;
+	LIBDNNAPI virtual void setupMLP(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, int minipatch)=0;
 
-	LIBMLPAPI virtual void batchTesting(int maxBatches)=0;
-	LIBMLPAPI virtual bool singleTesting(float *inputVector, float *labelVector, VECTOR_MATCH matchFunc)=0;
+	LIBDNNAPI virtual void batchTesting(int maxBatches)=0;
+	LIBDNNAPI virtual bool singleTesting(float *inputVector, float *labelVector, VECTOR_MATCH matchFunc)=0;
 
-	LIBMLPAPI MLPDataProvider *getDataProvider();
+	LIBDNNAPI DNNDataProvider *getDataProvider();
 
-	LIBMLPAPI void getTestingStats(int &totalFrames, int &succFrames);
+	LIBDNNAPI void getTestingStats(int &totalFrames, int &succFrames);
 
-    LIBMLPAPI int getInputVectorSize();
-    LIBMLPAPI int getOutputVectorSize();
-	LIBMLPAPI int getBatchSize();
+    LIBDNNAPI int getInputVectorSize();
+    LIBDNNAPI int getOutputVectorSize();
+	LIBDNNAPI int getBatchSize();
 };
 
 

@@ -13,7 +13,7 @@
 #include "MLPTesterOCL.h"
 #include "MLPPredictorOCL.h"
 #include "MLPNetProvider.h"
-#include "MLPMNistDataProvider.h"
+#include "DNNMNistDataProvider.h"
 #include "MLPChkPointingMgr.h"
 
 using namespace std;
@@ -40,7 +40,7 @@ void test_cp_cleanup()
 
 void mnist_training()
 {
-	struct mlp_tv startv, endv;
+	struct dnn_tv startv, endv;
 
 	/*
 	MLP_NETTYPE nettype = NETTYPE_MULTI_CLASSIFICATION;
@@ -59,14 +59,14 @@ void mnist_training()
 	int epoches = 400;
 
 	MLPNetProvider *netProviderp=NULL;
-    MLPDataProvider *dataProviderp=NULL;
+    DNNDataProvider *dataProviderp=NULL;
 
 
 	// Training the neural network using MNist labelled dataset
     MLPTrainerBase *trainerp;
 
-	dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
-	//dataProviderp = new MLPMNistDataProvider(MNIST_PATH3, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	dataProviderp = new DNNMNistDataProvider(MNIST_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	//dataProviderp = new DNNMNistDataProvider(MNIST_PATH3, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
 
 	/*
@@ -104,7 +104,7 @@ void mnist_training()
 // doing MNIST training based on pre-trained weights
 void mnist_training2()
 {
-	struct mlp_tv startv, endv;
+	struct dnn_tv startv, endv;
 
 	int minibatch = 1024;
 	int shuffleBatches = 20;
@@ -113,14 +113,14 @@ void mnist_training2()
 	int epoches=400;
 
 	MLPNetProvider *netProviderp=NULL;
-    MLPDataProvider *dataProviderp=NULL;
+    DNNDataProvider *dataProviderp=NULL;
 
 
 	// Training the neural network using MNist labelled dataset
     MLPTrainerBase *trainerp;
 
-	dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
-	//dataProviderp = new MLPMNistDataProvider(MNIST_PATH3, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	dataProviderp = new DNNMNistDataProvider(MNIST_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	//dataProviderp = new DNNMNistDataProvider(MNIST_PATH3, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
 	totalbatches = dataProviderp->getTotalBatches();
 
@@ -149,7 +149,7 @@ void mnist_training2()
 // doing MNIST training with checkpointing support
 void mnist_training3()
 {
-	struct mlp_tv startv, endv;
+	struct dnn_tv startv, endv;
 
 	int minibatch = 1024;
 	int shuffleBatches = 20;
@@ -162,7 +162,7 @@ void mnist_training3()
 
 	MLPCheckPointManager cpManager;
 	MLPNetProvider *netProviderp=NULL;
-    MLPDataProvider *dataProviderp=NULL;
+    DNNDataProvider *dataProviderp=NULL;
 
 	cpManager.cpFindAndLoad("./tmp/");
 	if ( cpManager.cpAvailable() ) {
@@ -173,8 +173,8 @@ void mnist_training3()
 		 statep = cpManager.getChkPointState();
 		 netProviderp = new MLPNetProvider(statep->netConfPath, statep->ncTrainingConfigFname, statep->ncNNetDataFname);
 
-	     //dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
-         dataProviderp = new MLPMNistDataProvider(MNIST_PATH3, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	     //dataProviderp = new DNNMNistDataProvider(MNIST_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+         dataProviderp = new DNNMNistDataProvider(MNIST_PATH3, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
 		 dataProviderp->setupDataProvider(statep->cpFrameNo, true);
 
 		 startBatch = statep->cpBatchNo;
@@ -188,8 +188,8 @@ void mnist_training3()
          netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
 		 //netProviderp = new MLPNetProvider("./", "mlp_training_init.conf",true);
 
-	     //dataProviderp = new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
-	     dataProviderp = new MLPMNistDataProvider(MNIST_PATH3, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	     //dataProviderp = new DNNMNistDataProvider(MNIST_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	     dataProviderp = new DNNMNistDataProvider(MNIST_PATH3, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	     dataProviderp->setupDataProvider(0, true);
 
 		 startBatch = 0;
@@ -229,20 +229,20 @@ void mnist_training3()
 
 void mnist_batch_testing()
 {
-	struct mlp_tv startv, endv;
+	struct dnn_tv startv, endv;
 
 	int minibatch = 500;
 	int shuffleBatches = 10;
 	int totalbatches;
 
 	MLPNetProvider *netProviderp=NULL;
-    MLPDataProvider *dataProviderp=NULL;
+    DNNDataProvider *dataProviderp=NULL;
 
 	// Testing the MNist labelled dataset on the trained neural network
 	MLPTesterBase *testerp=NULL;
 
 	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
-	dataProviderp =	new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TEST, minibatch, shuffleBatches);
+	dataProviderp =	new DNNMNistDataProvider(MNIST_PATH, DNN_DATAMODE_TEST, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
 	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU,minibatch);
@@ -282,7 +282,7 @@ static bool mnist_output_matching(float *frameOutput, float *frameLabel, int len
 
 void mnist_single_testing()
 {
-	struct mlp_tv startv, endv;
+	struct dnn_tv startv, endv;
 
 	int minibatch = 500;
 	int shuffleBatches = 10;
@@ -291,13 +291,13 @@ void mnist_single_testing()
 	int frames, succNum;
 
 	MLPNetProvider *netProviderp=NULL;
-    MLPDataProvider *dataProviderp=NULL;
+    DNNDataProvider *dataProviderp=NULL;
 
 	// Testing the MNist labelled dataset on the trained neural network
 	MLPTesterBase *testerp=NULL;
 
 	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
-	dataProviderp =	new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_TEST, minibatch, shuffleBatches);
+	dataProviderp =	new DNNMNistDataProvider(MNIST_PATH, DNN_DATAMODE_TEST, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
 	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU,minibatch);
@@ -349,7 +349,7 @@ void mnist_single_testing()
 
 void mnist_predicting()
 {
-	struct mlp_tv startv, endv;
+	struct dnn_tv startv, endv;
 
 	int minibatch = 1024;
     int shuffleBatches = 4;
@@ -358,7 +358,7 @@ void mnist_predicting()
 	int frames;
 
 	MLPNetProvider *netProviderp=NULL;
-    MLPDataProvider *dataProviderp=NULL;
+    DNNDataProvider *dataProviderp=NULL;
 
 	// Using MNist testing dataset to do batch predicting on the trained neural network
 	MLPPredictorBase *predictorp=NULL;
@@ -366,7 +366,7 @@ void mnist_predicting()
 	float *outputVectors;
 
 	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
-	dataProviderp =	new MLPMNistDataProvider(MNIST_PATH, MLP_DATAMODE_PREDICT, minibatch, shuffleBatches);
+	dataProviderp =	new DNNMNistDataProvider(MNIST_PATH, DNN_DATAMODE_PREDICT, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
 	predictorp = new MLPPredictorOCL(*netProviderp,MLP_OCL_DI_GPU, minibatch);
@@ -407,7 +407,7 @@ void mnist_predicting()
 	outputVector = new float[predictorp->getOutputVectorSize()];
 
     cout << "Please Wait 5 seconds, the single frame predicting will start soon" << endl;
-    MLP_SLEEP(5);
+    DNN_SLEEP(5);
 
 	getCurrentTime(&startv);
 

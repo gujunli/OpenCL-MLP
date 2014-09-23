@@ -83,3 +83,85 @@
 	"MLPApiExport.h"
 	"MLPDataProvider.h"
 
+1411377638 source:/home/qfzhang/AMD-work2/MLP-Linux-0917/mlpDataProviders/cpps/DNNIflyDataProvider.cpp
+	<iostream>
+	"DNNUtil.h"
+	"DNNIFlyDataProvider.h"
+
+1411374594 /home/qfzhang/AMD-work2/MLP-Linux-0917/libMLP/include/DNNUtil.h
+	<windows.h>
+	<pthread.h>
+	<signal.h>
+	<unistd.h>
+	<sstream>
+	<exception>
+	<stdexcept>
+	"DNNApiExport.h"
+
+1411373037 /home/qfzhang/AMD-work2/MLP-Linux-0917/libMLP/include/DNNApiExport.h
+
+1411377638 /home/qfzhang/AMD-work2/MLP-Linux-0917/mlpDataProviders/include/DNNIFlyDataProvider.h
+	<vector>
+	<fstream>
+	"DNNApiExport.h"
+	"DNNDataProvider.h"
+
+1411379705 /home/qfzhang/AMD-work2/MLP-Linux-0917/libMLP/include/DNNDataProvider.h
+	<Windows.h>
+	<pthread.h>
+	"DNNApiExport.h"
+	"DNNConstants.h"
+
+1411372752 /home/qfzhang/AMD-work2/MLP-Linux-0917/libMLP/include/DNNConstants.h
+
+1411377638 source:/home/qfzhang/AMD-work2/MLP-Linux-0917/mlpDataProviders/cpps/DNNPtcDataProvider.cpp
+	<iostream>
+	"DNNUtil.h"
+	"DNNPtcDataProvider.h"
+
+1411377638 /home/qfzhang/AMD-work2/MLP-Linux-0917/mlpDataProviders/include/DNNPtcDataProvider.h
+	<fstream>
+	"DNNApiExport.h"
+	"DNNDataProvider.h"
+
+1411377638 source:/home/qfzhang/AMD-work2/MLP-Linux-0922/mlpDataProviders/cpps/DNNIflyDataProvider.cpp
+	<iostream>
+	"DNNUtil.h"
+	"DNNIFlyDataProvider.h"
+
+1411374594 /home/qfzhang/AMD-work2/MLP-Linux-0922/libMLP/include/DNNUtil.h
+	<windows.h>
+	<pthread.h>
+	<signal.h>
+	<unistd.h>
+	<sstream>
+	<exception>
+	<stdexcept>
+	"DNNApiExport.h"
+
+1411373037 /home/qfzhang/AMD-work2/MLP-Linux-0922/libMLP/include/DNNApiExport.h
+
+1411377638 /home/qfzhang/AMD-work2/MLP-Linux-0922/mlpDataProviders/include/DNNIFlyDataProvider.h
+	<vector>
+	<fstream>
+	"DNNApiExport.h"
+	"DNNDataProvider.h"
+
+1411379705 /home/qfzhang/AMD-work2/MLP-Linux-0922/libMLP/include/DNNDataProvider.h
+	<Windows.h>
+	<pthread.h>
+	"DNNApiExport.h"
+	"DNNConstants.h"
+
+1411372752 /home/qfzhang/AMD-work2/MLP-Linux-0922/libMLP/include/DNNConstants.h
+
+1411377638 source:/home/qfzhang/AMD-work2/MLP-Linux-0922/mlpDataProviders/cpps/DNNPtcDataProvider.cpp
+	<iostream>
+	"DNNUtil.h"
+	"DNNPtcDataProvider.h"
+
+1411377638 /home/qfzhang/AMD-work2/MLP-Linux-0922/mlpDataProviders/include/DNNPtcDataProvider.h
+	<fstream>
+	"DNNApiExport.h"
+	"DNNDataProvider.h"
+

@@ -7,15 +7,16 @@
 
 #include <iostream>
 
-#include "MLPUtil.h"
-#include "MLPMNistDataProvider.h"
+#include "DNNUtil.h"
+#include "DNNMNistDataProvider.h"
+#include "conv_endian.h"
 
 //////////////////////////////////////////////////////////////////////////////////////
 ////                          constructors and destructor                         ////
 //////////////////////////////////////////////////////////////////////////////////////
 
 // only called by the constructors
-void MLPMNistDataProvider::InitializeFromMNistSource(const char *dataPath)
+void DNNMNistDataProvider::InitializeFromMNistSource(const char *dataPath)
 {
 	int filelen;
 	int records;
@@ -23,7 +24,7 @@ void MLPMNistDataProvider::InitializeFromMNistSource(const char *dataPath)
 	string datafname(dataPath);
     string labelfname(dataPath);
 
- 	if ( this->dataMode == MLP_DATAMODE_TRAIN )
+ 	if ( this->dataMode == DNN_DATAMODE_TRAIN )
  	     datafname.append("train-images.idx3-ubyte");
 	else
          datafname.append("t10k-images.idx3-ubyte");         // for TEST or PREDICT
@@ -31,8 +32,8 @@ void MLPMNistDataProvider::InitializeFromMNistSource(const char *dataPath)
 	this->dataFile.open(datafname.c_str(),ios_base::in|ios_base::binary);
 
 	if ( ! this->dataFile.is_open() ) {
-		   mlp_log("MLPMNist", "Failed to open MNIST data file");
-		   MLP_Exception("");
+		   dnn_log("DNNMNist", "Failed to open MNIST data file");
+		   DNN_Exception("");
 	};
 
 	struct header_imagefile header1;
@@ -45,8 +46,8 @@ void MLPMNistDataProvider::InitializeFromMNistSource(const char *dataPath)
 	BEtoHostl(header1.imageWidth);
 
 	if ( header1.magicNum != 0x0803 ) {
-		 mlp_log("MLPMNist", "MNIST data file may be not correct");
-		 MLP_Exception("");
+		 dnn_log("DNNMNistDataProvider", "MNIST data file may be not correct");
+		 DNN_Exception("");
 	};
 	this->m_dataFeatureSize = header1.imageWidth * header1.imageHeight;
 
@@ -56,22 +57,22 @@ void MLPMNistDataProvider::InitializeFromMNistSource(const char *dataPath)
 
 	records = ((filelen-sizeof(header1))/sizeof(unsigned char))/(header1.imageWidth*header1.imageHeight);
 	if ( records < (int) header1.numImages )  {
-		 mlp_log("MLPMNist", "MNIST TrainData file may be not correct");
-		 MLP_Exception("");
+		 dnn_log("DNNMNistDataProvider", "MNIST TrainData file may be not correct");
+		 DNN_Exception("");
 	};
 
 	if ( !this->haveLabel )
 		 goto finish;
 
- 	if ( this->dataMode == MLP_DATAMODE_TRAIN )
+ 	if ( this->dataMode == DNN_DATAMODE_TRAIN )
  	     labelfname.append("train-labels.idx1-ubyte");
 	else
          labelfname.append("t10k-labels.idx1-ubyte");         // for TEST or PREDICT
 
 	this->labelFile.open(labelfname.c_str(),ios_base::in|ios_base::binary);
 	if ( ! this->labelFile.is_open() ) {
-		   mlp_log("MLPMNist", "Failed to open MNIST label file");
-		   MLP_Exception("");
+		   dnn_log("DNNMNistDataProvider", "Failed to open MNIST label file");
+		   DNN_Exception("");
 	};
 
 	struct header_labelfile header2;
@@ -82,8 +83,8 @@ void MLPMNistDataProvider::InitializeFromMNistSource(const char *dataPath)
 	BEtoHostl(header2.numLabels);
 
 	if ( header2.magicNum != 0x0801 ) {
-		 mlp_log("MLPMNist", "MNIST label file may be not correct");
-		 MLP_Exception("");
+		 dnn_log("DNNMNistDataProvider", "MNIST label file may be not correct");
+		 DNN_Exception("");
 	};
 	this->m_dataLabelSize = 10;
 
@@ -93,13 +94,13 @@ void MLPMNistDataProvider::InitializeFromMNistSource(const char *dataPath)
 
 	records = (filelen-sizeof(header2))/sizeof(unsigned char);
     if (  records < (int)header2.numLabels ) {
-		 mlp_log("MLPMNist", "MNIST TrainLabel file may be not correct");
-		 MLP_Exception("");
+		 dnn_log("DNNMNistDataProvider", "MNIST TrainLabel file may be not correct");
+		 DNN_Exception("");
 	};
 
 	if ( header1.numImages != header2.numLabels ) {
-		 mlp_log("MLPMNist", "MNIST data is not correct");
-		 MLP_Exception("");
+		 dnn_log("DNNMNistDataProvider", "MNIST data is not correct");
+		 DNN_Exception("");
 	};
 
 finish:
@@ -109,13 +110,13 @@ finish:
 	this->imageHeight = header1.imageHeight;
 };
 
-MLPMNistDataProvider::MLPMNistDataProvider()
+DNNMNistDataProvider::DNNMNistDataProvider()
 {
-	this->dataMode = MLP_DATAMODE_TRAIN;
+	this->dataMode = DNN_DATAMODE_TRAIN;
 	this->haveLabel = true;
  	this->m_batchSize = 512;
 
-	if ( this->dataMode == MLP_DATAMODE_TRAIN )
+	if ( this->dataMode == DNN_DATAMODE_TRAIN )
 		this->m_shuffleBatches = 10;          // for testing and predicting, we don't need to shuffle the data
 	else
 	    this->m_shuffleBatches = 1;
@@ -125,18 +126,18 @@ MLPMNistDataProvider::MLPMNistDataProvider()
 	this->total_batches = DIVUPK(this->num_frames,this->m_batchSize);
 };
 
-MLPMNistDataProvider::MLPMNistDataProvider(const char *dataPath, MLP_DATA_MODE mode, int batchSize, int shuffleBatches)
+DNNMNistDataProvider::DNNMNistDataProvider(const char *dataPath, DNN_DATA_MODE mode, int batchSize, int shuffleBatches)
 {
-	if ( (mode < 0) || (mode >= MLP_DATAMODE_ERROR) ) {
-		  mlp_log("MLPMNistDataProvider", "Data mode for constructing MLPMNistDataProvider is not correct");
-		  MLP_Exception("");
+	if ( (mode < 0) || (mode >= DNN_DATAMODE_ERROR) ) {
+		  dnn_log("DNNMNistDataProvider", "Data mode for constructing DNNMNistDataProvider is not correct");
+		  DNN_Exception("");
 	};
 
 	this->dataMode = mode;
-	this->haveLabel = (mode==MLP_DATAMODE_PREDICT)?false:true;
+	this->haveLabel = (mode==DNN_DATAMODE_PREDICT)?false:true;
 	this->m_batchSize = batchSize;
 
-	if ( this->dataMode == MLP_DATAMODE_TRAIN )
+	if ( this->dataMode == DNN_DATAMODE_TRAIN )
 		 this->m_shuffleBatches = shuffleBatches;    // for testing and predicting, we don't need to shuffle the data
 	else
 	     this->m_shuffleBatches = 1;
@@ -146,22 +147,22 @@ MLPMNistDataProvider::MLPMNistDataProvider(const char *dataPath, MLP_DATA_MODE m
 	this->total_batches = DIVUPK(this->num_frames,this->m_batchSize);
 };
 
-MLPMNistDataProvider::~MLPMNistDataProvider()
+DNNMNistDataProvider::~DNNMNistDataProvider()
 {
-    MLP_CHECK(this->shutdown_worker());
+    DNN_CHECK(this->shutdown_worker());
 
 	if ( this->dataFile.is_open() )
 	     this->dataFile.close();
 	if ( this->labelFile.is_open() )
 	     this->labelFile.close();
 
-	this->release_io_buffers(); 
+	this->release_io_buffers();
 	this->release_transfer_buffers();
 };
 
 
-// set up the data source of MLPMNistDataProvider
-void MLPMNistDataProvider::setup_first_data_batches()
+// set up the data source of DNNMNistDataProvider
+void DNNMNistDataProvider::setup_first_data_batches()
 {
 	this->stageBatchNo = 0;
 	this->setup_cont_data_batches();
@@ -171,7 +172,7 @@ void MLPMNistDataProvider::setup_first_data_batches()
     };
 };
 
-void MLPMNistDataProvider::setup_cont_data_batches()
+void DNNMNistDataProvider::setup_cont_data_batches()
 {
 	int readCount=0;
 	int frame;
@@ -193,19 +194,19 @@ void MLPMNistDataProvider::setup_cont_data_batches()
 		 };
 
 		 if ( this->dataFile.fail() ) {
-			  mlp_log("MLPMNistDataProvider", "Failed to access feature data");
-			  MLP_Exception("");
+			  dnn_log("DNNMNistDataProvider", "Failed to access feature data");
+			  DNN_Exception("");
 		 };
 
 		 if ( this->haveLabel ) {
 		      if ( this->labelFile.fail() ) {
-			       mlp_log("MLPMNistDataProvider", "Failed to access feature data");
-			       MLP_Exception("");
+			       dnn_log("DNNMNistDataProvider", "Failed to access feature data");
+			       DNN_Exception("");
 		      };
 
 		      if ( ! (label>=0 && label <=9 ) ) {
-				   mlp_log("MLPMNistDataProvider", "label value from the label file is not correct");
-				   MLP_Exception("");
+				   dnn_log("DNNMNistDataProvider", "label value from the label file is not correct");
+				   DNN_Exception("");
 			  };
 		 };
 
@@ -219,16 +220,16 @@ void MLPMNistDataProvider::setup_cont_data_batches()
 		 };
 	};
 
-endf:   
+endf:
 
 	if ( readCount % this->m_batchSize > 0 ) {  // not one complete batch of frames are loaded
 	     int dst=readCount;
-		 int batches; 
+		 int batches;
 		 int src=0;
 
-		 batches = readCount/this->m_batchSize + 1; 
+		 batches = readCount/this->m_batchSize + 1;
 
-		 // replicate to fill the left frame in last batch 
+		 // replicate to fill the left frame in last batch
 		 while ( dst < this->m_batchSize * batches ) {
 				src = dst % readCount;
 
@@ -241,26 +242,26 @@ endf:
 
 				dst++;
 		  };
-		  this->batches_loaded = batches; 
+		  this->batches_loaded = batches;
 	 }
  	 else {
-		  this->batches_loaded = (readCount == 0)? this->m_shuffleBatches: (readCount/this->m_batchSize); 
-	 }; 
+		  this->batches_loaded = (readCount == 0)? this->m_shuffleBatches: (readCount/this->m_batchSize);
+	 };
 
-	 this->batchNo += this->batches_loaded; 
+	 this->batchNo += this->batches_loaded;
 
 	 delete [] imagebuf;
 };
 
 
-void MLPMNistDataProvider::gotoDataFrame(int frameNo)
+void DNNMNistDataProvider::gotoDataFrame(int frameNo)
 {
 	this->dataFile.seekg(sizeof(struct header_imagefile));
 	this->dataFile.seekg(frameNo * this->m_dataFeatureSize, ios_base::cur);
 };
 
 
-void MLPMNistDataProvider::gotoLabelFrame(int frameNo)
+void DNNMNistDataProvider::gotoLabelFrame(int frameNo)
 {
 	this->labelFile.seekg(sizeof(struct header_labelfile));
 	this->labelFile.seekg(frameNo * 1, ios_base::cur);
@@ -270,7 +271,7 @@ void MLPMNistDataProvider::gotoLabelFrame(int frameNo)
 ////                          public member functions                             ////
 //////////////////////////////////////////////////////////////////////////////////////
 
-void MLPMNistDataProvider::setupBackendDataProvider()
+void DNNMNistDataProvider::setupBackendDataProvider()
 {
 	this->gotoDataFrame(0);
 	if ( this->haveLabel )
@@ -281,18 +282,18 @@ void MLPMNistDataProvider::setupBackendDataProvider()
 	this->setup_first_data_batches();
 };
 
-void MLPMNistDataProvider::setupBackendDataProvider(int startFrameNo, bool doChkPointing)
+void DNNMNistDataProvider::setupBackendDataProvider(int startFrameNo, bool doChkPointing)
 {
 	this->gotoDataFrame((startFrameNo/this->m_batchSize)*this->m_batchSize);
 	this->gotoLabelFrame((startFrameNo/this->m_batchSize)*this->m_batchSize);
 
-	this->batchNo = (startFrameNo / this->m_batchSize);  
+	this->batchNo = (startFrameNo / this->m_batchSize);
 
 	this->setup_first_data_batches();
 };
 
 
-void MLPMNistDataProvider::resetBackendDataProvider()
+void DNNMNistDataProvider::resetBackendDataProvider()
 {
 	this->batchNo = 0;
 
@@ -307,28 +308,28 @@ void MLPMNistDataProvider::resetBackendDataProvider()
 };
 
 
-void MLPMNistDataProvider::getCheckPointFrame(int & frameNo)
+void DNNMNistDataProvider::getCheckPointFrame(int & frameNo)
 {
     int batch;
 
-	MLP_LOCK(&this->chkPointingLock);
+	DNN_LOCK(&this->chkPointingLock);
 
     // get the latest batch for which we are sure having been processed,  Consider there are batches on
 	// the transfer and io buffer that may not be processed by the Trainer
-	batch = this->batchNo - (this->batches_loaded - this->stageBatchNo) - MLP_BATCH_RING_SIZE;    
+	batch = this->batchNo - (this->batches_loaded - this->stageBatchNo) - DNN_BATCH_RING_SIZE;
 
 	// We will start from the first frame of the "stage", since frames before this "stage" have been processed
 	frameNo = batch * this->m_batchSize;
 
-	MLP_UNLOCK(&this->chkPointingLock);
+	DNN_UNLOCK(&this->chkPointingLock);
 };
 
 
 
 // if the output for the frame matches its label, return true to indicate a successful mapping of this
-// frame by the neural network.  This interface will be called by the MLPTester class when calculating
+// frame by the neural network.  This interface will be called by the DNNTester class when calculating
 // the success ratio of the neural network on this type of data
-bool MLPMNistDataProvider::frameMatching(const float *frameOutput, const float *frameLabel, int len)
+bool DNNMNistDataProvider::frameMatching(const float *frameOutput, const float *frameLabel, int len)
 {
 	float element;
 

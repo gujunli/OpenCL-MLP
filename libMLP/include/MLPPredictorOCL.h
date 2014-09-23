@@ -13,12 +13,13 @@
 #include <CL/cl.h>
 #include <CL/cl_ext.h>
 
-#include "MLPApiExport.h"
+#include "DNNApiExport.h"
+#include "DNNConstants.h"
+#include "DNNDataProvider.h"
+
 #include "MLPOclCommon.h"
-#include "MLPConstants.h"
 #include "SingleDevClass.h"
 #include "MLPNetProvider.h"
-#include "MLPDataProvider.h"
 #include "MLPPredictorBase.h"
 
 
@@ -51,17 +52,11 @@ private:
 	void activate(int layer, cl_mem x, cl_mem y, int width, int height);
 
 public:
-	LIBMLPAPI MLPPredictorOCL();
-	LIBMLPAPI MLPPredictorOCL(MLPNetProvider & netProvider, MLP_OCL_DEVTYPE devType, int _batchSize);
+	LIBDNNAPI MLPPredictorOCL();
+	LIBDNNAPI MLPPredictorOCL(MLPNetProvider & netProvider, MLP_OCL_DEVTYPE devType, int _batchSize);
 	~MLPPredictorOCL();
 
 public:
-    /*
-	LIBMLPAPI static SingleDevClass* getCLContext()
-	{
-		return CLContext;
-	}
-	*/
 	void setupMLP(MLPNetProvider & netProvider, int batchSize);
 
 	void batchPredicting(float *inVectors, float *outVectors);

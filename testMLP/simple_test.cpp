@@ -13,10 +13,7 @@
 #include "MLPTesterOCL.h"
 #include "MLPPredictorOCL.h"
 #include "MLPNetProvider.h"
-#include "MLPSimpleDataProvider.h"
-#include "MLPMNistDataProvider.h"
-#include "MLPIFlyDataProvider.h"
-#include "MLPChkPointingMgr.h"
+#include "DNNSimpleDataProvider.h"
 
 using namespace std;
 
@@ -28,7 +25,7 @@ void simple_predicting();
 
 void simple_training()
 {
-	struct mlp_tv startv, endv;
+	struct dnn_tv startv, endv;
 
 	MLP_NETTYPE nettype;
 	const int nLayers = 8;
@@ -45,7 +42,7 @@ void simple_training()
 	int epoches = 200;
 
 	MLPNetProvider *netProviderp=NULL;
-    MLPDataProvider *dataProviderp=NULL;
+    DNNDataProvider *dataProviderp=NULL;
 
 
     // Training the neural network using Simple labelled dataset
@@ -53,7 +50,7 @@ void simple_training()
 
 	nettype = NETTYPE_MULTI_CLASSIFICATION;
 	netProviderp = new MLPNetProvider(nettype,nLayers,dimensions,etas, momentum, actFuncs,costFunc, true);
-	dataProviderp =	new MLPSimpleDataProvider(MLP_DATAMODE_TRAIN,dimensions[0],dimensions[nLayers-1],minibatch,shuffleBatches);
+	dataProviderp =	new DNNSimpleDataProvider(DNN_DATAMODE_TRAIN,dimensions[0],dimensions[nLayers-1],minibatch,shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
     totalbatches = dataProviderp->getTotalBatches();
 
@@ -79,7 +76,7 @@ void simple_training()
 
 void simple_batch_testing()
 {
-	struct mlp_tv startv, endv;
+	struct dnn_tv startv, endv;
 
 	const int nLayers = 8;
 	int dimensions[nLayers] = {429,2048,2048,2048,2048,2048,2048,8991};
@@ -89,13 +86,13 @@ void simple_batch_testing()
 	// int totalbatches;
 
 	MLPNetProvider *netProviderp=NULL;
-    MLPDataProvider *dataProviderp=NULL;
+    DNNDataProvider *dataProviderp=NULL;
 
 	// Testing the Simple labelled dataset on the trained neural network
 	MLPTesterBase *testerp=NULL;
 
 	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
-	dataProviderp =	new MLPSimpleDataProvider(MLP_DATAMODE_TEST,dimensions[0],dimensions[nLayers-1],minibatch,shuffleBatches);
+	dataProviderp =	new DNNSimpleDataProvider(DNN_DATAMODE_TEST,dimensions[0],dimensions[nLayers-1],minibatch,shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
 	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU, minibatch);
@@ -119,7 +116,7 @@ void simple_batch_testing()
 
 void simple_predicting()
 {
-	struct mlp_tv startv, endv;
+	struct dnn_tv startv, endv;
 
 	const int nLayers = 3;
 	int dimensions[nLayers] = {429,2048,8991};
@@ -130,7 +127,7 @@ void simple_predicting()
 	int frames;
 
 	MLPNetProvider *netProviderp=NULL;
-    MLPDataProvider *dataProviderp=NULL;
+    DNNDataProvider *dataProviderp=NULL;
 
 	// Using Simple testing dataset to do batch predicting on the trained neural network
 	MLPPredictorBase *predictorp=NULL;
@@ -138,7 +135,7 @@ void simple_predicting()
 	float *outputVectors;
 
 	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
-    dataProviderp =	new MLPSimpleDataProvider(MLP_DATAMODE_PREDICT,dimensions[0],dimensions[nLayers-1],minibatch,0);
+    dataProviderp =	new DNNSimpleDataProvider(DNN_DATAMODE_PREDICT,dimensions[0],dimensions[nLayers-1],minibatch,0);
 	dataProviderp->setupDataProvider();                               // set up the data provider
 
 	predictorp = new MLPPredictorOCL(*netProviderp,MLP_OCL_DI_GPU, minibatch);

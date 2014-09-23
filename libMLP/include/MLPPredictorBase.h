@@ -10,10 +10,10 @@
 #ifndef _MPL_PREDICTOR_BASE_H_
 #define _MPL_PREDICTOR_BASE_H_
 
-#include "MLPApiExport.h"
-#include "MLPConstants.h"
+#include "DNNApiExport.h"
+#include "DNNConstants.h"
+#include "DNNDataProvider.h"
 #include "MLPNetProvider.h"
-#include "MLPDataProvider.h"
 
 
 class MLPPredictorBase
@@ -34,18 +34,18 @@ private:
 	void _dispose();
 
 public:
-	LIBMLPAPI MLPPredictorBase();
-	LIBMLPAPI virtual ~MLPPredictorBase()=0;
+	LIBDNNAPI MLPPredictorBase();
+	LIBDNNAPI virtual ~MLPPredictorBase()=0;
 
 public:
-	LIBMLPAPI virtual void setupMLP(MLPNetProvider & netProvider, int batchSize)=0;
+	LIBDNNAPI virtual void setupMLP(MLPNetProvider & netProvider, int batchSize)=0;
 
-	LIBMLPAPI virtual void batchPredicting(float *inVectors, float *outVectors)=0;
-	LIBMLPAPI virtual void singlePredicting(float *inVector, float *outVector)=0;
+	LIBDNNAPI virtual void batchPredicting(float *inVectors, float *outVectors)=0;
+	LIBDNNAPI virtual void singlePredicting(float *inVector, float *outVector)=0;
 
-	LIBMLPAPI int getInputVectorSize();
-	LIBMLPAPI int getOutputVectorSize();
-	LIBMLPAPI int getBatchSize();
+	LIBDNNAPI int getInputVectorSize();
+	LIBDNNAPI int getOutputVectorSize();
+	LIBDNNAPI int getBatchSize();
 };
 
 

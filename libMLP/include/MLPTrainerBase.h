@@ -17,10 +17,10 @@
 #endif
 
 
-#include "MLPApiExport.h"
-#include "MLPConstants.h"
+#include "DNNApiExport.h"
+#include "DNNConstants.h"
+#include "DNNDataProvider.h"
 #include "MLPNetProvider.h"
-#include "MLPDataProvider.h"
 #include "MLPChkPointState.h"
 
 // Implement the interfaces for training the MLP network
@@ -38,7 +38,7 @@ protected:
 	ACT_FUNC *actFuncs;          // Activation function used by all layers,  usually all hidden layers use same activation function, the output uses different one
 	COST_FUNC costFunc;          // Cost function used to measure the error value of the input batch got on the current MLP network
 
-	MLPDataProvider *dataProviderp;
+	DNNDataProvider *dataProviderp;
 
 	int currBatchNo;             // Indicate the current batchNo the training is on, need be saved when doing checkpointing
 	int currEpoch;               // Indicate the current epoch the training is on, need be saved when doing checkpointing
@@ -56,22 +56,22 @@ private:
 	void _dispose();
 
 public:
-	LIBMLPAPI MLPTrainerBase();
-	LIBMLPAPI virtual ~MLPTrainerBase()=0;
+	LIBDNNAPI MLPTrainerBase();
+	LIBDNNAPI virtual ~MLPTrainerBase()=0;
 
 public:
-	LIBMLPAPI virtual void setupMLP(MLPNetProvider & netProvider, MLPDataProvider & dataProvider, int minipatch)=0;
+	LIBDNNAPI virtual void setupMLP(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, int minipatch)=0;
 
-	LIBMLPAPI virtual void synchronizeNetConfig(MLPNetProvider &netProvider)=0;
+	LIBDNNAPI virtual void synchronizeNetConfig(MLPNetProvider &netProvider)=0;
 
-	LIBMLPAPI virtual int batchTrainingWithCheckPointing(int maxBatches, int epoches, int startBatch, int startEpoch, bool doChkPointing)=0;
+	LIBDNNAPI virtual int batchTrainingWithCheckPointing(int maxBatches, int epoches, int startBatch, int startEpoch, bool doChkPointing)=0;
 
-	LIBMLPAPI int batchTraining(int maxBatches, int epoches);
+	LIBDNNAPI int batchTraining(int maxBatches, int epoches);
 
-	LIBMLPAPI void saveNetConfig(const char *configPath);
-	LIBMLPAPI void showNetConfig();
+	LIBDNNAPI void saveNetConfig(const char *configPath);
+	LIBDNNAPI void showNetConfig();
 
-	LIBMLPAPI MLPDataProvider *getDataProvider();
+	LIBDNNAPI DNNDataProvider *getDataProvider();
 
 	void checkPointing(struct MLPCheckPointState &state);
 };

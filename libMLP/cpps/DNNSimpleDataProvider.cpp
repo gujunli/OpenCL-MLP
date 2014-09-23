@@ -7,16 +7,16 @@
 
 #include <algorithm>
 
-#include "MLPUtil.h"
-#include "MLPSimpleDataProvider.h"
+#include "DNNUtil.h"
+#include "DNNSimpleDataProvider.h"
 
 //////////////////////////////////////////////////////////////////////////////////////
 ////                          constructors and destructor                         ////
 //////////////////////////////////////////////////////////////////////////////////////
 
-MLPSimpleDataProvider::MLPSimpleDataProvider()
+DNNSimpleDataProvider::DNNSimpleDataProvider()
 {
-	this->dataMode = MLP_DATAMODE_TRAIN;
+	this->dataMode = DNN_DATAMODE_TRAIN;
 	this->haveLabel = true;
 	this->m_dataFeatureSize = 429;
 	this->m_dataLabelSize = 8991;
@@ -27,15 +27,15 @@ MLPSimpleDataProvider::MLPSimpleDataProvider()
 	this->total_batches =this->m_shuffleBatches*10;
 };
 
-MLPSimpleDataProvider::MLPSimpleDataProvider(MLP_DATA_MODE mode, int dataFeatureSize, int dataLabelSize, int batchSize, int shuffleBatches)
+DNNSimpleDataProvider::DNNSimpleDataProvider(DNN_DATA_MODE mode, int dataFeatureSize, int dataLabelSize, int batchSize, int shuffleBatches)
 {
-	if ( (mode < 0) || (mode >= MLP_DATAMODE_ERROR) ) {
-		  mlp_log("MLPSimpleDataProvider", "Data mode for constructing MLPSimpleDataProvider is not correct");
-		  MLP_Exception("");
+	if ( (mode < 0) || (mode >= DNN_DATAMODE_ERROR) ) {
+		  dnn_log("DNNSimpleDataProvider", "Data mode for constructing DNNSimpleDataProvider is not correct");
+		  DNN_Exception("");
 	};
 
 	this->dataMode = mode;
-	this->haveLabel = (mode==MLP_DATAMODE_PREDICT)?false:true;
+	this->haveLabel = (mode==DNN_DATAMODE_PREDICT)?false:true;
 	this->m_dataFeatureSize = dataFeatureSize;
 	this->m_dataLabelSize = dataLabelSize;
 
@@ -45,15 +45,15 @@ MLPSimpleDataProvider::MLPSimpleDataProvider(MLP_DATA_MODE mode, int dataFeature
 	this->total_batches = this->m_shuffleBatches*10;
 };
 
-MLPSimpleDataProvider::~MLPSimpleDataProvider()
+DNNSimpleDataProvider::~DNNSimpleDataProvider()
 {
-    MLP_CHECK(this->shutdown_worker());
+    DNN_CHECK(this->shutdown_worker());
 
-	this->release_io_buffers(); 
+	this->release_io_buffers();
 	this->release_transfer_buffers();
 };
 
-void MLPSimpleDataProvider::setup_first_data_batches()
+void DNNSimpleDataProvider::setup_first_data_batches()
 {
 	this->stageBatchNo = 0;
 	this->setup_cont_data_batches();
@@ -63,9 +63,9 @@ void MLPSimpleDataProvider::setup_first_data_batches()
     };
 };
 
-void MLPSimpleDataProvider::setup_cont_data_batches()
+void DNNSimpleDataProvider::setup_cont_data_batches()
 {
-	struct mlp_tv tv;
+	struct dnn_tv tv;
 
 	getCurrentTime(&tv);
 	srand(tv.tv_usec); // use current time as random seed
@@ -94,11 +94,11 @@ void MLPSimpleDataProvider::setup_cont_data_batches()
 		 };
 	};
 
-	this->batches_loaded = this->m_shuffleBatches; 
-	this->batchNo += this->batches_loaded; 
+	this->batches_loaded = this->m_shuffleBatches;
+	this->batchNo += this->batches_loaded;
 
-	if ( this->batchNo == this->total_batches ) 
-		 this->endOfDataSource = true; 
+	if ( this->batchNo == this->total_batches )
+		 this->endOfDataSource = true;
 };
 
 
@@ -106,14 +106,14 @@ void MLPSimpleDataProvider::setup_cont_data_batches()
 ////                          public member functions                             ////
 //////////////////////////////////////////////////////////////////////////////////////
 
-void MLPSimpleDataProvider::setupBackendDataProvider()
+void DNNSimpleDataProvider::setupBackendDataProvider()
 {
 	this->batchNo = 0;
 
 	this->setup_first_data_batches();
 };
 
-void MLPSimpleDataProvider::resetBackendDataProvider()
+void DNNSimpleDataProvider::resetBackendDataProvider()
 {
 	this->batchNo = 0;
 
@@ -122,9 +122,9 @@ void MLPSimpleDataProvider::resetBackendDataProvider()
 
 
 // if the output for the frame matches its label, return true to indicate a successful mapping of this
-// frame by the neural network.  This interface will be called by the MLPTester class when calculating
+// frame by the neural network.  This interface will be called by the DNNTester class when calculating
 // the success ratio of the neural network on this type of data
-bool MLPSimpleDataProvider::frameMatching(const float *frameOutput, const float *frameLabel, int len)
+bool DNNSimpleDataProvider::frameMatching(const float *frameOutput, const float *frameLabel, int len)
 {
 	float element;
 

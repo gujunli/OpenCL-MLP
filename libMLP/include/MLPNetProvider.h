@@ -8,7 +8,7 @@
 #ifndef _MLP_NET_PROVIDER_H_
 #define _MLP_NET_PROVIDER_H_
 
-#include "MLPApiExport.h"
+#include "DNNApiExport.h"
 
 enum  MLP_NETTYPE
 {
@@ -77,15 +77,15 @@ private:
 	void actFuncsInitialize();
 
 public:
-	LIBMLPAPI MLPNetProvider();
-    LIBMLPAPI MLPNetProvider(int layers, int dimensions[], bool DoInitialize=false);
-    LIBMLPAPI MLPNetProvider(MLP_NETTYPE type, int layers, int dimensions_[], float etas_[], float momentum_, ACT_FUNC actFuncs_[], COST_FUNC costFunc_, bool DoInitialize);
-    LIBMLPAPI MLPNetProvider(const char *dir, const char *trainingConfigFile, const char *nnetDataFile);   // initialized weights from the file
-	LIBMLPAPI MLPNetProvider(const char *dir, const char *trainingConfigFile, bool DoInitialize);     // using randomly initialized weights
+	LIBDNNAPI MLPNetProvider();
+    LIBDNNAPI MLPNetProvider(int layers, int dimensions[], bool DoInitialize=false);
+    LIBDNNAPI MLPNetProvider(MLP_NETTYPE type, int layers, int dimensions_[], float etas_[], float momentum_, ACT_FUNC actFuncs_[], COST_FUNC costFunc_, bool DoInitialize);
+    LIBDNNAPI MLPNetProvider(const char *dir, const char *trainingConfigFile, const char *nnetDataFile);   // initialized weights from the file
+	LIBDNNAPI MLPNetProvider(const char *dir, const char *trainingConfigFile, bool DoInitialize);     // using randomly initialized weights
 
-	LIBMLPAPI MLPNetProvider(const char *dir, const char *nnetDataFile);   // used for the MLPTester and MLPPredictor
+	LIBDNNAPI MLPNetProvider(const char *dir, const char *nnetDataFile);   // used for the MLPTester and MLPPredictor
 
-	LIBMLPAPI ~MLPNetProvider();
+	LIBDNNAPI ~MLPNetProvider();
 
 	void saveConfig(const char *dir, const char *trainingConfigFile, const char *nnetDataFile);
 

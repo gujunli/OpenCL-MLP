@@ -41,10 +41,10 @@
 		<Linker>
 			<Add library="MLP" />
 		</Linker>
-		<Unit filename="mlpDataProviders/cpps/MLPIflyDataProvider.cpp" />
-		<Unit filename="mlpDataProviders/cpps/MLPPtcDataProvider.cpp" />
-		<Unit filename="mlpDataProviders/include/MLPIFlyDataProvider.h" />
-		<Unit filename="mlpDataProviders/include/MLPPtcDataProvider.h" />
+		<Unit filename="mlpDataProviders/cpps/DNNIflyDataProvider.cpp" />
+		<Unit filename="mlpDataProviders/cpps/DNNPtcDataProvider.cpp" />
+		<Unit filename="mlpDataProviders/include/DNNIFlyDataProvider.h" />
+		<Unit filename="mlpDataProviders/include/DNNPtcDataProvider.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

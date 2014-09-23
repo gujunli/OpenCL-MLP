@@ -13,7 +13,7 @@
 #include "MLPPredictorOCL.h"
 #include "MLPNetProvider.h"
 #include "MLPChkPointingMgr.h"
-#include "MLPPtcDataProvider.h"
+#include "DNNPtcDataProvider.h"
 
 using namespace std;
 
@@ -29,7 +29,7 @@ void ptc_digital_predicting();
 // do ptc_en training with randomly initialized weights
 void ptc_digital_training()
 {
-	struct mlp_tv startv, endv;
+	struct dnn_tv startv, endv;
 
 	/*
 	MLP_NETTYPE nettype = NETTYPE_MULTI_CLASSIFICATION;
@@ -48,14 +48,14 @@ void ptc_digital_training()
 	int epoches = 400;
 
 	MLPNetProvider *netProviderp=NULL;
-    MLPDataProvider *dataProviderp=NULL;
+    DNNDataProvider *dataProviderp=NULL;
 
 
 	// Training the neural network using ptc_en labelled dataset
     MLPTrainerBase *trainerp;
 
-	//dataProviderp = new MLPptc_enDataProvider(ptc_digital_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
-	dataProviderp = new MLPPtcDataProvider(PTC_DIGITAL_DB_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	//dataProviderp = new MLPptc_enDataProvider(ptc_digital_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	dataProviderp = new DNNPtcDataProvider(PTC_DIGITAL_DB_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
 
 	//dimensions[0] = dataProviderp->getFeatureSize();
@@ -91,7 +91,7 @@ void ptc_digital_training()
 // doing ptc_en training based on pre-trained weights
 void ptc_digital_training2()
 {
-	struct mlp_tv startv, endv;
+	struct dnn_tv startv, endv;
 
 	int minibatch = 1024;
 	int shuffleBatches = 10;
@@ -100,14 +100,14 @@ void ptc_digital_training2()
 	int epoches=400;
 
 	MLPNetProvider *netProviderp=NULL;
-    MLPDataProvider *dataProviderp=NULL;
+    DNNDataProvider *dataProviderp=NULL;
 
 
 	// Training the neural network using ptc_en labelled dataset
     MLPTrainerBase *trainerp;
 
-	dataProviderp = new MLPPtcDataProvider(PTC_DIGITAL_DB_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
-	//dataProviderp = new MLPptc_enDataProvider(ptc_digital_PATH3, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	dataProviderp = new DNNPtcDataProvider(PTC_DIGITAL_DB_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	//dataProviderp = new MLPptc_enDataProvider(ptc_digital_PATH3, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
 	totalbatches = dataProviderp->getTotalBatches();
 
@@ -136,7 +136,7 @@ void ptc_digital_training2()
 // doing ptc_en training with checkpointing support
 void ptc_digital_training3()
 {
-	struct mlp_tv startv, endv;
+	struct dnn_tv startv, endv;
 
 	int minibatch = 1024;
 	int shuffleBatches = 10;
@@ -149,7 +149,7 @@ void ptc_digital_training3()
 
 	MLPCheckPointManager cpManager;
 	MLPNetProvider *netProviderp=NULL;
-    MLPDataProvider *dataProviderp=NULL;
+    DNNDataProvider *dataProviderp=NULL;
 
 	cpManager.cpFindAndLoad("./tmp/");
 	if ( cpManager.cpAvailable() ) {
@@ -160,8 +160,8 @@ void ptc_digital_training3()
 		 statep = cpManager.getChkPointState();
 		 netProviderp = new MLPNetProvider(statep->netConfPath, statep->ncTrainingConfigFname, statep->ncNNetDataFname);
 
-	     //dataProviderp = new MLPptc_enDataProvider(ptc_digital_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
-         dataProviderp = new MLPPtcDataProvider(PTC_DIGITAL_DB_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	     //dataProviderp = new MLPptc_enDataProvider(ptc_digital_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+         dataProviderp = new DNNPtcDataProvider(PTC_DIGITAL_DB_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
 		 dataProviderp->setupDataProvider(statep->cpFrameNo, true);
 
 		 startBatch = statep->cpBatchNo;
@@ -175,8 +175,8 @@ void ptc_digital_training3()
           netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
          //netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", true);
 
-	     //dataProviderp = new MLPPtcDataProvider(ptc_digital_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
-	     dataProviderp = new MLPPtcDataProvider(PTC_DIGITAL_DB_PATH, MLP_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	     //dataProviderp = new DNNPtcDataProvider(ptc_digital_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	     dataProviderp = new DNNPtcDataProvider(PTC_DIGITAL_DB_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
 	     dataProviderp->setupDataProvider(0, true);
 
 		 startBatch = 0;
@@ -216,7 +216,7 @@ void ptc_digital_training3()
 
 void ptc_digital_batch_testing()
 {
-	struct mlp_tv startv, endv;
+	struct dnn_tv startv, endv;
 
 	// 285 * 5 = 1425 to match the number of samples in the testing set
 	int minibatch = 285;
@@ -224,13 +224,13 @@ void ptc_digital_batch_testing()
 	int totalbatches;
 
 	MLPNetProvider *netProviderp=NULL;
-    MLPDataProvider *dataProviderp=NULL;
+    DNNDataProvider *dataProviderp=NULL;
 
 	// Testing the ptc_en labelled dataset on the trained neural network
 	MLPTesterBase *testerp=NULL;
 
 	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
-	dataProviderp =	new MLPPtcDataProvider(PTC_DIGITAL_DB_PATH, MLP_DATAMODE_TEST, minibatch, shuffleBatches);
+	dataProviderp =	new DNNPtcDataProvider(PTC_DIGITAL_DB_PATH, DNN_DATAMODE_TEST, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
 	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU,minibatch);
@@ -270,7 +270,7 @@ static bool ptc_digital_output_matching(float *frameOutput, float *frameLabel, i
 
 void ptc_digital_single_testing()
 {
-	struct mlp_tv startv, endv;
+	struct dnn_tv startv, endv;
 
 	int minibatch = 500;
 	int shuffleBatches = 10;
@@ -279,13 +279,13 @@ void ptc_digital_single_testing()
 	int frames, succNum;
 
 	MLPNetProvider *netProviderp=NULL;
-    MLPDataProvider *dataProviderp=NULL;
+    DNNDataProvider *dataProviderp=NULL;
 
 	// Testing the ptc_en labelled dataset on the trained neural network
 	MLPTesterBase *testerp=NULL;
 
 	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
-	dataProviderp =	new MLPPtcDataProvider(PTC_DIGITAL_DB_PATH, MLP_DATAMODE_TEST, minibatch, shuffleBatches);
+	dataProviderp =	new DNNPtcDataProvider(PTC_DIGITAL_DB_PATH, DNN_DATAMODE_TEST, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
 	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU,minibatch);
@@ -337,7 +337,7 @@ void ptc_digital_single_testing()
 
 void ptc_digital_predicting()
 {
-	struct mlp_tv startv, endv;
+	struct dnn_tv startv, endv;
 
 	int minibatch = 1024;
     int shuffleBatches = 4;
@@ -346,7 +346,7 @@ void ptc_digital_predicting()
 	int frames;
 
 	MLPNetProvider *netProviderp=NULL;
-    MLPDataProvider *dataProviderp=NULL;
+    DNNDataProvider *dataProviderp=NULL;
 
 	// Using ptc_en testing dataset to do batch predicting on the trained neural network
 	MLPPredictorBase *predictorp=NULL;
@@ -354,7 +354,7 @@ void ptc_digital_predicting()
 	float *outputVectors;
 
 	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
-	dataProviderp =	new MLPPtcDataProvider(PTC_DIGITAL_DB_PATH, MLP_DATAMODE_PREDICT, minibatch, shuffleBatches);
+	dataProviderp =	new DNNPtcDataProvider(PTC_DIGITAL_DB_PATH, DNN_DATAMODE_PREDICT, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
 	predictorp = new MLPPredictorOCL(*netProviderp,MLP_OCL_DI_GPU, minibatch);
@@ -395,7 +395,7 @@ void ptc_digital_predicting()
 	outputVector = new float[predictorp->getOutputVectorSize()];
 
     cout << "Please Wait 5 seconds, the single frame predicting will start soon" << endl;
-    MLP_SLEEP(5);
+    DNN_SLEEP(5);
 
 	getCurrentTime(&startv);
 

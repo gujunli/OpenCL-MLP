@@ -5,18 +5,18 @@
  *
  */
 
-#ifndef _MLP_PTC_DATA_PROVIDER_H_
-#define _MLP_PTC_DATA_PROVIDER_H_
+#ifndef _DNN_PTC_DATA_PROVIDER_H_
+#define _DNN_PTC_DATA_PROVIDER_H_
 
 #include <fstream>
 
-#include "MLPApiExport.h"
-#include "MLPDataProvider.h"
+#include "DNNApiExport.h"
+#include "DNNDataProvider.h"
 
 using namespace std;
 
 // for Printed-Text Characters data set
-class MLPPtcDataProvider:public MLPDataProvider
+class DNNPtcDataProvider:public DNNDataProvider
 {
 private:
 	ifstream dataFile;
@@ -29,10 +29,10 @@ private:
 	int imageHeight;           // height of the input image
 
 public:
-	LIBMLPAPI MLPPtcDataProvider();
-	LIBMLPAPI MLPPtcDataProvider(const char *dataPath, MLP_DATA_MODE mode, int batchSize, int shuffleBatches);
+	LIBDNNAPI DNNPtcDataProvider();
+	LIBDNNAPI DNNPtcDataProvider(const char *dataPath, DNN_DATA_MODE mode, int batchSize, int shuffleBatches);
 
-    ~MLPPtcDataProvider();
+    ~DNNPtcDataProvider();
 
     void setupBackendDataProvider();                                                      // implementation of public base class virtual interface
 	void resetBackendDataProvider();                                                      // implementation of public base class virtual interface
