@@ -11,26 +11,26 @@
 
 #include <CL/cl.h>
 
-enum MLP_OCL_DEVTYPE {
-	MLP_OCL_CPU, 
-	MLP_OCL_IGPU, 
-	MLP_OCL_DGPU,
-	MLP_OCL_DI_GPU
-}; 
+enum DNN_OCL_DEVTYPE {
+	DNN_OCL_CPU,
+	DNN_OCL_IGPU,
+	DNN_OCL_DGPU,
+	DNN_OCL_DI_GPU
+};
 
 class SingleDevClass
-{			
+{
 public:
 	cl_device_id m_device;
 	cl_context m_context;
-	cl_command_queue m_cmd_queues[2];
-	int numQueues; 
+	cl_command_queue m_queues[2];
+	int numQueues;
 	cl_program m_program;
-    MLP_OCL_DEVTYPE devtype; 
+    DNN_OCL_DEVTYPE devtype;
 public:
 	SingleDevClass();
-	SingleDevClass(MLP_OCL_DEVTYPE type); 
-	~SingleDevClass();	
+	SingleDevClass(DNN_OCL_DEVTYPE type);
+	~SingleDevClass();
 };
 
-#endif 
+#endif

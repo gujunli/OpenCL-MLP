@@ -1,5 +1,7 @@
 *  Thu Sep 25 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com> 
    -  Added FloatToBytes() and BytesToFloat() for converting float type between host and file storage
+   -  Renamed some member variables to make them shorter (m_cmd_queues => m_queues)
+   -  Moved some content of MLPUtil.h to DNNUtil.h to make them more generic 
 
 *  Tue Sep 23 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com> 
    -  Renamed the class MLPDataProvider and its derived classes into DNNDataProvider and DNNxxxDataProvider to make the data provider codes

@@ -95,7 +95,7 @@ void simple_batch_testing()
 	dataProviderp =	new DNNSimpleDataProvider(DNN_DATAMODE_TEST,dimensions[0],dimensions[nLayers-1],minibatch,shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
-	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU, minibatch);
+	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,DNN_OCL_DI_GPU, minibatch);
 
 	// totalbatches = dataProviderp->getTotalBatches();
 
@@ -138,7 +138,7 @@ void simple_predicting()
     dataProviderp =	new DNNSimpleDataProvider(DNN_DATAMODE_PREDICT,dimensions[0],dimensions[nLayers-1],minibatch,0);
 	dataProviderp->setupDataProvider();                               // set up the data provider
 
-	predictorp = new MLPPredictorOCL(*netProviderp,MLP_OCL_DI_GPU, minibatch);
+	predictorp = new MLPPredictorOCL(*netProviderp,DNN_OCL_DI_GPU, minibatch);
 	outputVectors = new float[predictorp->getOutputVectorSize() * minibatch];
 
 	getCurrentTime(&startv);

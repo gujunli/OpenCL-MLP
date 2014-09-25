@@ -26,7 +26,7 @@
 class MLPPredictorOCL:public MLPPredictorBase
 {
 private:
-	MLP_OCL_DEVTYPE devType;
+	DNN_OCL_DEVTYPE devType;
 
 	cl_mem *inputs;
 	cl_mem *weights;
@@ -38,7 +38,7 @@ private:
 private:
 	static MLP_Kerns mykerns;
 
-	static SingleDevClass * CLContext;
+	static SingleDevClass * CLCtx;
 	static int nInstances;
 
 private:
@@ -53,7 +53,7 @@ private:
 
 public:
 	LIBDNNAPI MLPPredictorOCL();
-	LIBDNNAPI MLPPredictorOCL(MLPNetProvider & netProvider, MLP_OCL_DEVTYPE devType, int _batchSize);
+	LIBDNNAPI MLPPredictorOCL(MLPNetProvider & netProvider, DNN_OCL_DEVTYPE devType, int _batchSize);
 	~MLPPredictorOCL();
 
 public:

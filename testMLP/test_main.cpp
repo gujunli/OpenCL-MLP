@@ -73,7 +73,7 @@ int main()
 	//mnist_training3();
 	//ptc_ch_training3();
 	//ptc_en_training();
-	//ptc_digital_training();
+	ptc_digital_training();
 	//ptc_symbol_training2();
 	//vlp_ch_training2();
 	//simple_training();

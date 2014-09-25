@@ -1497,7 +1497,7 @@
 	"DNNUtil.h"
 	"DNNDataProvider.h"
 
-1411394484 /home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/include/DNNUtil.h
+1411632147 /home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/include/DNNUtil.h
 	<windows.h>
 	<pthread.h>
 	<signal.h>
@@ -1556,7 +1556,7 @@
 	"MLPChkPointingMgr.h"
 	"conv_endian.h"
 
-1411377298 /home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/include/MLPUtil.h
+1411632113 /home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/include/MLPUtil.h
 	"DNNUtil.h"
 
 1411375226 /home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/include/MLPChkPointingMgr.h
@@ -1603,14 +1603,14 @@
 	"DNNDataProvider.h"
 	"MLPNetProvider.h"
 
-1410947262 source:/home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/cpps/MLPPredictorOCL.cpp
+1411632813 source:/home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/cpps/MLPPredictorOCL.cpp
 	<algorithm>
 	<clAmdBlas.h>
 	"MLPUtil.h"
 	"MLPOclCommon.h"
 	"MLPPredictorOCL.h"
 
-1411375464 /home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/include/MLPPredictorOCL.h
+1411632777 /home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/include/MLPPredictorOCL.h
 	<CL/cl.h>
 	<CL/cl_ext.h>
 	"DNNApiExport.h"
@@ -1621,7 +1621,7 @@
 	"MLPNetProvider.h"
 	"MLPPredictorBase.h"
 
-1404288553 /home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/include/SingleDevClass.h
+1411632660 /home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/include/SingleDevClass.h
 	<CL/cl.h>
 
 1411376818 source:/home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/cpps/MLPTesterBase.cpp
@@ -1633,14 +1633,14 @@
 	"DNNDataProvider.h"
 	"MLPNetProvider.h"
 
-1411379186 source:/home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/cpps/MLPTesterOCL.cpp
+1411632777 source:/home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/cpps/MLPTesterOCL.cpp
 	<algorithm>
 	<clAmdBlas.h>
 	"MLPUtil.h"
 	"MLPOclCommon.h"
 	"MLPTesterOCL.h"
 
-1411376889 /home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/include/MLPTesterOCL.h
+1411632838 /home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/include/MLPTesterOCL.h
 	<CL/cl.h>
 	<CL/cl_ext.h>
 	"DNNApiExport.h"
@@ -1656,7 +1656,7 @@
 	"MLPTrainerBase.h"
 	"MLPChkPointState.h"
 
-1411379209 source:/home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/cpps/MLPTrainerOCL.cpp
+1411632777 source:/home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/cpps/MLPTrainerOCL.cpp
 	<algorithm>
 	<clAmdBlas.h>
 	"MLPUtil.h"
@@ -1664,7 +1664,7 @@
 	"MLPTrainerOCL.h"
 	"MLPChkPointState.h"
 
-1411377170 /home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/include/MLPTrainerOCL.h
+1411632865 /home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/include/MLPTrainerOCL.h
 	<CL/cl.h>
 	<CL/cl_ext.h>
 	"DNNApiExport.h"
@@ -1676,8 +1676,8 @@
 	"MLPChkPointState.h"
 	"MLPTrainerBase.h"
 
-1405921431 source:/home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/cpps/SingleDevClass.cpp
-	"MLPUtil.h"
+1411632660 source:/home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/cpps/SingleDevClass.cpp
+	"DNNUtil.h"
 	"oclUtil.h"
 	"SingleDevClass.h"
 
@@ -1692,4 +1692,17 @@
 	<CL/cl.h>
 	<intrin.h>
 	"oclUtil.h"
+
+1411617102 source:/home/qfzhang/AMD-work2/MLP-Linux-0925/libMLP/cpps/MLPNetProvider.cpp
+	<iostream>
+	<fstream>
+	<sstream>
+	<string>
+	<algorithm>
+	<functional>
+	<vector>
+	<cstring>
+	"MLPUtil.h"
+	"MLPNetProvider.h"
+	"conv_endian.h"
 

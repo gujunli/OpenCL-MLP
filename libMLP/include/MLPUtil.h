@@ -23,31 +23,6 @@
 	}                                                                                                             \
     while (0)
 
-#define CL_CHECK(flag)                                                                                            \
-	do  {                                                                                                         \
-	    int _tmpVal;                                                                                              \
-	    if ( (_tmpVal = flag) != 0) {                                                                             \
-	        ostringstream mystream;                                                                               \
-		    mystream << "OpenCL Function Failed (" << __FILE__ << "," << __LINE__ << "), Error Code:" << _tmpVal; \
-		    dnn_log("MLP", mystream.str().c_str());                                                               \
-			DNN_Exception("OpenCL function call returned unexpected value");                                      \
-	    }                                                                                                         \
-	}                                                                                                             \
-    while (0)
-
-#define AMDBLAS_CHECK(flag)                                                                                         \
-	do  {                                                                                                           \
-	    int _tmpVal;                                                                                                \
-	    if ( (_tmpVal = flag) != 0) {                                                                               \
-	        ostringstream mystream;                                                                                 \
-		    mystream << "AmdBlas Function Failed (" << __FILE__ << "," << __LINE__ << "), Error Code:" << _tmpVal;  \
-		    dnn_log("MLP", mystream.str().c_str());                                                                 \
-            DNN_Exception("clAmdBlas function call returned unexpected value");                                     \
-	    }                                                                                                           \
-	}                                                                                                               \
-	while (0)
-
-
 #define mlp_log(header,content)         dnn_log(header,content)
 #define mlp_log_retval(header,retval)   dnn_log_retval(header,retval)
 

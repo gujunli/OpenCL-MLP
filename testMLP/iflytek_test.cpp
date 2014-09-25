@@ -56,7 +56,7 @@ void iflytek_training()
 	nettype = NETTYPE_MULTI_CLASSIFICATION;
     netProviderp = new MLPNetProvider(nettype, nLayers, dimensions, etas, momentum, actFuncs, costFunc, true);
 
-    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);    // set up the trainer
+    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, DNN_OCL_DI_GPU, minibatch);    // set up the trainer
 
 	cout << totalbatches << " batches of data to be trained with " << epoches << " epoches, just waiting..." << endl;
 
@@ -125,7 +125,7 @@ void iflytek_training2()
 		 startEpoch = 0;
 	};
 
-    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);
+    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, DNN_OCL_DI_GPU, minibatch);
 
 	cpManager.enableCheckPointing(*trainerp, "./tmp/");
 	MLP_CHECK( cpManager.startCheckPointing() );
@@ -171,7 +171,7 @@ void iflytek_batch_testing()
 	dataProviderp =	new DNNIFlyDataProvider(IFLY_PATH, DNN_DATAMODE_TEST, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
-	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU, minibatch);
+	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,DNN_OCL_DI_GPU, minibatch);
 
     totalbatches = dataProviderp->getTotalBatches();
 
@@ -213,7 +213,7 @@ void iflytek_predicting()
 	dataProviderp =	new DNNIFlyDataProvider(".", DNN_DATAMODE_PREDICT, minibatch, 0);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
-	predictorp = new MLPPredictorOCL(*netProviderp,MLP_OCL_DI_GPU, minibatch);
+	predictorp = new MLPPredictorOCL(*netProviderp,DNN_OCL_DI_GPU, minibatch);
 	outputVectors = new float[predictorp->getOutputVectorSize()*minibatch];
 
     totalbatches = dataProviderp->getTotalBatches();

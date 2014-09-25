@@ -27,7 +27,7 @@
 class MLPTrainerOCL:public MLPTrainerBase
 {
 private:
-	MLP_OCL_DEVTYPE devType;
+	DNN_OCL_DEVTYPE devType;
 
 	cl_mem *inputs;              // Device buffers to store input/output data calculated on various layers of the MLP network
 	cl_mem *weightT;             // Device buffers to store weights matrix of various layers of the MLP network
@@ -43,7 +43,7 @@ private:
 private:
 	static MLP_Kerns mykerns;
 
-	static SingleDevClass * CLContext;
+	static SingleDevClass * CLCtx;
 	static int nInstances;
 
 private:
@@ -62,7 +62,7 @@ private:
 
 public:
 	LIBDNNAPI MLPTrainerOCL();
-	LIBDNNAPI MLPTrainerOCL(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, MLP_OCL_DEVTYPE devType, int _minibatch);
+	LIBDNNAPI MLPTrainerOCL(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, DNN_OCL_DEVTYPE devType, int _minibatch);
     ~MLPTrainerOCL();
 
 public:

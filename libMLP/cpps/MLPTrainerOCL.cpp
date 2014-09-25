@@ -15,7 +15,7 @@
 #include "MLPChkPointState.h"
 
 //Class specific member shared by all instances
-SingleDevClass *MLPTrainerOCL::CLContext = NULL;
+SingleDevClass *MLPTrainerOCL::CLCtx = NULL;
 int MLPTrainerOCL::nInstances = 0;
 
 MLP_Kerns MLPTrainerOCL::mykerns;
@@ -26,7 +26,7 @@ MLPTrainerOCL::MLPTrainerOCL()
 	if ( this->nInstances++ == 0 )  // first instance
 	{
 
-        this->CLContext = new SingleDevClass(this->devType);
+        this->CLCtx = new SingleDevClass(this->devType);
 
 		clAmdBlasSetup();
 
@@ -34,7 +34,7 @@ MLPTrainerOCL::MLPTrainerOCL()
 
 	}
 
-	this->devType = MLP_OCL_DI_GPU;    // default OpenCL device
+	this->devType = DNN_OCL_DI_GPU;    // default OpenCL device
 
 	this->inputs = NULL;
 	this->weightT = NULL;
@@ -44,7 +44,7 @@ MLPTrainerOCL::MLPTrainerOCL()
 	this->initialized = false;
 };
 
-MLPTrainerOCL::MLPTrainerOCL(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, MLP_OCL_DEVTYPE dType, int _minibatch)
+MLPTrainerOCL::MLPTrainerOCL(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, DNN_OCL_DEVTYPE dType, int _minibatch)
 {
    	this->devType = dType;
 
@@ -52,7 +52,7 @@ MLPTrainerOCL::MLPTrainerOCL(MLPNetProvider & netProvider, DNNDataProvider & dat
 	if ( this->nInstances++ == 0 )  // first instance
 	{
 
-        this->CLContext = new SingleDevClass(this->devType);
+        this->CLCtx = new SingleDevClass(this->devType);
 
 		clAmdBlasSetup();
 
@@ -91,7 +91,7 @@ MLPTrainerOCL::~MLPTrainerOCL()
 	if ( --this->nInstances == 0 )  {
         this->destroy_ocl_kernels();
 
-		delete this->CLContext;
+		delete this->CLCtx;
 
 		clAmdBlasTeardown();
 
@@ -111,49 +111,49 @@ void MLPTrainerOCL::setup_ocl_kernels()
 		     return;
 	    };
 
-		this->CLContext->m_program = clCreateProgramWithSource(this->CLContext->m_context, 1, (const char**)&kernel_src,NULL,&status);
+		this->CLCtx->m_program = clCreateProgramWithSource(this->CLCtx->m_context, 1, (const char**)&kernel_src,NULL,&status);
 		CL_CHECK( status );
 
-		CL_CHECK( clBuildProgram(this->CLContext->m_program,1,&this->CLContext->m_device, NULL, NULL, NULL) );
+		CL_CHECK( clBuildProgram(this->CLCtx->m_program,1,&this->CLCtx->m_device, NULL, NULL, NULL) );
 
 		delete [] kernel_src;
 
-		this->mykerns.activate_sigmoid_kernel = clCreateKernel(this->CLContext->m_program,"activate_sigmoid",&status);
+		this->mykerns.activate_sigmoid_kernel = clCreateKernel(this->CLCtx->m_program,"activate_sigmoid",&status);
 		CL_CHECK( status );
-		this->mykerns.activate_softmax_kernel1 = clCreateKernel(this->CLContext->m_program,"activate_softmax1",&status);
+		this->mykerns.activate_softmax_kernel1 = clCreateKernel(this->CLCtx->m_program,"activate_softmax1",&status);
 		CL_CHECK( status );
-		this->mykerns.activate_softmax_kernel2 = clCreateKernel(this->CLContext->m_program,"activate_softmax2",&status);
+		this->mykerns.activate_softmax_kernel2 = clCreateKernel(this->CLCtx->m_program,"activate_softmax2",&status);
 		CL_CHECK( status );
-		this->mykerns.activate_tanh_kernel = clCreateKernel(this->CLContext->m_program,"activate_tanh",&status);
-		CL_CHECK( status );
-
-		this->mykerns.derivative_sigmoid_kernel = clCreateKernel(this->CLContext->m_program,"derivative_sigmoid",&status);
-		CL_CHECK( status );
-		this->mykerns.derivative_tanh_kernel = clCreateKernel(this->CLContext->m_program,"derivative_tanh",&status);
+		this->mykerns.activate_tanh_kernel = clCreateKernel(this->CLCtx->m_program,"activate_tanh",&status);
 		CL_CHECK( status );
 
-		this->mykerns.calculateError_SSE_kernel1 = clCreateKernel(this->CLContext->m_program,"calculateError_SSE1",&status);
+		this->mykerns.derivative_sigmoid_kernel = clCreateKernel(this->CLCtx->m_program,"derivative_sigmoid",&status);
 		CL_CHECK( status );
-		this->mykerns.calculateError_SSE_kernel2 = clCreateKernel(this->CLContext->m_program,"calculateError_SSE2",&status);
-		CL_CHECK( status );
-		this->mykerns.calculateError_CE_kernel1 = clCreateKernel(this->CLContext->m_program,"calculateError_CE1",&status);
-		CL_CHECK( status );
-		this->mykerns.calculateError_CE_kernel2 = clCreateKernel(this->CLContext->m_program,"calculateError_CE2",&status);
+		this->mykerns.derivative_tanh_kernel = clCreateKernel(this->CLCtx->m_program,"derivative_tanh",&status);
 		CL_CHECK( status );
 
-		this->mykerns.calculateDelta_SSE_Sigmoid_kernel = clCreateKernel(this->CLContext->m_program,"calculateDelta_SSE_Sigmoid",&status);
+		this->mykerns.calculateError_SSE_kernel1 = clCreateKernel(this->CLCtx->m_program,"calculateError_SSE1",&status);
 		CL_CHECK( status );
-		this->mykerns.calculateDelta_CE_Softmax_kernel = clCreateKernel(this->CLContext->m_program,"calculateDelta_CE_Softmax",&status);
+		this->mykerns.calculateError_SSE_kernel2 = clCreateKernel(this->CLCtx->m_program,"calculateError_SSE2",&status);
+		CL_CHECK( status );
+		this->mykerns.calculateError_CE_kernel1 = clCreateKernel(this->CLCtx->m_program,"calculateError_CE1",&status);
+		CL_CHECK( status );
+		this->mykerns.calculateError_CE_kernel2 = clCreateKernel(this->CLCtx->m_program,"calculateError_CE2",&status);
 		CL_CHECK( status );
 
-        this->mykerns.transpose_sim_kernel = clCreateKernel(this->CLContext->m_program,"transpose_simple",&status);
+		this->mykerns.calculateDelta_SSE_Sigmoid_kernel = clCreateKernel(this->CLCtx->m_program,"calculateDelta_SSE_Sigmoid",&status);
+		CL_CHECK( status );
+		this->mykerns.calculateDelta_CE_Softmax_kernel = clCreateKernel(this->CLCtx->m_program,"calculateDelta_CE_Softmax",&status);
+		CL_CHECK( status );
+
+        this->mykerns.transpose_sim_kernel = clCreateKernel(this->CLCtx->m_program,"transpose_simple",&status);
 	    CL_CHECK( status );
-        this->mykerns.transpose_kernel4 = clCreateKernel(this->CLContext->m_program,"transpose_f4",&status);
+        this->mykerns.transpose_kernel4 = clCreateKernel(this->CLCtx->m_program,"transpose_f4",&status);
 	    CL_CHECK( status );
-        this->mykerns.transpose_kernel32 = clCreateKernel(this->CLContext->m_program,"transpose_32x32",&status);
+        this->mykerns.transpose_kernel32 = clCreateKernel(this->CLCtx->m_program,"transpose_32x32",&status);
 	    CL_CHECK( status );
 
-        this->mykerns.expandMatrix_kernel = clCreateKernel(this->CLContext->m_program,"expandVectorToMatrix",&status);
+        this->mykerns.expandMatrix_kernel = clCreateKernel(this->CLCtx->m_program,"expandVectorToMatrix",&status);
 	    CL_CHECK( status );
 
 };
@@ -182,7 +182,7 @@ void MLPTrainerOCL::destroy_ocl_kernels()
 
 		CL_CHECK( clReleaseKernel(this->mykerns.expandMatrix_kernel) );
 
-		CL_CHECK( clReleaseProgram(this->CLContext->m_program) );
+		CL_CHECK( clReleaseProgram(this->CLCtx->m_program) );
 };
 
 void MLPTrainerOCL::create_ocl_buffers(MLPNetProvider &provider)
@@ -198,36 +198,36 @@ void MLPTrainerOCL::create_ocl_buffers(MLPNetProvider &provider)
 	// the first hidden layer, this->inputs[0] is for the output layer
 	for (int i = 1; i < this->nLayers; i++ )
 	{
-		this->inputs[i] = clCreateBuffer(this->CLContext->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*this->dimensions[i-1]*this->minibatch,NULL,&status);
+		this->inputs[i] = clCreateBuffer(this->CLCtx->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*this->dimensions[i-1]*this->minibatch,NULL,&status);
 		CL_CHECK(status);
 
-		this->weightT[i] = clCreateBuffer(this->CLContext->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*this->dimensions[i-1]*this->dimensions[i], NULL,&status);
+		this->weightT[i] = clCreateBuffer(this->CLCtx->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*this->dimensions[i-1]*this->dimensions[i], NULL,&status);
 		CL_CHECK(status);
 
 		cl_mem tmpBuff;
 
-		tmpBuff = clCreateBuffer(this->CLContext->m_context, CL_MEM_READ_ONLY|CL_MEM_COPY_HOST_PTR, sizeof(cl_float)*this->dimensions[i-1]*this->dimensions[i],
+		tmpBuff = clCreateBuffer(this->CLCtx->m_context, CL_MEM_READ_ONLY|CL_MEM_COPY_HOST_PTR, sizeof(cl_float)*this->dimensions[i-1]*this->dimensions[i],
 			                               provider.weights[i],&status);
 		CL_CHECK(status);
 		transpose_float_matrix(tmpBuff, this->weightT[i], this->dimensions[i], this->dimensions[i-1]);  // make this->weightT[i] in transposed format
 		clReleaseMemObject(tmpBuff);
 
 
-		this->biases[i] = clCreateBuffer(this->CLContext->m_context, CL_MEM_READ_WRITE|CL_MEM_COPY_HOST_PTR, sizeof(cl_float)*this->dimensions[i],
+		this->biases[i] = clCreateBuffer(this->CLCtx->m_context, CL_MEM_READ_WRITE|CL_MEM_COPY_HOST_PTR, sizeof(cl_float)*this->dimensions[i],
 			                               provider.biases[i],&status);
 		CL_CHECK(status);
 
-		this->delta[i] = clCreateBuffer(this->CLContext->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*this->dimensions[i]*this->minibatch,NULL,&status);
+		this->delta[i] = clCreateBuffer(this->CLCtx->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*this->dimensions[i]*this->minibatch,NULL,&status);
 		CL_CHECK(status);
 	}
 
 	// for output layer
-	this->output = clCreateBuffer(this->CLContext->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*(this->dimensions[this->nLayers-1])*this->minibatch,NULL,&status);
+	this->output = clCreateBuffer(this->CLCtx->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*(this->dimensions[this->nLayers-1])*this->minibatch,NULL,&status);
 	CL_CHECK(status);
 
 	this->inputs[0] = this->output;
 
-	this->target = clCreateBuffer(this->CLContext->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*this->dimensions[this->nLayers-1]*this->minibatch,NULL,&status);
+	this->target = clCreateBuffer(this->CLCtx->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*this->dimensions[this->nLayers-1]*this->minibatch,NULL,&status);
 	CL_CHECK(status);
 }
 
@@ -274,14 +274,14 @@ void MLPTrainerOCL::synchronizeNetConfig(MLPNetProvider &netProvider)
 	{
 		cl_mem tmpBuff;
 
-	    tmpBuff = clCreateBuffer(this->CLContext->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*this->dimensions[i-1]*this->dimensions[i], NULL,&status);
+	    tmpBuff = clCreateBuffer(this->CLCtx->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*this->dimensions[i-1]*this->dimensions[i], NULL,&status);
 		this->transpose_float_matrix(this->weightT[i], tmpBuff, this->dimensions[i-1], this->dimensions[i]);    // make tmpBuff in original format
-		status = clEnqueueReadBuffer(this->CLContext->m_cmd_queues[0], tmpBuff, CL_TRUE, 0,sizeof(cl_float)*this->dimensions[i-1]*this->dimensions[i],
+		status = clEnqueueReadBuffer(this->CLCtx->m_queues[0], tmpBuff, CL_TRUE, 0,sizeof(cl_float)*this->dimensions[i-1]*this->dimensions[i],
 			                         netProvider.weights[i], 0, NULL, NULL);
 		CL_CHECK(status);
         clReleaseMemObject(tmpBuff);
 
-		status = clEnqueueReadBuffer(this->CLContext->m_cmd_queues[0], this->biases[i], CL_TRUE, 0,sizeof(cl_float)*this->dimensions[i],
+		status = clEnqueueReadBuffer(this->CLCtx->m_queues[0], this->biases[i], CL_TRUE, 0,sizeof(cl_float)*this->dimensions[i],
 			                         netProvider.biases[i], 0, NULL, NULL);
 		CL_CHECK(status);
 	}
@@ -292,19 +292,19 @@ void MLPTrainerOCL::synchronizeNetConfig(MLPNetProvider &netProvider)
 
 void MLPTrainerOCL::expandFloatVectorToMatrix(cl_mem  myVector, cl_mem myMatrix, int width, int height)
 {
-	cmn_expandFloatVectorToMatrix(this->CLContext->m_cmd_queues[0],this->mykerns, myVector, myMatrix, width, height);
+	cmn_expandFloatVectorToMatrix(this->CLCtx->m_queues[0],this->mykerns, myVector, myMatrix, width, height);
 };
 
 // use three different method to implement transposition depending on the size of the width and height
 void MLPTrainerOCL::transpose_float_matrix(cl_mem src, cl_mem dst, cl_int width, cl_int height)
 {
 	if  ( (width % 32 == 0) && (height % 32 == 0) )
-            cmn_transpose_matrix_32x32(this->CLContext->m_cmd_queues[0],this->mykerns,src,dst,width,height);
+            cmn_transpose_matrix_32x32(this->CLCtx->m_queues[0],this->mykerns,src,dst,width,height);
 	else
 	    if (width % 4 == 0)
-		    cmn_transpose_matrix_f4(this->CLContext->m_cmd_queues[0],this->mykerns,src,dst,width,height);
+		    cmn_transpose_matrix_f4(this->CLCtx->m_queues[0],this->mykerns,src,dst,width,height);
 		else
-			cmn_transpose_matrix_simple(this->CLContext->m_cmd_queues[0],this->mykerns,src,dst,width,height);
+			cmn_transpose_matrix_simple(this->CLCtx->m_queues[0],this->mykerns,src,dst,width,height);
 };
 
 
@@ -312,16 +312,16 @@ void MLPTrainerOCL::activate(int layer, cl_mem x, cl_mem y, int width, int heigh
 {
 	switch (this->actFuncs[layer] ) {
 	case AFUNC_SIGMOID:
-		cmn_activate_sigmoid(this->CLContext->m_cmd_queues[0],this->mykerns,x,y,width,height);
+		cmn_activate_sigmoid(this->CLCtx->m_queues[0],this->mykerns,x,y,width,height);
 		return;
 	case AFUNC_SOFTMAX:
-	    cmn_activate_softmax(this->CLContext->m_cmd_queues[0],this->mykerns,x,y,width,height);
+	    cmn_activate_softmax(this->CLCtx->m_queues[0],this->mykerns,x,y,width,height);
 		return;
 	case AFUNC_TANH:
-	    cmn_activate_tanh(this->CLContext->m_cmd_queues[0],this->mykerns,x,y,width,height);
+	    cmn_activate_tanh(this->CLCtx->m_queues[0],this->mykerns,x,y,width,height);
 		return;
 	case AFUNC_IDENTITY:
-	    cmn_activate_identity(this->CLContext->m_cmd_queues[0],this->mykerns,x,y,width,height);
+	    cmn_activate_identity(this->CLCtx->m_queues[0],this->mykerns,x,y,width,height);
         return;
 	default:
 		mlp_log("MLPTrainer", "The assigned activation function for this layer is not supported.");
@@ -334,10 +334,10 @@ void MLPTrainerOCL::calculateError(cl_mem output, cl_mem target, int width, int 
 {
 	switch (this->costFunc) {
 	case CFUNC_SSE:
-		cmn_calculateError_SSE(this->CLContext->m_cmd_queues[0],this->mykerns,output,target,this->reduceMem,this->reduceBuff,width,height,ret);
+		cmn_calculateError_SSE(this->CLCtx->m_queues[0],this->mykerns,output,target,this->reduceMem,this->reduceBuff,width,height,ret);
 		return;
 	case CFUNC_CE:
-		cmn_calculateError_CE(this->CLContext->m_cmd_queues[0],this->mykerns,output,target,this->reduceMem,this->reduceBuff,width,height,ret);
+		cmn_calculateError_CE(this->CLCtx->m_queues[0],this->mykerns,output,target,this->reduceMem,this->reduceBuff,width,height,ret);
 		return;
 	default:
 		mlp_log("MLPTrainer", "The assigned cost function for this neural network is not supported.");
@@ -350,11 +350,11 @@ void MLPTrainerOCL::calculateError(cl_mem output, cl_mem target, int width, int 
 void MLPTrainerOCL::calculateDelta(cl_mem output, cl_mem target, cl_mem delta, int width, int height)
 {
 	if ( (this->costFunc == CFUNC_CE) && (this->actFuncs[this->nLayers-1] == AFUNC_SOFTMAX) ) {
-		 cmn_calculateDelta_CE_Softmax(this->CLContext->m_cmd_queues[0],this->mykerns,output,target,delta,width,height);
+		 cmn_calculateDelta_CE_Softmax(this->CLCtx->m_queues[0],this->mykerns,output,target,delta,width,height);
 		 return;
 	};
 	if ( (this->costFunc == CFUNC_SSE) && (this->actFuncs[this->nLayers-1] == AFUNC_SIGMOID) ) {
-		 cmn_calculateDelta_SSE_Sigmoid(this->CLContext->m_cmd_queues[0],this->mykerns,output,target,delta,width,height);
+		 cmn_calculateDelta_SSE_Sigmoid(this->CLCtx->m_queues[0],this->mykerns,output,target,delta,width,height);
 		 return;
 	};
 
@@ -368,10 +368,10 @@ void MLPTrainerOCL::derivative(int layer, cl_mem delta1, cl_mem y, cl_mem delta2
 {
 	switch (this->actFuncs[layer] ) {
 	case AFUNC_SIGMOID:
-		cmn_derivative_sigmoid(this->CLContext->m_cmd_queues[0],this->mykerns,delta1,y,delta2,width,height);
+		cmn_derivative_sigmoid(this->CLCtx->m_queues[0],this->mykerns,delta1,y,delta2,width,height);
 		return;
 	case AFUNC_TANH:
-		cmn_derivative_tanh(this->CLContext->m_cmd_queues[0],this->mykerns,delta1,y,delta2,width,height);
+		cmn_derivative_tanh(this->CLCtx->m_queues[0],this->mykerns,delta1,y,delta2,width,height);
 		return;
 	default:
 		mlp_log("MLPTrainer", "The assigned activation function for this layer is not supported.");
@@ -409,13 +409,13 @@ int MLPTrainerOCL::batchTrainingWithCheckPointing(int maxBatches, int epoches, i
 
 	// create deltaT buffer for each layer except for the input layer
 	for (int i = 1; i < this->nLayers; i++) {
- 	    deltaT[i] = clCreateBuffer(this->CLContext->m_context,CL_MEM_READ_WRITE,sizeof(cl_float)*this->minibatch*this->dimensions[i],NULL,&status);
+ 	    deltaT[i] = clCreateBuffer(this->CLCtx->m_context,CL_MEM_READ_WRITE,sizeof(cl_float)*this->minibatch*this->dimensions[i],NULL,&status);
         CL_CHECK(status);
 	};
 
 	// create bias Matrix buffer for each layer except for the input layer
 	for (int i = 1; i < this->nLayers; i++) {
- 	    biasesMatrix[i] = clCreateBuffer(this->CLContext->m_context,CL_MEM_READ_WRITE,sizeof(cl_float)*this->minibatch*this->dimensions[i],NULL,&status);
+ 	    biasesMatrix[i] = clCreateBuffer(this->CLCtx->m_context,CL_MEM_READ_WRITE,sizeof(cl_float)*this->minibatch*this->dimensions[i],NULL,&status);
         CL_CHECK(status);
 
 		this->expandFloatVectorToMatrix(this->biases[i],biasesMatrix[i],this->dimensions[i],this->minibatch);
@@ -429,7 +429,7 @@ int MLPTrainerOCL::batchTrainingWithCheckPointing(int maxBatches, int epoches, i
 		for (int k=0; k < this->minibatch; k++ )
 			 tmpHostBuff[k] = 1.0f;
 
-        OnesVector = clCreateBuffer(this->CLContext->m_context,CL_MEM_READ_ONLY|CL_MEM_COPY_HOST_PTR,sizeof(cl_float)*this->minibatch,tmpHostBuff,&status);
+        OnesVector = clCreateBuffer(this->CLCtx->m_context,CL_MEM_READ_ONLY|CL_MEM_COPY_HOST_PTR,sizeof(cl_float)*this->minibatch,tmpHostBuff,&status);
         CL_CHECK(status);
 
 	    delete [] tmpHostBuff;
@@ -444,11 +444,11 @@ int MLPTrainerOCL::batchTrainingWithCheckPointing(int maxBatches, int epoches, i
 		tmpHostBuff = new float[this->dimensions[i-1]*this->dimensions[i]];
 		for (int k=0; k < this->dimensions[i-1]*this->dimensions[i]; k++ )
 			 tmpHostBuff[k] = 0.0f;
- 	    lastVarWeight[i] = clCreateBuffer(this->CLContext->m_context,CL_MEM_READ_WRITE|CL_MEM_COPY_HOST_PTR,sizeof(cl_float)*this->dimensions[i-1]*this->dimensions[i],
+ 	    lastVarWeight[i] = clCreateBuffer(this->CLCtx->m_context,CL_MEM_READ_WRITE|CL_MEM_COPY_HOST_PTR,sizeof(cl_float)*this->dimensions[i-1]*this->dimensions[i],
 			                               tmpHostBuff,&status);
         CL_CHECK(status);
 
- 	    curVarWeight[i] = clCreateBuffer(this->CLContext->m_context,CL_MEM_READ_WRITE,sizeof(cl_float)*this->dimensions[i-1]*this->dimensions[i],NULL,&status);
+ 	    curVarWeight[i] = clCreateBuffer(this->CLCtx->m_context,CL_MEM_READ_WRITE,sizeof(cl_float)*this->dimensions[i-1]*this->dimensions[i],NULL,&status);
         CL_CHECK(status);
 
 		delete [] tmpHostBuff;
@@ -456,21 +456,21 @@ int MLPTrainerOCL::batchTrainingWithCheckPointing(int maxBatches, int epoches, i
 		tmpHostBuff = new float[this->dimensions[i]];
 	    for (int k=0; k < this->dimensions[i]; k++ )
 			 tmpHostBuff[k] = 0.0f;
-		lastVarBias[i] = clCreateBuffer(this->CLContext->m_context,CL_MEM_READ_WRITE|CL_MEM_COPY_HOST_PTR,sizeof(cl_float)*this->dimensions[i], tmpHostBuff,&status);
+		lastVarBias[i] = clCreateBuffer(this->CLCtx->m_context,CL_MEM_READ_WRITE|CL_MEM_COPY_HOST_PTR,sizeof(cl_float)*this->dimensions[i], tmpHostBuff,&status);
         CL_CHECK(status);
 
-	    curVarBias[i] = clCreateBuffer(this->CLContext->m_context,CL_MEM_READ_WRITE,sizeof(cl_float)*this->dimensions[i],NULL,&status);
+	    curVarBias[i] = clCreateBuffer(this->CLCtx->m_context,CL_MEM_READ_WRITE,sizeof(cl_float)*this->dimensions[i],NULL,&status);
         CL_CHECK(status);
 
 		delete [] tmpHostBuff;
 	};
 
 	// create reducing buffers on the host and device
-	this->reduceMem = clCreateBuffer(this->CLContext->m_context,CL_MEM_WRITE_ONLY,sizeof(cl_float)*this->minibatch,NULL,&status);
+	this->reduceMem = clCreateBuffer(this->CLCtx->m_context,CL_MEM_WRITE_ONLY,sizeof(cl_float)*this->minibatch,NULL,&status);
 	CL_CHECK(status);
 	this->reduceBuff = new float[this->minibatch];
 
-    CL_CHECK(clFinish(this->CLContext->m_cmd_queues[0]));
+    CL_CHECK(clFinish(this->CLCtx->m_queues[0]));
 
 	//ofstream outfile;
 
@@ -491,19 +491,19 @@ int MLPTrainerOCL::batchTrainingWithCheckPointing(int maxBatches, int epoches, i
 
 			 MLP_CHECK(this->dataProviderp->getBatchData(this->minibatch,l_features,l_labels,true));  // blocking method
 
-			 CL_CHECK(clEnqueueWriteBuffer(this->CLContext->m_cmd_queues[0],this->inputs[1],CL_TRUE,0,sizeof(cl_float)*this->dimensions[0]*this->minibatch,l_features,0,NULL,NULL ));
-			 CL_CHECK(clEnqueueWriteBuffer(this->CLContext->m_cmd_queues[0],this->target,CL_TRUE,0,sizeof(cl_float)*this->dimensions[this->nLayers-1]*this->minibatch,l_labels,0,NULL,NULL ));
+			 CL_CHECK(clEnqueueWriteBuffer(this->CLCtx->m_queues[0],this->inputs[1],CL_TRUE,0,sizeof(cl_float)*this->dimensions[0]*this->minibatch,l_features,0,NULL,NULL ));
+			 CL_CHECK(clEnqueueWriteBuffer(this->CLCtx->m_queues[0],this->target,CL_TRUE,0,sizeof(cl_float)*this->dimensions[this->nLayers-1]*this->minibatch,l_labels,0,NULL,NULL ));
 
 			 for (int i = 1; i < this->nLayers; i++) {
 
 			 	 // Input[i] = Output[i-1] * Weight[i]     , here Weight[i] is in transposed form
 				 blasStatus = clAmdBlasSgemm(clAmdBlasRowMajor,clAmdBlasNoTrans,clAmdBlasTrans,this->minibatch,this->dimensions[i],this->dimensions[i-1],1.0f,this->inputs[i],
-					this->dimensions[i-1],this->weightT[i],this->dimensions[i-1],0.0f,this->inputs[(i+1)%this->nLayers],this->dimensions[i],1,&this->CLContext->m_cmd_queues[0],0,NULL,NULL);
+					this->dimensions[i-1],this->weightT[i],this->dimensions[i-1],0.0f,this->inputs[(i+1)%this->nLayers],this->dimensions[i],1,&this->CLCtx->m_queues[0],0,NULL,NULL);
 				 AMDBLAS_CHECK(blasStatus);
 
 				 // Input[i] = Input[i] + 1.0 * Bias[i],   regarding the two Matrixes as  two vectors
 				 blasStatus = clAmdBlasSaxpy(this->dimensions[i]*this->minibatch, 1.0f, biasesMatrix[i], 0, 1, this->inputs[(i+1)%this->nLayers], 0, 1, 1,
-					                        &this->CLContext->m_cmd_queues[0], 0, NULL, NULL);
+					                        &this->CLCtx->m_queues[0], 0, NULL, NULL);
 				 AMDBLAS_CHECK(blasStatus);
 
 				 // Output[i] = activate(Input[i])
@@ -512,7 +512,7 @@ int MLPTrainerOCL::batchTrainingWithCheckPointing(int maxBatches, int epoches, i
 
 			 float costval=0.0f;
 
-			 //check_memory("Output", this->CLContext->m_cmd_queues[0], this->output, this->dimensions[this->nLayers-1]*this->minibatch, check_zero);
+			 //check_memory("Output", this->CLCtx->m_queues[0], this->output, this->dimensions[this->nLayers-1]*this->minibatch, check_zero);
 
  			 this->calculateError(this->output, this->target, this->dimensions[this->nLayers-1], this->minibatch, costval);
 
@@ -520,18 +520,18 @@ int MLPTrainerOCL::batchTrainingWithCheckPointing(int maxBatches, int epoches, i
 			 cout << std::showpoint << std::fixed << endl;
 			 cout << "Error Value for Batch  " << myBatch << " of Epoch " << myEpoch << ": " << costval << endl;
 
-             CL_CHECK(clFinish(this->CLContext->m_cmd_queues[0]));
+             CL_CHECK(clFinish(this->CLCtx->m_queues[0]));
 
 		     this->calculateDelta(this->output, this->target, this->delta[this->nLayers-1], this->dimensions[this->nLayers-1], this->minibatch);
 
-			 CL_CHECK(clFinish(this->CLContext->m_cmd_queues[0]));
+			 CL_CHECK(clFinish(this->CLCtx->m_queues[0]));
 
 			 this->transpose_float_matrix(this->delta[this->nLayers-1], deltaT[this->nLayers-1], this->dimensions[this->nLayers-1], this->minibatch);
 
 			 for ( int i = this->nLayers - 2; i > 0; i-- ) {
 				 // Delta[i] = Delta[i+1] * WeightT[i+1],
 				 blasStatus = clAmdBlasSgemm( clAmdBlasRowMajor, clAmdBlasNoTrans, clAmdBlasNoTrans, this->minibatch, this->dimensions[i], this->dimensions[i+1],1.0f, this->delta[i+1],
-					this->dimensions[i+1], this->weightT[i+1], this->dimensions[i],  0.0f, this->delta[i], this->dimensions[i], 1, &this->CLContext->m_cmd_queues[0],0,NULL,NULL );
+					this->dimensions[i+1], this->weightT[i+1], this->dimensions[i],  0.0f, this->delta[i], this->dimensions[i], 1, &this->CLCtx->m_queues[0],0,NULL,NULL );
 				 AMDBLAS_CHECK(blasStatus);
 
 				 // Delta[i] = derivative(Delta[i],Output[i])
@@ -540,7 +540,7 @@ int MLPTrainerOCL::batchTrainingWithCheckPointing(int maxBatches, int epoches, i
                  this->transpose_float_matrix(this->delta[i], deltaT[i], this->dimensions[i], this->minibatch);
 			 }
 
-	         CL_CHECK( clFinish(this->CLContext->m_cmd_queues[0]) );
+	         CL_CHECK( clFinish(this->CLCtx->m_queues[0]) );
 
 			 if ( doChkPointing)
 			      DNN_LOCK(&this->chkPointingLock);
@@ -551,28 +551,28 @@ int MLPTrainerOCL::batchTrainingWithCheckPointing(int maxBatches, int epoches, i
 
 				  // curVarWeightT[i] = DeltaT[i] * Output[i-1] , here curVarWeight[i] is in transposed form
 				  blasStatus = clAmdBlasSgemm( clAmdBlasRowMajor,clAmdBlasNoTrans,clAmdBlasNoTrans, this->dimensions[i], this->dimensions[i-1], this->minibatch, coef,
-					  deltaT[i], this->minibatch, this->inputs[i],this->dimensions[i-1],0.0f,curVarWeight[i],this->dimensions[i-1],1,&this->CLContext->m_cmd_queues[0],0,NULL,NULL);
+					  deltaT[i], this->minibatch, this->inputs[i],this->dimensions[i-1],0.0f,curVarWeight[i],this->dimensions[i-1],1,&this->CLCtx->m_queues[0],0,NULL,NULL);
 				  AMDBLAS_CHECK(blasStatus);
 
 				  // curVarWeightT[i] = curVarWeightT[i] + mm * lastVarWeightT[i], regarding the two Matrixes as two vectors
-				  blasStatus = clAmdBlasSaxpy(this->dimensions[i]*this->dimensions[i-1],mm,lastVarWeight[i],0,1,curVarWeight[i],0,1,1,&this->CLContext->m_cmd_queues[0],0,NULL,NULL);
+				  blasStatus = clAmdBlasSaxpy(this->dimensions[i]*this->dimensions[i-1],mm,lastVarWeight[i],0,1,curVarWeight[i],0,1,1,&this->CLCtx->m_queues[0],0,NULL,NULL);
                   AMDBLAS_CHECK(blasStatus);
 
 				  // WeightT[i] = WeightT[i] + 1.0 * curVarWeightT[i],  regarding the two Matrixes as two vectors
-				  blasStatus = clAmdBlasSaxpy(this->dimensions[i]*this->dimensions[i-1],1.0f,curVarWeight[i],0,1,this->weightT[i],0,1,1,&this->CLContext->m_cmd_queues[0],0,NULL,NULL);
+				  blasStatus = clAmdBlasSaxpy(this->dimensions[i]*this->dimensions[i-1],1.0f,curVarWeight[i],0,1,this->weightT[i],0,1,1,&this->CLCtx->m_queues[0],0,NULL,NULL);
                   AMDBLAS_CHECK(blasStatus);
 
 				  // curVarBias[i] = DeltaT[i] * (1,1, ... 1)T
                   blasStatus=clAmdBlasSgemv(clAmdBlasRowMajor, clAmdBlasNoTrans, this->dimensions[i], this->minibatch, coef, deltaT[i], this->minibatch, OnesVector,
-					  0, 1, 0.0f, curVarBias[i], 0, 1, 1, &this->CLContext->m_cmd_queues[0], 0, NULL, NULL);
+					  0, 1, 0.0f, curVarBias[i], 0, 1, 1, &this->CLCtx->m_queues[0], 0, NULL, NULL);
 
                   // curVarBias[i] = curVarBias[i] + mm * lastVarBias[i]
-				  blasStatus = clAmdBlasSaxpy(this->dimensions[i],mm,lastVarBias[i],0,1,curVarBias[i],0,1,1,&this->CLContext->m_cmd_queues[0],0,NULL,NULL);
+				  blasStatus = clAmdBlasSaxpy(this->dimensions[i],mm,lastVarBias[i],0,1,curVarBias[i],0,1,1,&this->CLCtx->m_queues[0],0,NULL,NULL);
                   AMDBLAS_CHECK(blasStatus);
 
 
 				  // Bias[i] = Bias[i] + 1.0 * curVarBias[i]
-				  blasStatus = clAmdBlasSaxpy(this->dimensions[i],1.0f,curVarBias[i],0,1,this->biases[i],0,1,1,&this->CLContext->m_cmd_queues[0],0,NULL,NULL);
+				  blasStatus = clAmdBlasSaxpy(this->dimensions[i],1.0f,curVarBias[i],0,1,this->biases[i],0,1,1,&this->CLCtx->m_queues[0],0,NULL,NULL);
                   AMDBLAS_CHECK(blasStatus);
 
 				  this->expandFloatVectorToMatrix(this->biases[i], biasesMatrix[i], this->dimensions[i], this->minibatch);

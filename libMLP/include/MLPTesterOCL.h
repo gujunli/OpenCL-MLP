@@ -25,7 +25,7 @@
 class MLPTesterOCL:public MLPTesterBase
 {
 private:
-	MLP_OCL_DEVTYPE devType;
+	DNN_OCL_DEVTYPE devType;
 
 	cl_mem *inputs;
 	cl_mem *weights;
@@ -38,7 +38,7 @@ private:
 private:
     static MLP_Kerns mykerns;
 
-	static SingleDevClass * CLContext;
+	static SingleDevClass * CLCtx;
 	static int nInstances ;
 
 private:
@@ -53,7 +53,7 @@ private:
 
 public:
 	LIBDNNAPI MLPTesterOCL();
-	LIBDNNAPI MLPTesterOCL(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, MLP_OCL_DEVTYPE devType, int _batchSize);
+	LIBDNNAPI MLPTesterOCL(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, DNN_OCL_DEVTYPE devType, int _batchSize);
 	~MLPTesterOCL();
 
 public:

@@ -16,7 +16,7 @@
 
 
 //Class specific member shared by all instances
-SingleDevClass *MLPTesterOCL::CLContext = NULL;
+SingleDevClass *MLPTesterOCL::CLCtx = NULL;
 int MLPTesterOCL::nInstances = 0;
 
 MLP_Kerns MLPTesterOCL::mykerns;
@@ -25,14 +25,14 @@ MLPTesterOCL::MLPTesterOCL()
 {
 	// class wide set up
 	if ( this->nInstances++ == 0 )  {   // at the first instance
-        this->CLContext = new SingleDevClass(this->devType);
+        this->CLCtx = new SingleDevClass(this->devType);
 
 		clAmdBlasSetup();
 
 		this->setup_ocl_kernels();
 	}
 
-	this->devType = MLP_OCL_DI_GPU;    // default OpenCL device
+	this->devType = DNN_OCL_DI_GPU;    // default OpenCL device
 
 	this->inputs = NULL;
 	this->weights = NULL;
@@ -42,13 +42,13 @@ MLPTesterOCL::MLPTesterOCL()
 	this->initialized = false;
 };
 
-MLPTesterOCL::MLPTesterOCL(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, MLP_OCL_DEVTYPE dType, int _batchSize)
+MLPTesterOCL::MLPTesterOCL(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, DNN_OCL_DEVTYPE dType, int _batchSize)
 {
 	this->devType = dType;
 
 	// class wide set up
 	if ( this->nInstances++ == 0 )  {   // at the first instance
-        this->CLContext = new SingleDevClass(this->devType);
+        this->CLCtx = new SingleDevClass(this->devType);
 
 		clAmdBlasSetup();
 
@@ -86,7 +86,7 @@ MLPTesterOCL::~MLPTesterOCL()
 	if ( --this->nInstances == 0 ) {
         this->destroy_ocl_kernels();
 
-		delete this->CLContext;
+		delete this->CLCtx;
 
 		clAmdBlasTeardown();
 	}
@@ -104,23 +104,23 @@ void MLPTesterOCL::setup_ocl_kernels()
 		     return;
 	    };
 
-		this->CLContext->m_program = clCreateProgramWithSource(this->CLContext->m_context, 1, (const char**)&kernel_src,NULL,&status);
+		this->CLCtx->m_program = clCreateProgramWithSource(this->CLCtx->m_context, 1, (const char**)&kernel_src,NULL,&status);
 		CL_CHECK( status );
 
-		CL_CHECK( clBuildProgram(this->CLContext->m_program,1,&this->CLContext->m_device, NULL, NULL, NULL) );
+		CL_CHECK( clBuildProgram(this->CLCtx->m_program,1,&this->CLCtx->m_device, NULL, NULL, NULL) );
 
 		delete [] kernel_src;
 
-		this->mykerns.activate_sigmoid_kernel = clCreateKernel(this->CLContext->m_program,"activate_sigmoid",&status);
+		this->mykerns.activate_sigmoid_kernel = clCreateKernel(this->CLCtx->m_program,"activate_sigmoid",&status);
 		CL_CHECK( status );
-		this->mykerns.activate_softmax_kernel1 = clCreateKernel(this->CLContext->m_program,"activate_softmax1",&status);
+		this->mykerns.activate_softmax_kernel1 = clCreateKernel(this->CLCtx->m_program,"activate_softmax1",&status);
 		CL_CHECK( status );
-		this->mykerns.activate_softmax_kernel2 = clCreateKernel(this->CLContext->m_program,"activate_softmax2",&status);
+		this->mykerns.activate_softmax_kernel2 = clCreateKernel(this->CLCtx->m_program,"activate_softmax2",&status);
 		CL_CHECK( status );
-		this->mykerns.activate_tanh_kernel = clCreateKernel(this->CLContext->m_program,"activate_tanh",&status);
+		this->mykerns.activate_tanh_kernel = clCreateKernel(this->CLCtx->m_program,"activate_tanh",&status);
 		CL_CHECK( status );
 
-        this->mykerns.expandMatrix_kernel = clCreateKernel(this->CLContext->m_program,"expandVectorToMatrix",&status);
+        this->mykerns.expandMatrix_kernel = clCreateKernel(this->CLCtx->m_program,"expandVectorToMatrix",&status);
 	    CL_CHECK( status );
 
 }
@@ -133,7 +133,7 @@ void MLPTesterOCL::destroy_ocl_kernels()
 	    CL_CHECK( clReleaseKernel(this->mykerns.activate_tanh_kernel) );
 		CL_CHECK( clReleaseKernel(this->mykerns.expandMatrix_kernel) );
 
-		CL_CHECK( clReleaseProgram(this->CLContext->m_program) );
+		CL_CHECK( clReleaseProgram(this->CLCtx->m_program) );
 };
 
 void MLPTesterOCL::create_ocl_buffers(MLPNetProvider &provider)
@@ -148,20 +148,20 @@ void MLPTesterOCL::create_ocl_buffers(MLPNetProvider &provider)
 	// the first hidden layer, this->inputs[0] is for the output layer
 	for (int i = 1; i < this->nLayers; i++ )
 	{
-		this->inputs[i] = clCreateBuffer(this->CLContext->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*this->dimensions[i-1]*this->batchSize,NULL,&status);
+		this->inputs[i] = clCreateBuffer(this->CLCtx->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*this->dimensions[i-1]*this->batchSize,NULL,&status);
 		CL_CHECK(status);
 
-		this->weights[i] = clCreateBuffer(this->CLContext->m_context, CL_MEM_READ_WRITE|CL_MEM_COPY_HOST_PTR, sizeof(cl_float)*this->dimensions[i-1]*this->dimensions[i],
+		this->weights[i] = clCreateBuffer(this->CLCtx->m_context, CL_MEM_READ_WRITE|CL_MEM_COPY_HOST_PTR, sizeof(cl_float)*this->dimensions[i-1]*this->dimensions[i],
 			                               provider.weights[i],&status);
 		CL_CHECK(status);
 
-		this->biases[i] = clCreateBuffer(this->CLContext->m_context, CL_MEM_READ_WRITE|CL_MEM_COPY_HOST_PTR, sizeof(cl_float)*this->dimensions[i],
+		this->biases[i] = clCreateBuffer(this->CLCtx->m_context, CL_MEM_READ_WRITE|CL_MEM_COPY_HOST_PTR, sizeof(cl_float)*this->dimensions[i],
 			                               provider.biases[i],&status);
 		CL_CHECK(status);
 	}
 
 	// for output layer
-	this->output = clCreateBuffer(this->CLContext->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*(this->dimensions[this->nLayers-1])*this->batchSize,NULL,&status);
+	this->output = clCreateBuffer(this->CLCtx->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*(this->dimensions[this->nLayers-1])*this->batchSize,NULL,&status);
 	CL_CHECK(status);
 
 	this->inputs[0] = this->output;
@@ -170,14 +170,14 @@ void MLPTesterOCL::create_ocl_buffers(MLPNetProvider &provider)
 
 	// create bias Matrix buffer for each layer except for the input layer
 	for (int i = 1; i < this->nLayers; i++) {
- 	    this->biasMatrixes[i] = clCreateBuffer(this->CLContext->m_context,CL_MEM_READ_WRITE,sizeof(cl_float)*this->batchSize*this->dimensions[i],NULL,&status);
+ 	    this->biasMatrixes[i] = clCreateBuffer(this->CLCtx->m_context,CL_MEM_READ_WRITE,sizeof(cl_float)*this->batchSize*this->dimensions[i],NULL,&status);
         CL_CHECK(status);
 
 		this->expandFloatVectorToMatrix(this->biases[i],this->biasMatrixes[i],this->dimensions[i],this->batchSize);
 	};
 
 
-	this->target = clCreateBuffer(this->CLContext->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*this->dimensions[this->nLayers-1]*this->batchSize,NULL,&status);
+	this->target = clCreateBuffer(this->CLCtx->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*this->dimensions[this->nLayers-1]*this->batchSize,NULL,&status);
 	CL_CHECK(status);
 };
 
@@ -209,7 +209,7 @@ void MLPTesterOCL::release_ocl_buffers()
 
 void MLPTesterOCL::expandFloatVectorToMatrix(cl_mem  myVector, cl_mem myMatrix, int width, int height)
 {
-	cmn_expandFloatVectorToMatrix(this->CLContext->m_cmd_queues[0],this->mykerns, myVector, myMatrix, width, height);
+	cmn_expandFloatVectorToMatrix(this->CLCtx->m_queues[0],this->mykerns, myVector, myMatrix, width, height);
 };
 
 
@@ -217,16 +217,16 @@ void MLPTesterOCL::activate(int layer, cl_mem x, cl_mem y, int width, int height
 {
 	switch (this->actFuncs[layer] ) {
 	case AFUNC_SIGMOID:
-		cmn_activate_sigmoid(this->CLContext->m_cmd_queues[0],this->mykerns,x,y,width,height);
+		cmn_activate_sigmoid(this->CLCtx->m_queues[0],this->mykerns,x,y,width,height);
 		return;
 	case AFUNC_SOFTMAX:
-	    cmn_activate_softmax(this->CLContext->m_cmd_queues[0],this->mykerns,x,y,width,height);
+	    cmn_activate_softmax(this->CLCtx->m_queues[0],this->mykerns,x,y,width,height);
 		return;
 	case AFUNC_TANH:
-	    cmn_activate_tanh(this->CLContext->m_cmd_queues[0],this->mykerns,x,y,width,height);
+	    cmn_activate_tanh(this->CLCtx->m_queues[0],this->mykerns,x,y,width,height);
 		return;
 	case AFUNC_IDENTITY:
-	    cmn_activate_identity(this->CLContext->m_cmd_queues[0],this->mykerns,x,y,width,height);
+	    cmn_activate_identity(this->CLCtx->m_queues[0],this->mykerns,x,y,width,height);
         return;
 	default:
 		mlp_log("MLPTester", "The assigned activation function for this layer is not supported.");
@@ -261,17 +261,17 @@ void MLPTesterOCL::batchTesting(int maxBatches)
 
 			MLP_CHECK(this->dataProviderp->getBatchData(this->batchSize,features,labels,true));
 
-			CL_CHECK(clEnqueueWriteBuffer(this->CLContext->m_cmd_queues[0],this->inputs[1],CL_TRUE,0,sizeof(cl_float)*this->dimensions[0]*this->batchSize,features,0,NULL,NULL));
+			CL_CHECK(clEnqueueWriteBuffer(this->CLCtx->m_queues[0],this->inputs[1],CL_TRUE,0,sizeof(cl_float)*this->dimensions[0]*this->batchSize,features,0,NULL,NULL));
 
 			for (int i = 1; i < nLayers; i++) {
 				// Input[i] = Output[i-1] * Weight[i]
 				blasStatus = clAmdBlasSgemm(clAmdBlasRowMajor,clAmdBlasNoTrans,clAmdBlasNoTrans,this->batchSize,this->dimensions[i],this->dimensions[i-1],1.0f,this->inputs[i],
-					this->dimensions[i-1],this->weights[i],this->dimensions[i],0.0f,this->inputs[(i+1)%this->nLayers],this->dimensions[i],1,&this->CLContext->m_cmd_queues[0],0,NULL,NULL);
+					this->dimensions[i-1],this->weights[i],this->dimensions[i],0.0f,this->inputs[(i+1)%this->nLayers],this->dimensions[i],1,&this->CLCtx->m_queues[0],0,NULL,NULL);
 				AMDBLAS_CHECK(blasStatus);
 
 				// Input[i] = Input[i] + 1.0 * Bias[i],   regarding the two Matrixes as  two vectors
 				blasStatus = clAmdBlasSaxpy(this->dimensions[i]*this->batchSize, 1.0f, this->biasMatrixes[i], 0, 1, this->inputs[(i+1)%this->nLayers], 0, 1, 1,
-					                        &this->CLContext->m_cmd_queues[0], 0, NULL, NULL);
+					                        &this->CLCtx->m_queues[0], 0, NULL, NULL);
 				AMDBLAS_CHECK(blasStatus);
 
 				// Output[i] = activate(Input[i])
@@ -279,7 +279,7 @@ void MLPTesterOCL::batchTesting(int maxBatches)
 			}
 
 			// read the output vectors from the device to the host layer so that they can be checked
-			CL_CHECK(clEnqueueReadBuffer(this->CLContext->m_cmd_queues[0],this->output,CL_TRUE,0,sizeof(cl_float)*this->dimensions[this->nLayers-1]*this->batchSize,outputs,0,NULL,NULL));
+			CL_CHECK(clEnqueueReadBuffer(this->CLCtx->m_queues[0],this->output,CL_TRUE,0,sizeof(cl_float)*this->dimensions[this->nLayers-1]*this->batchSize,outputs,0,NULL,NULL));
 
 			this->totalTestFrames += this->batchSize;
 			int succCount=0;
@@ -316,23 +316,23 @@ bool MLPTesterOCL::singleTesting(float *inVector, float *labelVector, VECTOR_MAT
     outputSize = this->getOutputVectorSize();
     outVector = new float[outputSize];
 
-	status = clEnqueueWriteBuffer(this->CLContext->m_cmd_queues[0],this->inputs[1],CL_TRUE,0,sizeof(cl_float)*this->dimensions[0],inVector,0,NULL,NULL);
+	status = clEnqueueWriteBuffer(this->CLCtx->m_queues[0],this->inputs[1],CL_TRUE,0,sizeof(cl_float)*this->dimensions[0],inVector,0,NULL,NULL);
     CL_CHECK(status);
 
 	for (int i = 1; i < nLayers; i++) {
          // Input[i] = Output[i-1] * Weight[i], matrix * matrix is also OK, but less efficient
 		 //blasStatus = clAmdBlasSgemm(clAmdBlasRowMajor,clAmdBlasNoTrans,clAmdBlasNoTrans,1,this->dimensions[i],this->dimensions[i-1],1.0f,this->inputs[i],
-		 //  this->dimensions[i-1],this->weights[i],this->dimensions[i],0.0f,this->inputs[(i+1)%this->nLayers],this->dimensions[i],1,&this->CLContext->m_cmd_queues[0],0,NULL,NULL);
+		 //  this->dimensions[i-1],this->weights[i],this->dimensions[i],0.0f,this->inputs[(i+1)%this->nLayers],this->dimensions[i],1,&this->CLCtx->m_queues[0],0,NULL,NULL);
 
 		 // Input[i] = Output[i-1] * Weight[i], calculated using WeightT[i]*Output[i] to call the library interface
 		 blasStatus=clAmdBlasSgemv(clAmdBlasRowMajor, clAmdBlasTrans, this->dimensions[i-1], this->dimensions[i], 1.0f, this->weights[i], this->dimensions[i], this->inputs[i],
-		 			0, 1, 0.0f, this->inputs[(i+1)%this->nLayers], 0, 1, 1, &this->CLContext->m_cmd_queues[0], 0, NULL, NULL);
+		 			0, 1, 0.0f, this->inputs[(i+1)%this->nLayers], 0, 1, 1, &this->CLCtx->m_queues[0], 0, NULL, NULL);
 
 		 AMDBLAS_CHECK(blasStatus);
 
 		 // Input[i] = Input[i] + 1.0 * Bias[i]
 		 blasStatus = clAmdBlasSaxpy(this->dimensions[i], 1.0f, this->biases[i], 0, 1, this->inputs[(i+1)%this->nLayers], 0, 1, 1,
-			                        &this->CLContext->m_cmd_queues[0], 0, NULL, NULL);
+			                        &this->CLCtx->m_queues[0], 0, NULL, NULL);
 
 
 		 AMDBLAS_CHECK(blasStatus);
@@ -342,7 +342,7 @@ bool MLPTesterOCL::singleTesting(float *inVector, float *labelVector, VECTOR_MAT
 	}
 
 	// read the output vectors from the device to the host layer so that they can be checked
-	status = clEnqueueReadBuffer(this->CLContext->m_cmd_queues[0],this->output,CL_TRUE,0,sizeof(cl_float)*this->dimensions[this->nLayers-1],outVector,0,NULL,NULL);
+	status = clEnqueueReadBuffer(this->CLCtx->m_queues[0],this->output,CL_TRUE,0,sizeof(cl_float)*this->dimensions[this->nLayers-1],outVector,0,NULL,NULL);
     CL_CHECK(status);
 
     bool result;

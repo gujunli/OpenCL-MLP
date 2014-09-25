@@ -68,7 +68,7 @@ void ptc_symbol_training()
     //netProviderp = new MLPNetProvider(nettype, nLayers, dimensions, etas, momentum, actFuncs, costFunc, true);
     netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", true);
 
-    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);    // set up the trainer
+    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, DNN_OCL_DI_GPU, minibatch);    // set up the trainer
 
 	cout << totalbatches << " batches of data to be trained with " << epoches << " epoches, just waiting..." << endl;
 
@@ -113,7 +113,7 @@ void ptc_symbol_training2()
 
 	netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
 
-    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);
+    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, DNN_OCL_DI_GPU, minibatch);
 
 	cout << totalbatches << " batches of data to be trained with " << epoches << " epoches, just waiting..." << endl;
 
@@ -186,7 +186,7 @@ void ptc_symbol_training3()
 	// Training the neural network using ptc_en labelled dataset
     MLPTrainerBase *trainerp;
 
-    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, MLP_OCL_DI_GPU, minibatch);
+    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, DNN_OCL_DI_GPU, minibatch);
 
 	cpManager.enableCheckPointing(*trainerp, "./tmp/");
 	MLP_CHECK( cpManager.startCheckPointing() );
@@ -233,7 +233,7 @@ void ptc_symbol_batch_testing()
 	dataProviderp =	new DNNPtcDataProvider(PTC_SYMBOL_DB_PATH, DNN_DATAMODE_TEST, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
-	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU,minibatch);
+	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,DNN_OCL_DI_GPU,minibatch);
 
     totalbatches = dataProviderp->getTotalBatches();
 
@@ -288,7 +288,7 @@ void ptc_symbol_single_testing()
 	dataProviderp =	new DNNPtcDataProvider(PTC_SYMBOL_DB_PATH, DNN_DATAMODE_TEST, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
-	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,MLP_OCL_DI_GPU,minibatch);
+	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,DNN_OCL_DI_GPU,minibatch);
 
     totalbatches = dataProviderp->getTotalBatches();
     totalbatches = min<int>(totalbatches, 2);
@@ -357,7 +357,7 @@ void ptc_symbol_predicting()
 	dataProviderp =	new DNNPtcDataProvider(PTC_SYMBOL_DB_PATH, DNN_DATAMODE_PREDICT, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
-	predictorp = new MLPPredictorOCL(*netProviderp,MLP_OCL_DI_GPU, minibatch);
+	predictorp = new MLPPredictorOCL(*netProviderp,DNN_OCL_DI_GPU, minibatch);
 	outputVectors = new float[predictorp->getOutputVectorSize()*minibatch];
 
     totalbatches = dataProviderp->getTotalBatches();
