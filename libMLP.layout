@@ -16,8 +16,8 @@
 	<File name="libMLP/cpps/MLPChkPointingMgr.cpp" open="1" top="0" tabpos="19">
 		<Cursor position="300" topLine="0" />
 	</File>
-	<File name="libMLP/cpps/MLPNetProvider.cpp" open="1" top="0" tabpos="31">
-		<Cursor position="383" topLine="0" />
+	<File name="libMLP/cpps/MLPNetProvider.cpp" open="1" top="1" tabpos="31">
+		<Cursor position="29265" topLine="846" />
 	</File>
 	<File name="libMLP/cpps/MLPOclCommon.cpp" open="1" top="0" tabpos="16">
 		<Cursor position="18054" topLine="422" />
@@ -38,7 +38,7 @@
 		<Cursor position="1027" topLine="22" />
 	</File>
 	<File name="libMLP/cpps/MLPTrainerOCL.cpp" open="1" top="0" tabpos="7">
-		<Cursor position="1800" topLine="55" />
+		<Cursor position="20710" topLine="514" />
 	</File>
 	<File name="libMLP/cpps/SingleDevClass.cpp" open="1" top="0" tabpos="32">
 		<Cursor position="0" topLine="0" />
@@ -86,10 +86,10 @@
 		<Cursor position="1196" topLine="4" />
 	</File>
 	<File name="libMLP/include/MLPTesterOCL.h" open="1" top="0" tabpos="8">
-		<Cursor position="1398" topLine="0" />
+		<Cursor position="1398" topLine="29" />
 	</File>
 	<File name="libMLP/include/MLPTrainerBase.h" open="1" top="0" tabpos="5">
-		<Cursor position="2619" topLine="0" />
+		<Cursor position="2619" topLine="48" />
 	</File>
 	<File name="libMLP/include/MLPTrainerOCL.h" open="1" top="0" tabpos="6">
 		<Cursor position="2886" topLine="43" />
@@ -101,7 +101,7 @@
 		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="libMLP/include/conv_endian.h" open="1" top="0" tabpos="36">
-		<Cursor position="1157" topLine="38" />
+		<Cursor position="1986" topLine="87" />
 	</File>
 	<File name="libMLP/include/oclUtil.h" open="1" top="0" tabpos="34">
 		<Cursor position="0" topLine="0" />

@@ -1,3 +1,6 @@
+*  Thu Sep 25 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com> 
+   -  Added FloatToBytes() and BytesToFloat() for converting float type between host and file storage
+
 *  Tue Sep 23 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com> 
    -  Renamed the class MLPDataProvider and its derived classes into DNNDataProvider and DNNxxxDataProvider to make the data provider codes
       more portable (used by other DNN implementation), some file names are changed accordingly

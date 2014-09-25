@@ -84,6 +84,44 @@ static inline void LEtoHostl(unsigned int &x)
                          // ToDO: other architecture
 };
 
+
+// Don't care what byte order it is on the host side
+static inline void FloatToBytes(float &x)
+{
+    unsigned int *datap;
+    unsigned char *cp;
+    unsigned char byte0, byte1, byte2, byte3;
+
+    datap = (unsigned int *) &x;
+    byte0 = (*datap) & 0x000000ff;
+    byte1 = ( (*datap) & 0x0000ff00 ) >> 8;
+    byte2 = ( (*datap) & 0x00ff0000 ) >> 16;
+    byte3 = ( (*datap) & 0xff000000 ) >> 24;
+
+    cp = (unsigned char *) &x;
+    *cp = byte0;
+    *(cp+1) = byte1;
+    *(cp+2) = byte2;
+    *(cp+3) = byte3;
+};
+
+// Don't care what byte order it is on the host side
+static inline void BytesToFloat(float &x)
+{
+    unsigned int *datap;
+    unsigned char *cp;
+    unsigned int byte0, byte1, byte2, byte3;
+
+    cp = (unsigned char *) &x;
+    byte0 = (*cp);
+    byte1 = *(cp+1) << 8;
+    byte2 = *(cp+2) << 16;
+    byte3 = *(cp+3) << 24;
+
+    datap = (unsigned int *) &x;
+    *datap = byte0 | byte1 | byte2 | byte3;
+};
+
 #endif
 
 

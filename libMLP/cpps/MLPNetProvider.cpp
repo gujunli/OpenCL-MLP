@@ -386,12 +386,15 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
 			 nnetFile.read(reinterpret_cast<char*>(&this->weights[i][row*this->dimensions[i]]), sizeof(float)*this->dimensions[i]);
 		nnetFile.read(reinterpret_cast<char*>(&this->biases[i][0]),sizeof(float)*this->dimensions[i]);
 
-		// convert to host bytes sequence from Little Endian bytes sequence
+		// convert to host float type from generice bytes
 		for (int row=0; row < this->dimensions[i-1]; row++)
 			 for (int col=0; col < this->dimensions[i]; col++)
-				  LEtoHostl(*(unsigned int *)&this->weights[i][row*this->dimensions[i]+col]);
+                      BytesToFloat(this->weights[i][row*this->dimensions[i]+col]);
+				      // LEtoHostl(*(unsigned int *)&this->weights[i][row*this->dimensions[i]+col]);
+
 		for (int col=0; col < this->dimensions[i]; col++)
-			 LEtoHostl(*(unsigned int *)&this->biases[i][col]);
+                 BytesToFloat(this->biases[i][col]);
+			     //LEtoHostl(*(unsigned int *)&this->biases[i][col]);
 	};
 
     configFile.close();
@@ -414,7 +417,6 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
 		   mlp_log("MLPNetProvider", "Failed to open MLP training configuration for reading");
 		   MLP_Exception("");
 	};
-
 
 	vector<string> lines;
 
@@ -669,12 +671,15 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *nnetDataFile)
             nnetFile.read(reinterpret_cast<char*>(&this->weights[i][row*this->dimensions[i]]), sizeof(float)*this->dimensions[i]);
         nnetFile.read(reinterpret_cast<char*>(&this->biases[i][0]),sizeof(float)*this->dimensions[i]);
 
-        // convert to host bytes sequence from Little Endian bytes sequence
+        // convert to host float type from generic bytes
         for (int row=0; row < this->dimensions[i-1]; row++)
             for (int col=0; col < this->dimensions[i]; col++)
-                LEtoHostl(*(unsigned int *)&this->weights[i][row*this->dimensions[i]+col]);
+                     BytesToFloat(this->weights[i][row*this->dimensions[i]+col]);
+		             // LEtoHostl(*(unsigned int *)&this->weights[i][row*this->dimensions[i]+col]);
+
         for (int col=0; col < this->dimensions[i]; col++)
-            LEtoHostl(*(unsigned int *)&this->biases[i][col]);
+                     BytesToFloat(this->biases[i][col]);
+					// LEtoHostl(*(unsigned int *)&this->biases[i][col]);
     };
 
     nnetFile.close();
@@ -779,16 +784,22 @@ void MLPNetProvider::saveConfig(const char *dir, const char *trainingConfigFile,
         MLP_Exception("");
     };
 
+    configFile.setf(ios_base::showpoint|ios_base::dec|ios_base::fixed);
+
     configFile << "### Configuration file for the neural network training, produced automatically "  << endl;
     configFile << "### You can do modification for your need "  << endl;
 
     configFile << endl << "Network Type: " << getNetTypeName(this->netType) << endl;
     configFile << endl << "Layers: " << this->nLayers << endl;
     configFile << endl << "Cost Function: " << getCostFuncName(this->costFunc) << endl;
+    configFile.precision(2);
     configFile << endl << "Momentum: " << this->momentum << endl;
+    configFile.precision(5);
     configFile << endl << "Layer 0: " << this->dimensions[0] << endl;
     for (int i=1; i < this->nLayers; i++ )
         configFile << "Layer " << i << ": " << this->dimensions[i] << " " << this->etas[i] << " " << getActFuncName(this->actFuncs[i]) << endl;
+
+    configFile << endl;
 
     configFile.flush();
 
@@ -824,12 +835,15 @@ void MLPNetProvider::saveConfig(const char *dir, const char *trainingConfigFile,
         // go to the location for writing the weights and biases for this layer
         nnetFile.seekp(header.weight_offsets[i]);
 
-        // convert to Little Endian bytes sequence from host bytes sequence
+        // convert to generice bytes from host float type
         for (int row=0; row < this->dimensions[i-1]; row++)
             for (int col=0; col < this->dimensions[i]; col++)
-                HostToLEl(*(unsigned int *)&this->weights[i][row*this->dimensions[i]+col]);
+                 FloatToBytes(this->weights[i][row*this->dimensions[i]+col]);
+                 // HostToLEl(*(unsigned int *)&this->weights[i][row*this->dimensions[i]+col]);
+
         for (int col=0; col < this->dimensions[i]; col++)
-            HostToLEl(*(unsigned int *)&this->biases[i][col]);
+             FloatToBytes(this->biases[i][col]);
+             // HostToLEl(*(unsigned int *)&this->biases[i][col]);
 
         // write the converted data to file
         for (int row=0; row < this->dimensions[i-1]; row++)
@@ -837,12 +851,15 @@ void MLPNetProvider::saveConfig(const char *dir, const char *trainingConfigFile,
 
         nnetFile.write(reinterpret_cast<char*>(&this->biases[i][0]),sizeof(float)*this->dimensions[i]);
 
-        // convert back to host bytes sequence from Little Endian bytes sequence
+        // convert back to host float type from generic bytes 
         for (int row=0; row < this->dimensions[i-1]; row++)
             for (int col=0; col < this->dimensions[i]; col++)
-                LEtoHostl(*(unsigned int *)&this->weights[i][row*this->dimensions[i]+col]);
+                     BytesToFloat(this->weights[i][row*this->dimensions[i]+col]);
+                     // LEtoHostl(*(unsigned int *)&this->weights[i][row*this->dimensions[i]+col]);
+
         for (int col=0; col < this->dimensions[i]; col++)
-            LEtoHostl(*(unsigned int *)&this->biases[i][col]);
+                 BytesToFloat(this->biases[i][col]);
+                 // LEtoHostl(*(unsigned int *)&this->biases[i][col]);
     };
 
     // convert the data in the header to Little Endian bytes sequence from host bytes sequence
@@ -871,7 +888,9 @@ void MLPNetProvider::showConfig()
     cout << "Network Type: " << getNetTypeName(this->netType) << endl;
     cout << "Layers: " << this->nLayers << endl;
     cout << "Cost Function: " << getCostFuncName(this->costFunc) << endl;
+    cout.precision(2);
     cout << "Momentum: " << this->momentum << endl;
+    cout.precision(5);
     cout << "Layer 0: " << this->dimensions[0] << endl;
     for (int i=1; i < this->nLayers; i++ )
         cout << "Layer " << i << ": " << this->dimensions[i] << " " << this->etas[i] << " " << getActFuncName(this->actFuncs[i]) << endl;
@@ -880,6 +899,8 @@ void MLPNetProvider::showConfig()
 
     myprec = (int)cout.precision();
     cout.precision(6);
+    cout.setf(ios_base::showpoint|ios_base::dec|ios_base::fixed);
+
     cout << endl;
     for (int i=1; i < this->nLayers; i++)
     {
@@ -895,6 +916,9 @@ void MLPNetProvider::showConfig()
             cout << this->biases[i][col]<< " ";
         cout << endl << endl;
     };
+
+    cout << endl;
+
     cout.precision(myprec);
 };
 
