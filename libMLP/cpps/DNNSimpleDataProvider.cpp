@@ -16,7 +16,8 @@
 
 DNNSimpleDataProvider::DNNSimpleDataProvider()
 {
-	this->dataMode = DNN_DATAMODE_TRAIN;
+	this->dataMode = DNN_DATAMODE_SP_TRAIN;
+	this->haveLabel = ( (this->dataMode == DNN_DATAMODE_SP_TRAIN) || (this->dataMode == DNN_DATAMODE_TEST) )? true:false;
 	this->haveLabel = true;
 	this->m_dataFeatureSize = 429;
 	this->m_dataLabelSize = 8991;
@@ -35,7 +36,7 @@ DNNSimpleDataProvider::DNNSimpleDataProvider(DNN_DATA_MODE mode, int dataFeature
 	};
 
 	this->dataMode = mode;
-	this->haveLabel = (mode==DNN_DATAMODE_PREDICT)?false:true;
+	this->haveLabel = ( (this->dataMode == DNN_DATAMODE_SP_TRAIN) || (this->dataMode == DNN_DATAMODE_TEST) )? true:false;
 	this->m_dataFeatureSize = dataFeatureSize;
 	this->m_dataLabelSize = dataLabelSize;
 

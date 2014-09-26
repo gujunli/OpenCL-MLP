@@ -50,7 +50,7 @@ void simple_training()
 
 	nettype = NETTYPE_MULTI_CLASSIFICATION;
 	netProviderp = new MLPNetProvider(nettype,nLayers,dimensions,etas, momentum, actFuncs,costFunc, true);
-	dataProviderp =	new DNNSimpleDataProvider(DNN_DATAMODE_TRAIN,dimensions[0],dimensions[nLayers-1],minibatch,shuffleBatches);
+	dataProviderp =	new DNNSimpleDataProvider(DNN_DATAMODE_SP_TRAIN,dimensions[0],dimensions[nLayers-1],minibatch,shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
     totalbatches = dataProviderp->getTotalBatches();
 

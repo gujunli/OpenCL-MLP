@@ -54,8 +54,8 @@ void ptc_en_training()
 	// Training the neural network using ptc_en labelled dataset
     MLPTrainerBase *trainerp;
 
-	//dataProviderp = new MLPptc_enDataProvider(ptc_en_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
-	dataProviderp = new DNNPtcDataProvider(PTC_EN_DB_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	//dataProviderp = new MLPptc_enDataProvider(ptc_en_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
+	dataProviderp = new DNNPtcDataProvider(PTC_EN_DB_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
 
 	//dimensions[0] = dataProviderp->getFeatureSize();
@@ -106,8 +106,8 @@ void ptc_en_training2()
 	// Training the neural network using ptc_en labelled dataset
     MLPTrainerBase *trainerp;
 
-	dataProviderp = new DNNPtcDataProvider(PTC_EN_DB_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
-	//dataProviderp = new MLPptc_enDataProvider(ptc_en_PATH3, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	dataProviderp = new DNNPtcDataProvider(PTC_EN_DB_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
+	//dataProviderp = new MLPptc_enDataProvider(ptc_en_PATH3, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
 	totalbatches = dataProviderp->getTotalBatches();
 
@@ -160,8 +160,8 @@ void ptc_en_training3()
 		 statep = cpManager.getChkPointState();
 		 netProviderp = new MLPNetProvider(statep->netConfPath, statep->ncTrainingConfigFname, statep->ncNNetDataFname);
 
-	     //dataProviderp = new MLPptc_enDataProvider(ptc_en_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
-         dataProviderp = new DNNPtcDataProvider(PTC_EN_DB_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	     //dataProviderp = new MLPptc_enDataProvider(ptc_en_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
+         dataProviderp = new DNNPtcDataProvider(PTC_EN_DB_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
 		 dataProviderp->setupDataProvider(statep->cpFrameNo, true);
 
 		 startBatch = statep->cpBatchNo;
@@ -175,8 +175,8 @@ void ptc_en_training3()
           netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
          //netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", true);
 
-	     //dataProviderp = new DNNPtcDataProvider(ptc_en_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
-	     dataProviderp = new DNNPtcDataProvider(PTC_EN_DB_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	     //dataProviderp = new DNNPtcDataProvider(ptc_en_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
+	     dataProviderp = new DNNPtcDataProvider(PTC_EN_DB_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
 	     dataProviderp->setupDataProvider(0, true);
 
 		 startBatch = 0;

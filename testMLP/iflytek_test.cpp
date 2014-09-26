@@ -47,7 +47,7 @@ void iflytek_training()
 	// Training the neural network using MNist labelled dataset
     MLPTrainerBase *trainerp;
 
-	dataProviderp = new DNNIFlyDataProvider(IFLY_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	dataProviderp = new DNNIFlyDataProvider(IFLY_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
 	dimensions[0] = dataProviderp->getFeatureSize();
 	dimensions[nLayers-1] = dataProviderp->getLabelSize();
@@ -102,7 +102,7 @@ void iflytek_training2()
 		 statep = cpManager.getChkPointState();
 		 netProviderp = new MLPNetProvider(statep->netConfPath, statep->ncTrainingConfigFname, statep->ncNNetDataFname);
 
-         dataProviderp = new DNNIFlyDataProvider(IFLY_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+         dataProviderp = new DNNIFlyDataProvider(IFLY_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
 		 dataProviderp->setupDataProvider(statep->cpFrameNo, true);
 
 		 cout << "The DNNDataProvider start from Frame " << statep->cpFrameNo << endl;
@@ -118,7 +118,7 @@ void iflytek_training2()
 		 cout << "No old checkpoint found, start new checkpointing any way" << endl;
 
 	     netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
-         dataProviderp = new DNNIFlyDataProvider(IFLY_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+         dataProviderp = new DNNIFlyDataProvider(IFLY_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
 	     dataProviderp->setupDataProvider(0, true);
 
 		 startBatch = 0;

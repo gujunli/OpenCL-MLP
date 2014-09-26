@@ -548,7 +548,7 @@ void DNNDataProvider::setupDataProvider()
 
 void DNNDataProvider::setupDataProvider(int startFrameNo, bool doChkPointing)
 {
- 	if ( this->dataMode != DNN_DATAMODE_TRAIN ) {
+ 	if ( (this->dataMode != DNN_DATAMODE_SP_TRAIN) && (this->dataMode != DNN_DATAMODE_US_TRAIN) ) {
 		 dnn_log("DNNDataProvider", "This interface can only be called with the TRAIN mode");
 		 DNN_Exception("");
 	};

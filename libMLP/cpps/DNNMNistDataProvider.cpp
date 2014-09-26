@@ -24,7 +24,7 @@ void DNNMNistDataProvider::InitializeFromMNistSource(const char *dataPath)
 	string datafname(dataPath);
     string labelfname(dataPath);
 
- 	if ( this->dataMode == DNN_DATAMODE_TRAIN )
+ 	if ( (this->dataMode == DNN_DATAMODE_SP_TRAIN) || (this->dataMode == DNN_DATAMODE_US_TRAIN) )
  	     datafname.append("train-images.idx3-ubyte");
 	else
          datafname.append("t10k-images.idx3-ubyte");         // for TEST or PREDICT
@@ -64,7 +64,7 @@ void DNNMNistDataProvider::InitializeFromMNistSource(const char *dataPath)
 	if ( !this->haveLabel )
 		 goto finish;
 
- 	if ( this->dataMode == DNN_DATAMODE_TRAIN )
+ 	if ( this->dataMode == DNN_DATAMODE_SP_TRAIN )
  	     labelfname.append("train-labels.idx1-ubyte");
 	else
          labelfname.append("t10k-labels.idx1-ubyte");         // for TEST or PREDICT
@@ -112,11 +112,11 @@ finish:
 
 DNNMNistDataProvider::DNNMNistDataProvider()
 {
-	this->dataMode = DNN_DATAMODE_TRAIN;
-	this->haveLabel = true;
+	this->dataMode = DNN_DATAMODE_SP_TRAIN;
+	this->haveLabel = ( (this->dataMode == DNN_DATAMODE_SP_TRAIN) || (this->dataMode == DNN_DATAMODE_TEST) )? true:false;
  	this->m_batchSize = 512;
 
-	if ( this->dataMode == DNN_DATAMODE_TRAIN )
+	if ( (this->dataMode == DNN_DATAMODE_SP_TRAIN) || (this->dataMode == DNN_DATAMODE_US_TRAIN) )
 		this->m_shuffleBatches = 10;          // for testing and predicting, we don't need to shuffle the data
 	else
 	    this->m_shuffleBatches = 1;
@@ -134,10 +134,10 @@ DNNMNistDataProvider::DNNMNistDataProvider(const char *dataPath, DNN_DATA_MODE m
 	};
 
 	this->dataMode = mode;
-	this->haveLabel = (mode==DNN_DATAMODE_PREDICT)?false:true;
+	this->haveLabel = ( (this->dataMode == DNN_DATAMODE_SP_TRAIN) || (this->dataMode == DNN_DATAMODE_TEST) )? true:false;
 	this->m_batchSize = batchSize;
 
-	if ( this->dataMode == DNN_DATAMODE_TRAIN )
+	if ( (this->dataMode == DNN_DATAMODE_SP_TRAIN) || (this->dataMode == DNN_DATAMODE_US_TRAIN) )
 		 this->m_shuffleBatches = shuffleBatches;    // for testing and predicting, we don't need to shuffle the data
 	else
 	     this->m_shuffleBatches = 1;

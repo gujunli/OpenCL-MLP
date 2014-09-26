@@ -70,10 +70,10 @@ int main()
 
     //iflytek_training2();
 	//mnist_training();
-	//mnist_training3();
+	mnist_training3();
 	//ptc_ch_training3();
 	//ptc_en_training();
-	ptc_digital_training();
+	//ptc_digital_training2();
 	//ptc_symbol_training2();
 	//vlp_ch_training2();
 	//simple_training();
@@ -84,11 +84,11 @@ int main()
 
 	//iflytek_batch_testing();
 	//iflytek_predicting();
-	//mnist_batch_testing();
+	mnist_batch_testing();
 	//mnist_single_testing();
 	//ptc_ch_batch_testing();
 	//ptc_en_batch_testing();
-	ptc_digital_batch_testing();
+	//ptc_digital_batch_testing();
 	//ptc_symbol_batch_testing();
 	//vlp_ch_batch_testing();
 	//simple_batch_testing();

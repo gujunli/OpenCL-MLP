@@ -23,7 +23,7 @@ void DNNPtcDataProvider::InitializeFromPtcSource(const char *dataPath)
 
 	string datafname(dataPath);
 
-	if ( this->dataMode == DNN_DATAMODE_TRAIN )
+	if ( (this->dataMode == DNN_DATAMODE_SP_TRAIN) || (this->dataMode == DNN_DATAMODE_US_TRAIN) )
  	     datafname.append("ptc_training_db.dat");
 	else
 		 datafname.append("ptc_testing_db.dat");
@@ -71,11 +71,11 @@ void DNNPtcDataProvider::InitializeFromPtcSource(const char *dataPath)
 
 DNNPtcDataProvider::DNNPtcDataProvider()
 {
-	this->dataMode = DNN_DATAMODE_TRAIN;
-	this->haveLabel = true;
+	this->dataMode = DNN_DATAMODE_SP_TRAIN;
+	this->haveLabel = ( (this->dataMode == DNN_DATAMODE_SP_TRAIN) || (this->dataMode == DNN_DATAMODE_TEST) )? true:false;
  	this->m_batchSize = 512;
 
-	if ( this->dataMode == DNN_DATAMODE_TRAIN )
+	if ( (this->dataMode == DNN_DATAMODE_SP_TRAIN) || (this->dataMode == DNN_DATAMODE_US_TRAIN) )
 		this->m_shuffleBatches = 10;          // for testing and predicting, we don't need to shuffle the data
 	else
 	    this->m_shuffleBatches = 1;
@@ -93,10 +93,10 @@ DNNPtcDataProvider::DNNPtcDataProvider(const char *dataPath, DNN_DATA_MODE mode,
 	};
 
 	this->dataMode = mode;
-	this->haveLabel = (mode==DNN_DATAMODE_PREDICT)?false:true;
+	this->haveLabel = ( (this->dataMode == DNN_DATAMODE_SP_TRAIN) || (this->dataMode == DNN_DATAMODE_TEST) )? true:false;
 	this->m_batchSize = batchSize;
 
-	if ( this->dataMode == DNN_DATAMODE_TRAIN )
+	if ( (this->dataMode == DNN_DATAMODE_SP_TRAIN) || (this->dataMode == DNN_DATAMODE_US_TRAIN) )
 		 this->m_shuffleBatches = shuffleBatches;    // for testing and predicting, we don't need to shuffle the data
 	else
 	     this->m_shuffleBatches = 1;

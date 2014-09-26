@@ -1,3 +1,8 @@
+*  Fri Sep 26 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>
+   -  Replace the "DNN_DATAMODE_TRAIN" by "DNN_DATAMODE_SP_TRAIN" and "DNN_DATAMODE_US_TRAIN" to support both supervised and 
+      unsupervised training
+   -  The DNNDataProvider and DNNxxxDataProvider codes were changed to support expanded data modes
+
 *  Thu Sep 25 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com> 
    -  Added FloatToBytes() and BytesToFloat() for converting float type between host and file storage
    -  Renamed some member variables to make them shorter (m_cmd_queues => m_queues)

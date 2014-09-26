@@ -2,21 +2,21 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
 	<File name="libMLP/cpps/DNNDataProvider.cpp" open="1" top="0" tabpos="25">
-		<Cursor position="15219" topLine="26" />
+		<Cursor position="14350" topLine="0" />
 	</File>
 	<File name="libMLP/cpps/DNNMNistDataProvider.cpp" open="1" top="0" tabpos="29">
-		<Cursor position="1258" topLine="30" />
+		<Cursor position="3808" topLine="102" />
 	</File>
 	<File name="libMLP/cpps/DNNSimpleDataProvider.cpp" open="1" top="0" tabpos="30">
-		<Cursor position="1960" topLine="109" />
+		<Cursor position="781" topLine="0" />
 	</File>
 	<File name="libMLP/cpps/DNNUtil.cpp" open="1" top="0" tabpos="28">
-		<Cursor position="2616" topLine="100" />
+		<Cursor position="2560" topLine="105" />
 	</File>
 	<File name="libMLP/cpps/MLPChkPointingMgr.cpp" open="1" top="0" tabpos="19">
 		<Cursor position="300" topLine="0" />
 	</File>
-	<File name="libMLP/cpps/MLPNetProvider.cpp" open="1" top="1" tabpos="31">
+	<File name="libMLP/cpps/MLPNetProvider.cpp" open="1" top="0" tabpos="31">
 		<Cursor position="29265" topLine="846" />
 	</File>
 	<File name="libMLP/cpps/MLPOclCommon.cpp" open="1" top="0" tabpos="16">
@@ -26,34 +26,34 @@
 		<Cursor position="238" topLine="0" />
 	</File>
 	<File name="libMLP/cpps/MLPPredictorOCL.cpp" open="1" top="0" tabpos="15">
-		<Cursor position="3942" topLine="252" />
+		<Cursor position="1024" topLine="31" />
 	</File>
 	<File name="libMLP/cpps/MLPTesterBase.cpp" open="1" top="0" tabpos="14">
 		<Cursor position="1202" topLine="48" />
 	</File>
 	<File name="libMLP/cpps/MLPTesterOCL.cpp" open="1" top="0" tabpos="10">
-		<Cursor position="1860" topLine="61" />
+		<Cursor position="1031" topLine="0" />
 	</File>
 	<File name="libMLP/cpps/MLPTrainerBase.cpp" open="1" top="0" tabpos="4">
 		<Cursor position="1027" topLine="22" />
 	</File>
 	<File name="libMLP/cpps/MLPTrainerOCL.cpp" open="1" top="0" tabpos="7">
-		<Cursor position="20710" topLine="514" />
+		<Cursor position="2092" topLine="64" />
 	</File>
 	<File name="libMLP/cpps/SingleDevClass.cpp" open="1" top="0" tabpos="32">
-		<Cursor position="0" topLine="0" />
+		<Cursor position="2037" topLine="47" />
 	</File>
 	<File name="libMLP/cpps/oclUtil.cpp" open="1" top="0" tabpos="33">
-		<Cursor position="0" topLine="340" />
+		<Cursor position="1407" topLine="30" />
 	</File>
 	<File name="libMLP/include/DNNApiExport.h" open="1" top="0" tabpos="20">
 		<Cursor position="266" topLine="0" />
 	</File>
 	<File name="libMLP/include/DNNConstants.h" open="1" top="0" tabpos="21">
-		<Cursor position="0" topLine="0" />
+		<Cursor position="531" topLine="0" />
 	</File>
 	<File name="libMLP/include/DNNDataProvider.h" open="1" top="0" tabpos="22">
-		<Cursor position="4456" topLine="0" />
+		<Cursor position="4456" topLine="80" />
 	</File>
 	<File name="libMLP/include/DNNMNistDataProvider.h" open="1" top="0" tabpos="23">
 		<Cursor position="1120" topLine="5" />
@@ -62,7 +62,7 @@
 		<Cursor position="1691" topLine="4" />
 	</File>
 	<File name="libMLP/include/DNNUtil.h" open="1" top="0" tabpos="26">
-		<Cursor position="7916" topLine="0" />
+		<Cursor position="4538" topLine="56" />
 	</File>
 	<File name="libMLP/include/MLPChkPointState.h" open="1" top="0" tabpos="3">
 		<Cursor position="0" topLine="0" />
@@ -80,25 +80,25 @@
 		<Cursor position="1093" topLine="16" />
 	</File>
 	<File name="libMLP/include/MLPPredictorOCL.h" open="1" top="0" tabpos="11">
-		<Cursor position="1386" topLine="0" />
+		<Cursor position="1251" topLine="31" />
 	</File>
 	<File name="libMLP/include/MLPTesterBase.h" open="1" top="0" tabpos="9">
 		<Cursor position="1196" topLine="4" />
 	</File>
 	<File name="libMLP/include/MLPTesterOCL.h" open="1" top="0" tabpos="8">
-		<Cursor position="1398" topLine="29" />
+		<Cursor position="1280" topLine="23" />
 	</File>
 	<File name="libMLP/include/MLPTrainerBase.h" open="1" top="0" tabpos="5">
 		<Cursor position="2619" topLine="48" />
 	</File>
 	<File name="libMLP/include/MLPTrainerOCL.h" open="1" top="0" tabpos="6">
-		<Cursor position="2886" topLine="43" />
+		<Cursor position="2541" topLine="0" />
 	</File>
 	<File name="libMLP/include/MLPUtil.h" open="1" top="0" tabpos="27">
-		<Cursor position="3935" topLine="27" />
+		<Cursor position="1378" topLine="4" />
 	</File>
 	<File name="libMLP/include/SingleDevClass.h" open="1" top="0" tabpos="35">
-		<Cursor position="0" topLine="0" />
+		<Cursor position="360" topLine="9" />
 	</File>
 	<File name="libMLP/include/conv_endian.h" open="1" top="0" tabpos="36">
 		<Cursor position="1986" topLine="87" />

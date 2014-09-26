@@ -71,7 +71,7 @@ void MLPTrainerOCL::setupMLP(MLPNetProvider & netProvider, DNNDataProvider & dat
 		   MLP_Exception("");
 	};
 
-	if (  (_minibatch != dataProvider.getBatchSize()) || dataProvider.getDataMode() != DNN_DATAMODE_TRAIN) {
+	if (  (_minibatch != dataProvider.getBatchSize()) || dataProvider.getDataMode() != DNN_DATAMODE_SP_TRAIN) {
 		   mlp_log("MLPTrainer", "The setting of the MLPDataProvider doesn't match the need of the MLPTrainer");
 		   MLP_Exception("");
 	};

@@ -225,7 +225,7 @@ void DNNIFlyDataProvider::InitializeFromIFlySource(const char *dataPath)
 	};
 	this->TestSetStart = frameNo;
 
-	if ( this->dataMode == DNN_DATAMODE_TRAIN )    {        // first 95% frames as training set
+	if ( (this->dataMode == DNN_DATAMODE_SP_TRAIN) || (this->dataMode == DNN_DATAMODE_US_TRAIN) ) {
 		 this->mySetFrames = this->TestSetStart;
 		 this->mySetStart = 0;
 	}
@@ -278,11 +278,11 @@ void DNNIFlyDataProvider::InitializeFromIFlySource(const char *dataPath)
 
 DNNIFlyDataProvider::DNNIFlyDataProvider()
 {
-	this->dataMode = DNN_DATAMODE_TRAIN;
-	this->haveLabel = true;
+	this->dataMode = DNN_DATAMODE_SP_TRAIN;
+	this->haveLabel = ( (this->dataMode == DNN_DATAMODE_SP_TRAIN) || (this->dataMode == DNN_DATAMODE_TEST) )? true:false;
  	this->m_batchSize = 512;
 
-	if ( this->dataMode == DNN_DATAMODE_TRAIN )
+	if ( (this->dataMode == DNN_DATAMODE_SP_TRAIN) || (this->dataMode == DNN_DATAMODE_US_TRAIN) )
 		this->m_shuffleBatches = 10;          // for testing and predicting, we don't need to shuffle the data
 	else
 	    this->m_shuffleBatches = 1;
@@ -301,10 +301,10 @@ DNNIFlyDataProvider::DNNIFlyDataProvider(const char *dataPath, DNN_DATA_MODE mod
 	};
 
 	this->dataMode = mode;
-	this->haveLabel = (mode==DNN_DATAMODE_PREDICT)?false:true;
+	this->haveLabel = ( (this->dataMode == DNN_DATAMODE_SP_TRAIN) || (this->dataMode == DNN_DATAMODE_TEST) )? true:false;
 	this->m_batchSize = batchSize;
 
-	if ( this->dataMode == DNN_DATAMODE_TRAIN )
+	if ( (this->dataMode == DNN_DATAMODE_SP_TRAIN) || (this->dataMode == DNN_DATAMODE_US_TRAIN) )
 		 this->m_shuffleBatches = shuffleBatches;    // for testing and predicting, we don't need to shuffle the data
 	else
 	     this->m_shuffleBatches = 1;

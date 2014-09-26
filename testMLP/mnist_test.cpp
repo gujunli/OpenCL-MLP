@@ -65,8 +65,8 @@ void mnist_training()
 	// Training the neural network using MNist labelled dataset
     MLPTrainerBase *trainerp;
 
-	dataProviderp = new DNNMNistDataProvider(MNIST_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
-	//dataProviderp = new DNNMNistDataProvider(MNIST_PATH3, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	dataProviderp = new DNNMNistDataProvider(MNIST_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
+	//dataProviderp = new DNNMNistDataProvider(MNIST_PATH3, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
 
 	/*
@@ -119,8 +119,8 @@ void mnist_training2()
 	// Training the neural network using MNist labelled dataset
     MLPTrainerBase *trainerp;
 
-	dataProviderp = new DNNMNistDataProvider(MNIST_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
-	//dataProviderp = new DNNMNistDataProvider(MNIST_PATH3, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	dataProviderp = new DNNMNistDataProvider(MNIST_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
+	//dataProviderp = new DNNMNistDataProvider(MNIST_PATH3, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
 	totalbatches = dataProviderp->getTotalBatches();
 
@@ -173,8 +173,8 @@ void mnist_training3()
 		 statep = cpManager.getChkPointState();
 		 netProviderp = new MLPNetProvider(statep->netConfPath, statep->ncTrainingConfigFname, statep->ncNNetDataFname);
 
-	     //dataProviderp = new DNNMNistDataProvider(MNIST_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
-         dataProviderp = new DNNMNistDataProvider(MNIST_PATH3, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	     //dataProviderp = new DNNMNistDataProvider(MNIST_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
+         dataProviderp = new DNNMNistDataProvider(MNIST_PATH3, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
 		 dataProviderp->setupDataProvider(statep->cpFrameNo, true);
 
 		 startBatch = statep->cpBatchNo;
@@ -188,8 +188,8 @@ void mnist_training3()
          netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
 		 //netProviderp = new MLPNetProvider("./", "mlp_training_init.conf",true);
 
-	     //dataProviderp = new DNNMNistDataProvider(MNIST_PATH, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
-	     dataProviderp = new DNNMNistDataProvider(MNIST_PATH3, DNN_DATAMODE_TRAIN, minibatch, shuffleBatches);
+	     //dataProviderp = new DNNMNistDataProvider(MNIST_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
+	     dataProviderp = new DNNMNistDataProvider(MNIST_PATH3, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
 	     dataProviderp->setupDataProvider(0, true);
 
 		 startBatch = 0;
