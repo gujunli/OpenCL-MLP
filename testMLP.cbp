@@ -35,15 +35,17 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add directory="libMLP/include" />
-			<Add directory="mlpDataProviders/include" />
+			<Add directory="dnnDataProviders/include" />
 			<Add directory="/opt/AMDAPP/include" />
 			<Add directory="/opt/clAmdBlas/include" />
+			<Add directory="dnnCommon/include" />
 		</Compiler>
 		<Linker>
 			<Add library="clAmdBlas" />
 			<Add library="OpenCL" />
 			<Add library="MLP" />
-			<Add library="mlpDataProviders" />
+			<Add library="DNNDataProvider" />
+			<Add library="DNNCommon" />
 			<Add directory="bin/Release" />
 			<Add directory="/opt/clAmdBlas/lib64" />
 		</Linker>

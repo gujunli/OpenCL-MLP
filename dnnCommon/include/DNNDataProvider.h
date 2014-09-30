@@ -15,7 +15,15 @@
 #endif
 
 #include "DNNApiExport.h"
-#include "DNNConstants.h"
+
+enum  DNN_DATA_MODE
+{
+    DNN_DATAMODE_SP_TRAIN,        // for supervised training
+	DNN_DATAMODE_TEST,
+	DNN_DATAMODE_PREDICT,
+	DNN_DATAMODE_US_TRAIN,        // for unsupervised training
+	DNN_DATAMODE_ERROR
+};
 
 #define DNN_BATCH_RING_SIZE 8
 

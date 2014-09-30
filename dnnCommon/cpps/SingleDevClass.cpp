@@ -16,10 +16,10 @@ SingleDevClass::SingleDevClass()
 	this->numQueues = 0;
 
     if (  (result=choose_ocl_dgpu_device(this->m_device)) < 0 ) {
-          dnn_log("DNN", "Failed to choose one OpenCL discrete GPUd evice for the application, try to use integrated GPU device\n");
+          dnn_log("MLP", "Failed to choose one OpenCL discrete GPUd evice for the application, try to use integrated GPU device\n");
 		  if ( (result=choose_ocl_igpu_device(this->m_device)) < 0 ) {
-		        dnn_log("DNN", "Failed to choose one OpenCL platform and device for the application\n");
-		        dnn_log_retval("DNN", result);
+		        dnn_log("MLP", "Failed to choose one OpenCL platform and device for the application\n");
+		        dnn_log_retval("MLP", result);
 		        DNN_Exception("");
 		  }
 		  else
@@ -29,8 +29,8 @@ SingleDevClass::SingleDevClass()
 	      this->devtype = DNN_OCL_DGPU;
 
 	if  ( (result=setup_simple_ocl_context(this->m_device, this->m_context, 1, &this->m_queues[0])) < 0 ) {
-		  dnn_log("DNN", "Failed to setup OpenCL context and queue on the selected device\n");
-		  dnn_log_retval("DNN", result);
+		  dnn_log("MLP", "Failed to setup OpenCL context and queue on the selected device\n");
+		  dnn_log_retval("MLP", result);
 		  DNN_Exception("");
 	};
 
@@ -57,7 +57,7 @@ SingleDevClass::SingleDevClass(DNN_OCL_DEVTYPE type)
 			break;
         case DNN_OCL_DI_GPU:
             if ( (result = choose_ocl_dgpu_device(this->m_device)) < 0 ) {
-                  dnn_log("DNN", "Failed to choose one OpenCL discrete GPU device for the application, try to use integrated GPU device\n");
+                  dnn_log("MLP", "Failed to choose one OpenCL discrete GPU device for the application, try to use integrated GPU device\n");
                   result = choose_ocl_igpu_device(this->m_device);
                   setType = DNN_OCL_IGPU;
             }
@@ -65,19 +65,19 @@ SingleDevClass::SingleDevClass(DNN_OCL_DEVTYPE type)
                   setType = DNN_OCL_DGPU;
             break;
         default:
-            dnn_log("DNN", "Incorrect OpenCL device type as parameter");
+            dnn_log("MLP", "Incorrect OpenCL device type as parameter");
             DNN_Exception("");
 	};
 
     if ( result < 0 ) {
-		  dnn_log("DNN", "Failed to choose one OpenCL platform and device for the application\n");
-		  dnn_log_retval("DNN", result);
+		  dnn_log("MLP", "Failed to choose one OpenCL platform and device for the application\n");
+		  dnn_log_retval("MLP", result);
 		  DNN_Exception("");
 	};
 
 	if  ( (result=setup_simple_ocl_context(this->m_device, this->m_context, 1,  &this->m_queues[0])) < 0 ) {
-		  dnn_log("DNN", "Failed to setup OpenCL context and queue on the selected device\n");
-		  dnn_log_retval("DNN", result);
+		  dnn_log("MLP", "Failed to setup OpenCL context and queue on the selected device\n");
+		  dnn_log_retval("MLP", result);
 		  DNN_Exception("");
 	};
 

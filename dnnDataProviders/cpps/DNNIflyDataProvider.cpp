@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "DNNUtil.h"
+#include "DNNConstants.h"
 #include "DNNIFlyDataProvider.h"
 #include "conv_endian.h"
 

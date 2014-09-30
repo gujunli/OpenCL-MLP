@@ -28,9 +28,9 @@ public:
 	cl_program m_program;
     DNN_OCL_DEVTYPE devtype;
 public:
-	SingleDevClass();
-	SingleDevClass(DNN_OCL_DEVTYPE type);
-	~SingleDevClass();
+    LIBDNNAPI	SingleDevClass();
+	LIBDNNAPI SingleDevClass(DNN_OCL_DEVTYPE type);
+	LIBDNNAPI ~SingleDevClass();
 };
 
 #endif

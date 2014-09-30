@@ -1,0 +1,59 @@
+# depslib dependency file v1.0
+1412056994 source:/home/qfzhang/AMD-work2/MLP-Linux-0930/dnnDataProviders/cpps/DNNIflyDataProvider.cpp
+	<iostream>
+	"DNNUtil.h"
+	"DNNConstants.h"
+	"DNNIFlyDataProvider.h"
+	"conv_endian.h"
+
+1412058078 /home/qfzhang/AMD-work2/MLP-Linux-0930/dnnCommon/include/DNNUtil.h
+	<windows.h>
+	<pthread.h>
+	<signal.h>
+	<unistd.h>
+	<sstream>
+	<exception>
+	<stdexcept>
+	"DNNApiExport.h"
+
+1411633858 /home/qfzhang/AMD-work2/MLP-Linux-0930/dnnCommon/include/DNNApiExport.h
+
+1412056392 /home/qfzhang/AMD-work2/MLP-Linux-0930/dnnCommon/include/DNNConstants.h
+
+1411377638 /home/qfzhang/AMD-work2/MLP-Linux-0930/dnnDataProviders/include/DNNIFlyDataProvider.h
+	<vector>
+	<fstream>
+	"DNNApiExport.h"
+	"DNNDataProvider.h"
+
+1412056336 /home/qfzhang/AMD-work2/MLP-Linux-0930/dnnCommon/include/DNNDataProvider.h
+	<Windows.h>
+	<pthread.h>
+	"DNNApiExport.h"
+
+1411633858 /home/qfzhang/AMD-work2/MLP-Linux-0930/dnnCommon/include/conv_endian.h
+
+1412057006 source:/home/qfzhang/AMD-work2/MLP-Linux-0930/dnnDataProviders/cpps/DNNMNistDataProvider.cpp
+	<iostream>
+	"DNNUtil.h"
+	"DNNConstants.h"
+	"DNNMNistDataProvider.h"
+	"conv_endian.h"
+
+1411633858 /home/qfzhang/AMD-work2/MLP-Linux-0930/dnnDataProviders/include/DNNMNistDataProvider.h
+	<fstream>
+	"DNNApiExport.h"
+	"DNNDataProvider.h"
+
+1412057020 source:/home/qfzhang/AMD-work2/MLP-Linux-0930/dnnDataProviders/cpps/DNNPtcDataProvider.cpp
+	<iostream>
+	"DNNUtil.h"
+	"DNNConstants.h"
+	"DNNPtcDataProvider.h"
+	"conv_endian.h"
+
+1411377638 /home/qfzhang/AMD-work2/MLP-Linux-0930/dnnDataProviders/include/DNNPtcDataProvider.h
+	<fstream>
+	"DNNApiExport.h"
+	"DNNDataProvider.h"
+

@@ -36,7 +36,7 @@ LIBDNNAPI extern long diff_usec(struct dnn_tv *stv, struct dnn_tv *etv);
 
 extern int getLogicCoreNum();
 
-extern int read_srcfile(const char *filename, char * &src_str);
+LIBDNNAPI extern int read_srcfile(const char *filename, char * &src_str);
 
 LIBDNNAPI extern void dnn_log(const char *header, const char *content);
 LIBDNNAPI extern void dnn_log_retval(const char *header, int retVal);

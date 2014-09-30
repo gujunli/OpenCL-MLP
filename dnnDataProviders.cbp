@@ -2,12 +2,12 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="mlpDataProviders" />
+		<Option title="dnnDataProviders" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/libmlpDataProviders" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Debug/libDNNDataProvider" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -19,7 +19,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/libmlpDataProviders" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/libDNNDataProvider" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -35,16 +35,19 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fPIC" />
-			<Add directory="mlpDataProviders/include" />
-			<Add directory="libMLP/include" />
+			<Add directory="dnnDataProviders/include" />
+			<Add directory="dnnCommon/include" />
 		</Compiler>
 		<Linker>
-			<Add library="MLP" />
+			<Add library="DNNCommon" />
+			<Add directory="bin/Release" />
 		</Linker>
-		<Unit filename="mlpDataProviders/cpps/DNNIflyDataProvider.cpp" />
-		<Unit filename="mlpDataProviders/cpps/DNNPtcDataProvider.cpp" />
-		<Unit filename="mlpDataProviders/include/DNNIFlyDataProvider.h" />
-		<Unit filename="mlpDataProviders/include/DNNPtcDataProvider.h" />
+		<Unit filename="dnnDataProviders/cpps/DNNIflyDataProvider.cpp" />
+		<Unit filename="dnnDataProviders/cpps/DNNMNistDataProvider.cpp" />
+		<Unit filename="dnnDataProviders/cpps/DNNPtcDataProvider.cpp" />
+		<Unit filename="dnnDataProviders/include/DNNIFlyDataProvider.h" />
+		<Unit filename="dnnDataProviders/include/DNNMNistDataProvider.h" />
+		<Unit filename="dnnDataProviders/include/DNNPtcDataProvider.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

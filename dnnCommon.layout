@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
-	<File name="libMLP/include/MLPUtil.h" open="1" top="0" tabpos="10">
-		<Cursor position="207" topLine="3" />
+	<File name="dnnCommon/cpps/DNNDataProvider.cpp" open="1" top="0" tabpos="10">
+		<Cursor position="184" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

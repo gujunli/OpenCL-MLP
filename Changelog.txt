@@ -1,3 +1,8 @@
+*  Tue Sep 30 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>
+   -  Reorganized the source codes by adding a subproject "dnnCommon" to hold all common functions usable by all of DNNxxxDataProviders,
+      MLPTrainer/MLPTester/MLPPredictor  and the application
+   -  Renamed the subproject from "mlpDataProviders" to "dnnDataProviders" 
+
 *  Fri Sep 26 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>
    -  Replace the "DNN_DATAMODE_TRAIN" by "DNN_DATAMODE_SP_TRAIN" and "DNN_DATAMODE_US_TRAIN" to support both supervised and 
       unsupervised training

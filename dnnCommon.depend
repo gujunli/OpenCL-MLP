@@ -1,0 +1,80 @@
+# depslib dependency file v1.0
+1411710638 source:/home/qfzhang/AMD-work2/MLP-Linux-0930/dnnCommon/cpps/DNNDataProvider.cpp
+	<algorithm>
+	"DNNUtil.h"
+	"DNNDataProvider.h"
+
+1412058078 /home/qfzhang/AMD-work2/MLP-Linux-0930/dnnCommon/include/DNNUtil.h
+	<windows.h>
+	<pthread.h>
+	<signal.h>
+	<unistd.h>
+	<sstream>
+	<exception>
+	<stdexcept>
+	"DNNApiExport.h"
+
+1411633858 /home/qfzhang/AMD-work2/MLP-Linux-0930/dnnCommon/include/DNNApiExport.h
+
+1412056336 /home/qfzhang/AMD-work2/MLP-Linux-0930/dnnCommon/include/DNNDataProvider.h
+	<Windows.h>
+	<pthread.h>
+	"DNNApiExport.h"
+
+1411703898 source:/home/qfzhang/AMD-work2/MLP-Linux-0930/dnnCommon/cpps/DNNSimpleDataProvider.cpp
+	<algorithm>
+	"DNNUtil.h"
+	"DNNSimpleDataProvider.h"
+
+1411633858 /home/qfzhang/AMD-work2/MLP-Linux-0930/dnnCommon/include/DNNSimpleDataProvider.h
+	"DNNApiExport.h"
+	"DNNDataProvider.h"
+
+1411633858 source:/home/qfzhang/AMD-work2/MLP-Linux-0930/dnnCommon/cpps/DNNUtil.cpp
+	<time.h>
+	<Windows.h>
+	<sys/time.h>
+	<unistd.h>
+	"DNNUtil.h"
+	<iostream>
+	<fstream>
+
+1411633858 source:/home/qfzhang/AMD-work2/MLP-Linux-0930/dnnCommon/cpps/SingleDevClass.cpp
+	"DNNUtil.h"
+	"oclUtil.h"
+	"SingleDevClass.h"
+
+1411633858 /home/qfzhang/AMD-work2/MLP-Linux-0930/dnnCommon/include/oclUtil.h
+	<CL/cl.h>
+
+1383129523 /opt/AMDAPP/include/CL/cl.h
+	<OpenCL/cl_platform.h>
+	<CL/cl_platform.h>
+
+1383129523 /opt/AMDAPP/include/CL/cl_platform.h
+	<AvailabilityMacros.h>
+	<stdint.h>
+	<stddef.h>
+	<float.h>
+	<stddef.h>
+	<altivec.h>
+	<intrin.h>
+	<xmmintrin.h>
+	<intrin.h>
+	<emmintrin.h>
+	<mmintrin.h>
+	<intrin.h>
+	<immintrin.h>
+
+1412057894 /home/qfzhang/AMD-work2/MLP-Linux-0930/dnnCommon/include/SingleDevClass.h
+	<CL/cl.h>
+
+1411633858 source:/home/qfzhang/AMD-work2/MLP-Linux-0930/dnnCommon/cpps/oclUtil.cpp
+	<string>
+	<sstream>
+	<iostream>
+	<fstream>
+	<CL/cl.h>
+	<intrin.h>
+	"oclUtil.h"
+
