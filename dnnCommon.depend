@@ -78,3 +78,71 @@
 	<intrin.h>
 	"oclUtil.h"
 
+1412518354 source:/home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/cpps/DNNDataProvider.cpp
+	<algorithm>
+	<fstream>
+	"DNNUtil.h"
+	"DNNDataProvider.h"
+	"conv_endian.h"
+	"stats_info.h"
+
+1412058078 /home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/include/DNNUtil.h
+	<windows.h>
+	<pthread.h>
+	<signal.h>
+	<unistd.h>
+	<sstream>
+	<exception>
+	<stdexcept>
+	"DNNApiExport.h"
+
+1411633858 /home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/include/DNNApiExport.h
+
+1412516878 /home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/include/DNNDataProvider.h
+	<Windows.h>
+	<pthread.h>
+	"DNNApiExport.h"
+
+1411633858 /home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/include/conv_endian.h
+
+1412518064 /home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/include/stats_info.h
+	"DNNApiExport.h"
+
+1411703898 source:/home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/cpps/DNNSimpleDataProvider.cpp
+	<algorithm>
+	"DNNUtil.h"
+	"DNNSimpleDataProvider.h"
+
+1411633858 /home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/include/DNNSimpleDataProvider.h
+	"DNNApiExport.h"
+	"DNNDataProvider.h"
+
+1411633858 source:/home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/cpps/DNNUtil.cpp
+	<time.h>
+	<Windows.h>
+	<sys/time.h>
+	<unistd.h>
+	"DNNUtil.h"
+	<iostream>
+	<fstream>
+
+1411633858 source:/home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/cpps/SingleDevClass.cpp
+	"DNNUtil.h"
+	"oclUtil.h"
+	"SingleDevClass.h"
+
+1411633858 /home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/include/oclUtil.h
+	<CL/cl.h>
+
+1412057894 /home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/include/SingleDevClass.h
+	<CL/cl.h>
+
+1411633858 source:/home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/cpps/oclUtil.cpp
+	<string>
+	<sstream>
+	<iostream>
+	<fstream>
+	<CL/cl.h>
+	<intrin.h>
+	"oclUtil.h"
+

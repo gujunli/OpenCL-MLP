@@ -37,14 +37,14 @@ MLPTrainerBase::~MLPTrainerBase()
 };
 
 // only called by the constructor and setupMLP()
-void MLPTrainerBase::_initialize(MLPNetProvider & provider, int _minibatch)
+void MLPTrainerBase::_initialize(MLPConfigProvider & provider, int _minibatch)
 {
 	this->netType = provider.netType;
 	this->nLayers = provider.nLayers;
 	this->minibatch = _minibatch;
 	this->dimensions = new int[this->nLayers];
 
-	this->etas = new float[this->nLayers];         // learning rate for each layer
+	this->etas = new float[this->nLayers];            // learning rate for each layer
 	this->actFuncs = new ACT_FUNC[this->nLayers];     // activating function for each layer
 
 	for ( int i = 0; i < this->nLayers; i++ )
@@ -58,6 +58,7 @@ void MLPTrainerBase::_initialize(MLPNetProvider & provider, int _minibatch)
 
 	this->costFunc = provider.costFunc;
 	this->momentum = provider.momentum;
+	this->epochs = provider.epochs; 
 }
 
 // only called by the destructor
@@ -79,17 +80,17 @@ DNNDataProvider *MLPTrainerBase::getDataProvider()
 
 void MLPTrainerBase::saveNetConfig(const char *configPath)
 {
-	MLPNetProvider  netProvider(this->nLayers,this->dimensions,false);
+	MLPConfigProvider  netProvider(this->nLayers,this->dimensions,false);
 
 	this->synchronizeNetConfig(netProvider);
 
-	netProvider.saveConfig(configPath, MLP_NP_TRAINING_CONF_NEW, MLP_NP_NNET_DATA_NEW);
+	netProvider.saveConfig(configPath, MLP_CP_TRAINING_CONF_NEW, MLP_CP_NNET_DATA_NEW);
 };
 
 
 void MLPTrainerBase::showNetConfig()
 {
-	MLPNetProvider  netProvider(this->nLayers,this->dimensions,false);
+	MLPConfigProvider  netProvider(this->nLayers,this->dimensions,false);
 
 	this->synchronizeNetConfig(netProvider);
 
@@ -112,15 +113,19 @@ void MLPTrainerBase::checkPointing(struct MLPCheckPointState &cpState)
 	 cpState.cpFrameNo = (unsigned int) frameNo;
 
      // Snapshot one state of network configuration from the MLPTrainer, and save it to the files
-     MLPNetProvider  netProvider(this->nLayers,this->dimensions,false);
+     MLPConfigProvider  netProvider(this->nLayers,this->dimensions,false);
      this->synchronizeNetConfig(netProvider);
      netProvider.saveConfig(cpState.netConfPath, cpState.ncTrainingConfigFname, cpState.ncNNetDataFname);
 
      DNN_UNLOCK(&this->chkPointingLock);
 }
 
-int MLPTrainerBase::batchTraining(int maxBatches, int epoches)
+int MLPTrainerBase::batchTraining(int maxBatches)
 {
-	return(this->batchTrainingWithCheckPointing(maxBatches, epoches, 0, 0, NULL));
+	return(this->batchTrainingWithCheckPointing(maxBatches, 0, 0, NULL));
 };
 
+int MLPTrainerBase::getEpochs()
+{
+	return(this->epochs); 
+}; 

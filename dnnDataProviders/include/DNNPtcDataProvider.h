@@ -30,7 +30,7 @@ private:
 
 public:
 	LIBDNNAPI DNNPtcDataProvider();
-	LIBDNNAPI DNNPtcDataProvider(const char *dataPath, DNN_DATA_MODE mode, int batchSize, int shuffleBatches);
+	LIBDNNAPI DNNPtcDataProvider(const char *dataPath, bool use_stats_, DNN_DATA_MODE mode, int batchSize, int shuffleBatches);
 
     ~DNNPtcDataProvider();
 

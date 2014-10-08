@@ -1,3 +1,8 @@
+*  Sun Oct 05 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>
+   -  Renamed the MLPNetProvider class to MLPConfigProvider class
+   -  Updated the MLPConfigProvider to add the "Epochs" setting to mlp_training_init.conf to make the number of MLP training 
+      epochs configurable from the configuration file
+
 *  Tue Sep 30 2014  Qianfeng Zhang <Qianfeng.Zhang@amd.com>
    -  Reorganized the source codes by adding a subproject "dnnCommon" to hold all common functions usable by all of DNNxxxDataProviders,
       MLPTrainer/MLPTester/MLPPredictor  and the application

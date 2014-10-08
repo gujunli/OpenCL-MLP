@@ -19,7 +19,7 @@
 
 #include "MLPOclCommon.h"
 #include "SingleDevClass.h"
-#include "MLPNetProvider.h"
+#include "MLPConfigProvider.h"
 #include "MLPPredictorBase.h"
 
 
@@ -44,7 +44,7 @@ private:
 private:
 	void setup_ocl_kernels();
 	void destroy_ocl_kernels();
-	void create_ocl_buffers(MLPNetProvider &provider);
+	void create_ocl_buffers(MLPConfigProvider & configProvider);
 	void release_ocl_buffers();
 
 private:
@@ -53,11 +53,11 @@ private:
 
 public:
 	LIBDNNAPI MLPPredictorOCL();
-	LIBDNNAPI MLPPredictorOCL(MLPNetProvider & netProvider, DNN_OCL_DEVTYPE devType, int _batchSize);
+	LIBDNNAPI MLPPredictorOCL(MLPConfigProvider &configProvider, DNN_OCL_DEVTYPE devType, int _batchSize);
 	~MLPPredictorOCL();
 
 public:
-	void setupMLP(MLPNetProvider & netProvider, int batchSize);
+	void setupMLP(MLPConfigProvider &configProvider, int batchSize);
 
 	void batchPredicting(float *inVectors, float *outVectors);
 	void singlePredicting(float *inVector, float *outVector);

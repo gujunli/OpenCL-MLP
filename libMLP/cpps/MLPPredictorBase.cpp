@@ -26,7 +26,7 @@ MLPPredictorBase::~MLPPredictorBase()
 };
 
 // only called by the constructor and setupMLP()
-void MLPPredictorBase::_initialize(MLPNetProvider & provider, int _batchSize)
+void MLPPredictorBase::_initialize(MLPConfigProvider & provider, int _batchSize)
 {
 	this->nLayers = provider.nLayers;
 	this->batchSize = _batchSize;

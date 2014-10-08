@@ -1920,3 +1920,203 @@
 	"DNNApiExport.h"
 	"DNNDataProvider.h"
 
+1412503566 source:/home/qfzhang/AMD-work2/MLP-Linux-1008/testMLP/iflytek_test.cpp
+	<iostream>
+	"MLPUtil.h"
+	"MLPTrainerOCL.h"
+	"MLPTesterOCL.h"
+	"MLPPredictorOCL.h"
+	"MLPConfigProvider.h"
+	"DNNIFlyDataProvider.h"
+	"MLPChkPointingMgr.h"
+
+1412501306 /home/qfzhang/AMD-work2/MLP-Linux-1008/libMLP/include/MLPUtil.h
+	"DNNUtil.h"
+
+1412058078 /home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/include/DNNUtil.h
+	<windows.h>
+	<pthread.h>
+	<signal.h>
+	<unistd.h>
+	<sstream>
+	<exception>
+	<stdexcept>
+	"DNNApiExport.h"
+
+1411633858 /home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/include/DNNApiExport.h
+
+1412501674 /home/qfzhang/AMD-work2/MLP-Linux-1008/libMLP/include/MLPTrainerOCL.h
+	<CL/cl.h>
+	<CL/cl_ext.h>
+	"DNNApiExport.h"
+	"DNNConstants.h"
+	"DNNDataProvider.h"
+	"MLPOclCommon.h"
+	"SingleDevClass.h"
+	"MLPConfigProvider.h"
+	"MLPChkPointState.h"
+	"MLPTrainerBase.h"
+
+1412056392 /home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/include/DNNConstants.h
+
+1412516878 /home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/include/DNNDataProvider.h
+	<Windows.h>
+	<pthread.h>
+	"DNNApiExport.h"
+
+1412500916 /home/qfzhang/AMD-work2/MLP-Linux-1008/libMLP/include/MLPOclCommon.h
+	<CL/cl.h>
+	<iostream>
+	<fstream>
+
+1412057894 /home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/include/SingleDevClass.h
+	<CL/cl.h>
+
+1412590740 /home/qfzhang/AMD-work2/MLP-Linux-1008/libMLP/include/MLPConfigProvider.h
+	"DNNApiExport.h"
+
+1411633858 /home/qfzhang/AMD-work2/MLP-Linux-1008/libMLP/include/MLPChkPointState.h
+
+1412502164 /home/qfzhang/AMD-work2/MLP-Linux-1008/libMLP/include/MLPTrainerBase.h
+	<Windows.h>
+	<pthread.h>
+	"DNNApiExport.h"
+	"DNNConstants.h"
+	"DNNDataProvider.h"
+	"MLPConfigProvider.h"
+	"MLPChkPointState.h"
+
+1412500916 /home/qfzhang/AMD-work2/MLP-Linux-1008/libMLP/include/MLPTesterOCL.h
+	<CL/cl.h>
+	<CL/cl_ext.h>
+	"DNNApiExport.h"
+	"DNNConstants.h"
+	"DNNDataProvider.h"
+	"MLPOclCommon.h"
+	"SingleDevClass.h"
+	"MLPConfigProvider.h"
+	"MLPTesterBase.h"
+
+1412500594 /home/qfzhang/AMD-work2/MLP-Linux-1008/libMLP/include/MLPTesterBase.h
+	"DNNApiExport.h"
+	"DNNConstants.h"
+	"DNNDataProvider.h"
+	"MLPConfigProvider.h"
+
+1412500916 /home/qfzhang/AMD-work2/MLP-Linux-1008/libMLP/include/MLPPredictorOCL.h
+	<CL/cl.h>
+	<CL/cl_ext.h>
+	"DNNApiExport.h"
+	"DNNConstants.h"
+	"DNNDataProvider.h"
+	"MLPOclCommon.h"
+	"SingleDevClass.h"
+	"MLPConfigProvider.h"
+	"MLPPredictorBase.h"
+
+1412500862 /home/qfzhang/AMD-work2/MLP-Linux-1008/libMLP/include/MLPPredictorBase.h
+	"DNNApiExport.h"
+	"DNNConstants.h"
+	"DNNDataProvider.h"
+	"MLPConfigProvider.h"
+
+1412162228 /home/qfzhang/AMD-work2/MLP-Linux-1008/dnnDataProviders/include/DNNIFlyDataProvider.h
+	<vector>
+	<fstream>
+	"DNNApiExport.h"
+	"DNNDataProvider.h"
+
+1412500072 /home/qfzhang/AMD-work2/MLP-Linux-1008/libMLP/include/MLPChkPointingMgr.h
+	<Windows.h>
+	<pthread.h>
+	<string>
+	"DNNApiExport.h"
+	"MLPTrainerBase.h"
+	"MLPChkPointState.h"
+
+1412502760 source:/home/qfzhang/AMD-work2/MLP-Linux-1008/testMLP/mnist_test.cpp
+	<iostream>
+	"MLPUtil.h"
+	"MLPTrainerOCL.h"
+	"MLPTesterOCL.h"
+	"MLPPredictorOCL.h"
+	"MLPConfigProvider.h"
+	"DNNMNistDataProvider.h"
+	"MLPChkPointingMgr.h"
+
+1412158930 /home/qfzhang/AMD-work2/MLP-Linux-1008/dnnDataProviders/include/DNNMNistDataProvider.h
+	<fstream>
+	"DNNApiExport.h"
+	"DNNDataProvider.h"
+
+1412503016 source:/home/qfzhang/AMD-work2/MLP-Linux-1008/testMLP/ptc_ch_test.cpp
+	<iostream>
+	"MLPUtil.h"
+	"MLPTrainerOCL.h"
+	"MLPTesterOCL.h"
+	"MLPPredictorOCL.h"
+	"MLPConfigProvider.h"
+	"DNNPtcDataProvider.h"
+	"MLPChkPointingMgr.h"
+
+1412158536 /home/qfzhang/AMD-work2/MLP-Linux-1008/dnnDataProviders/include/DNNPtcDataProvider.h
+	<fstream>
+	"DNNApiExport.h"
+	"DNNDataProvider.h"
+
+1412503016 source:/home/qfzhang/AMD-work2/MLP-Linux-1008/testMLP/ptc_digital_test.cpp
+	<iostream>
+	"MLPUtil.h"
+	"MLPTrainerOCL.h"
+	"MLPTesterOCL.h"
+	"MLPPredictorOCL.h"
+	"MLPConfigProvider.h"
+	"MLPChkPointingMgr.h"
+	"DNNPtcDataProvider.h"
+
+1412695478 source:/home/qfzhang/AMD-work2/MLP-Linux-1008/testMLP/ptc_en_lowercase_test.cpp
+	<iostream>
+	"MLPUtil.h"
+	"MLPTrainerOCL.h"
+	"MLPTesterOCL.h"
+	"MLPPredictorOCL.h"
+	"MLPConfigProvider.h"
+	"MLPChkPointingMgr.h"
+	"DNNPtcDataProvider.h"
+
+1412694088 source:/home/qfzhang/AMD-work2/MLP-Linux-1008/testMLP/ptc_en_uppercase_test.cpp
+	<iostream>
+	"MLPUtil.h"
+	"MLPTrainerOCL.h"
+	"MLPTesterOCL.h"
+	"MLPPredictorOCL.h"
+	"MLPConfigProvider.h"
+	"MLPChkPointingMgr.h"
+	"DNNPtcDataProvider.h"
+
+1412503332 source:/home/qfzhang/AMD-work2/MLP-Linux-1008/testMLP/simple_test.cpp
+	<iostream>
+	"MLPUtil.h"
+	"MLPTrainerOCL.h"
+	"MLPTesterOCL.h"
+	"MLPPredictorOCL.h"
+	"MLPConfigProvider.h"
+	"DNNSimpleDataProvider.h"
+
+1411633858 /home/qfzhang/AMD-work2/MLP-Linux-1008/dnnCommon/include/DNNSimpleDataProvider.h
+	"DNNApiExport.h"
+	"DNNDataProvider.h"
+
+1412738967 source:/home/qfzhang/AMD-work2/MLP-Linux-1008/testMLP/test_main.cpp
+	<iostream>
+
+1412503462 source:/home/qfzhang/AMD-work2/MLP-Linux-1008/testMLP/vlp_ch_test.cpp
+	<iostream>
+	"MLPUtil.h"
+	"MLPTrainerOCL.h"
+	"MLPTesterOCL.h"
+	"MLPPredictorOCL.h"
+	"MLPConfigProvider.h"
+	"DNNPtcDataProvider.h"
+	"MLPChkPointingMgr.h"
+

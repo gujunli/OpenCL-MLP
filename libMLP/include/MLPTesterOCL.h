@@ -18,7 +18,7 @@
 #include "DNNDataProvider.h"
 #include "MLPOclCommon.h"
 #include "SingleDevClass.h"
-#include "MLPNetProvider.h"
+#include "MLPConfigProvider.h"
 #include "MLPTesterBase.h"
 
 
@@ -44,7 +44,7 @@ private:
 private:
 	void setup_ocl_kernels();
 	void destroy_ocl_kernels();
-	void create_ocl_buffers(MLPNetProvider &provider);
+	void create_ocl_buffers(MLPConfigProvider & configProvider);
 	void release_ocl_buffers();
 
 private:
@@ -53,11 +53,11 @@ private:
 
 public:
 	LIBDNNAPI MLPTesterOCL();
-	LIBDNNAPI MLPTesterOCL(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, DNN_OCL_DEVTYPE devType, int _batchSize);
+	LIBDNNAPI MLPTesterOCL(MLPConfigProvider & configProvider, DNNDataProvider & dataProvider, DNN_OCL_DEVTYPE devType, int _batchSize);
 	~MLPTesterOCL();
 
 public:
-	void setupMLP(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, int minipatch);
+	void setupMLP(MLPConfigProvider & configProvider, DNNDataProvider & dataProvider, int minipatch);
 	void batchTesting(int maxBatches);
 	bool singleTesting(float *inputVector, float *labelVector, VECTOR_MATCH matchFunc);
 };

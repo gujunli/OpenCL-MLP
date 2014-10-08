@@ -15,7 +15,7 @@
 #include <cstring>
 
 #include "MLPUtil.h"
-#include "MLPNetProvider.h"
+#include "MLPConfigProvider.h"
 #include "conv_endian.h"
 
 using namespace std;
@@ -36,7 +36,7 @@ static COST_FUNC getCostFuncID(string &funcName);
 
 static void lowerCaselize(char *str);
 
-MLPNetProvider::MLPNetProvider()
+MLPConfigProvider::MLPConfigProvider()
 {
     this->netType = NETTYPE_MULTI_CLASSIFICATION;
     this->nLayers = DEFAULT_LAYERS;
@@ -63,11 +63,12 @@ MLPNetProvider::MLPNetProvider()
     this->actFuncsInitialize();
     this->costFunc = CFUNC_SSE;
     this->momentum = 0.4f;
+	this->epochs = 100; 
 };
 
 
 // this constructor should be used by the MLPTrainer, not the MLPTester and MLPPredictor
-MLPNetProvider::MLPNetProvider(MLP_NETTYPE type, int layers, int dimensions_[], float etas_[], float momentum_, ACT_FUNC actFuncs_[], COST_FUNC costFunc_, bool DoInitialize)
+MLPConfigProvider::MLPConfigProvider(MLP_NETTYPE type, int layers, int dimensions_[], float etas_[], float momentum_, ACT_FUNC actFuncs_[], COST_FUNC costFunc_, int epochs_, bool DoInitialize)
 {
     this->netType = type;
     this->nLayers = layers;
@@ -90,6 +91,7 @@ MLPNetProvider::MLPNetProvider(MLP_NETTYPE type, int layers, int dimensions_[], 
 
     this->costFunc = costFunc_;
     this->momentum = momentum_;
+	this->epochs = epochs_; 
 
     this->biases[0] = NULL;
     for (int i=1; i< this->nLayers; i++)
@@ -106,7 +108,7 @@ MLPNetProvider::MLPNetProvider(MLP_NETTYPE type, int layers, int dimensions_[], 
 };
 
 
-MLPNetProvider::MLPNetProvider(int layers, int dimensions_[], bool DoInitialize)
+MLPConfigProvider::MLPConfigProvider(int layers, int dimensions_[], bool DoInitialize)
 {
     this->nLayers = layers;
     this->dimensions = new int[this->nLayers];
@@ -134,6 +136,7 @@ MLPNetProvider::MLPNetProvider(int layers, int dimensions_[], bool DoInitialize)
         this->actFuncsInitialize();
         this->costFunc = CFUNC_SSE;
         this->momentum = 0.4f;
+		this->epochs = 100; 
     };
 };
 
@@ -147,7 +150,7 @@ static void ltrim(string &str)
 
 // this constructor should be used by the MLPTrainer, not the MLPTester and MLPPredictor
 // the MLPTrainer will initialize its neural network parameters from the exiting config file and nnet data file
-MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, const char *nnetDataFile)
+MLPConfigProvider::MLPConfigProvider(const char *dir, const char *trainingConfigFile, const char *nnetDataFile)
 {
 	string configFileName(dir);
 	string nnetFileName(dir);
@@ -162,7 +165,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
 	nnetFile.open(nnetFileName.c_str(),ios_base::in|ios_base::binary);
 
 	if ( ! configFile.is_open() || ! nnetFile.is_open() ) {
-		   mlp_log("MLPNetProvider", "Failed to open MLP net config files for reading");
+		   mlp_log("MLPConfigProvider", "Failed to open MLP net config files for reading");
 		   MLP_Exception("");
 	};
 
@@ -197,7 +200,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
     };
     MLP_NETTYPE typeID=getNetTypeID(typeName1);
 	if ( typeID == NETNOTYPE ) {
-		  mlp_log("MLPNetProvider", "The setting for <Network Type> from the config file is not correct");
+		  mlp_log("MLPConfigProvider", "The setting for <Network Type> from the config file is not correct");
 		  MLP_Exception("");
 	};
 	this->netType = typeID;
@@ -214,7 +217,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
           };
     };
 	if ( (layers < 2) || (layers > 9 )) {
-		  mlp_log("MLPNetProvider", "The setting for <Layers> from the config file is not correct");
+		  mlp_log("MLPConfigProvider", "The setting for <Layers> from the config file is not correct");
 		  MLP_Exception("");
 	};
 	this->nLayers = layers;
@@ -238,7 +241,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
     };
     COST_FUNC cfunID=getCostFuncID(funName);
 	if ( cfunID == CNOFUNC ) {
-		  mlp_log("MLPNetProvider", "The setting for <Cost Function> from the config file is not correct");
+		  mlp_log("MLPConfigProvider", "The setting for <Cost Function> from the config file is not correct");
 		  MLP_Exception("");
 	};
 
@@ -256,7 +259,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
           };
     };
     if ( layer0_dim < 2  ) {
-		  mlp_log("MLPNetProvider", "The setting for <Layer 0> from the config file is not correct");
+		  mlp_log("MLPConfigProvider", "The setting for <Layer 0> from the config file is not correct");
 		  MLP_Exception("");
 	};
 	this->dimensions[0] = layer0_dim;
@@ -281,7 +284,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
 					if ( (layers_dim[k] < 2) || (layers_eta[k] <= 0.0f) || (layers_eta[k] >= 1.0f) || (afunID == ANOFUNC) ) {
 						  ostringstream errBuf;
 						  errBuf << "The setting for layer " << k+1 << " is not correct";
-		                  mlp_log("MLPNetProvider", errBuf.str().c_str());
+		                  mlp_log("MLPConfigProvider", errBuf.str().c_str());
 		                  MLP_Exception("");
 					};
                     found = true;
@@ -295,7 +298,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
 			   ostringstream errBuf;
 
 			   errBuf << "The setting for layer " << k+1 << " is not found" ;
-		       mlp_log("MLPNetProvider", errBuf.str().c_str());
+		       mlp_log("MLPConfigProvider", errBuf.str().c_str());
 		       MLP_Exception("");
 		  };
     };
@@ -305,7 +308,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
     delete [] funNames;
 
 	// read momentum value
-	float mmValue;
+	float mmValue = -1.0f;
 	string key4("Momentum:");
     for (vector<string>::iterator it=lines.begin(); it != lines.end(); ++it) {
           if ( (*it).compare(0,key4.length(),key4) == 0 ) {
@@ -316,10 +319,28 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
           };
     };
     if ( mmValue < 0.0f || mmValue >= 1.0f  ) {
-		  mlp_log("MLPNetProvider", "The setting for <Momentum> from the config file may be not reasonable");
+		  mlp_log("MLPConfigProvider", "The setting for <Momentum> from the config file may be not reasonable");
 		  MLP_Exception("");
 	};
 	this->momentum = mmValue;
+
+	// read Epochs value
+	int nEpoch = 0;
+	string key5("Epochs:");
+    for (vector<string>::iterator it=lines.begin(); it != lines.end(); ++it) {
+          if ( (*it).compare(0,key5.length(),key5) == 0 ) {
+                istringstream mystream((*it).substr(key5.length()));
+
+                mystream >> nEpoch;
+                break;
+          };
+    };
+    if ( nEpoch < 1 || nEpoch >= 100000  ) {
+		  mlp_log("MLPConfigProvider", "The setting for <Epochs> from the config file may be not reasonable");
+		  MLP_Exception("");
+	};
+	this->epochs = nEpoch; 
+
 
 	// allocate memory for weights and biases data of each layer
 	this->biases[0] = NULL;
@@ -341,7 +362,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
 	Mark[4] = '\0';
 
 	if ( corrMark != Mark ) {
-		 mlp_log("MLPNetProvider", "checking the integrity of MLP neural network data file failed, discarded");
+		 mlp_log("MLPConfigProvider", "checking the integrity of MLP neural network data file failed, discarded");
 		 MLP_Exception("");
 	};
 
@@ -374,7 +395,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
     };
 
     if ( ! match ) {
-         mlp_log("MLPNetProvider", "The infomration from the config file and the neural network data file does not match");
+         mlp_log("MLPConfigProvider", "The infomration from the config file and the neural network data file does not match");
          MLP_Exception("");
     };
 
@@ -402,7 +423,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
 }
 
 // this constuctor is used by the trainer to create a randomly initialized neural network
- MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, bool DoInitialize)
+ MLPConfigProvider::MLPConfigProvider(const char *dir, const char *trainingConfigFile, bool DoInitialize)
 {
 	string configFileName(dir);
 	string nnetFileName(dir);
@@ -414,7 +435,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
 	configFile.open(configFileName.c_str(),ios_base::in);
 
 	if ( ! configFile.is_open() ) {
-		   mlp_log("MLPNetProvider", "Failed to open MLP training configuration for reading");
+		   mlp_log("MLPConfigProvider", "Failed to open MLP training configuration for reading");
 		   MLP_Exception("");
 	};
 
@@ -448,7 +469,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
     };
     MLP_NETTYPE typeID=getNetTypeID(typeName1);
 	if ( typeID == NETNOTYPE ) {
-		  mlp_log("MLPNetProvider", "The setting for <Network Type> from the config file is not correct");
+		  mlp_log("MLPConfigProvider", "The setting for <Network Type> from the config file is not correct");
 		  MLP_Exception("");
 	};
 	this->netType = typeID;
@@ -465,7 +486,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
           };
     };
 	if ( (layers < 2) || (layers > 9 )) {
-		  mlp_log("MLPNetProvider", "The setting for <Layers> from the config file is not correct");
+		  mlp_log("MLPConfigProvider", "The setting for <Layers> from the config file is not correct");
 		  MLP_Exception("");
 	};
 	this->nLayers = layers;
@@ -489,7 +510,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
     };
     COST_FUNC cfunID=getCostFuncID(funName);
 	if ( cfunID == CNOFUNC ) {
-		  mlp_log("MLPNetProvider", "The setting for <Cost Function> from the config file is not correct");
+		  mlp_log("MLPConfigProvider", "The setting for <Cost Function> from the config file is not correct");
 		  MLP_Exception("");
 	};
 
@@ -507,7 +528,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
           };
     };
     if ( layer0_dim < 2  ) {
-		  mlp_log("MLPNetProvider", "The setting for <Layer 0> from the config file is not correct");
+		  mlp_log("MLPConfigProvider", "The setting for <Layer 0> from the config file is not correct");
 		  MLP_Exception("");
 	};
 	this->dimensions[0] = layer0_dim;
@@ -532,7 +553,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
 					if ( (layers_dim[k] < 2) || (layers_eta[k] <= 0.0f) || (layers_eta[k] >= 1.0f) || (afunID == ANOFUNC) ) {
 						  ostringstream errBuf;
 						  errBuf << "The setting for layer " << k+1 << " is not correct";
-		                  mlp_log("MLPNetProvider", errBuf.str().c_str());
+		                  mlp_log("MLPConfigProvider", errBuf.str().c_str());
 		                  MLP_Exception("");
 					};
                     found = true;
@@ -546,7 +567,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
 			   ostringstream errBuf;
 
 			   errBuf << "The setting for layer " << k+1 << " is not found" ;
-		       mlp_log("MLPNetProvider", errBuf.str().c_str());
+		       mlp_log("MLPConfigProvider", errBuf.str().c_str());
 		       MLP_Exception("");
 		  };
     };
@@ -556,7 +577,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
     delete [] funNames;
 
 	// read momentum value
-	float mmValue;
+	float mmValue = -1.0f;
 	string key4("Momentum:");
     for (vector<string>::iterator it=lines.begin(); it != lines.end(); ++it) {
           if ( (*it).compare(0,key4.length(),key4) == 0 ) {
@@ -567,10 +588,27 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
           };
     };
     if ( mmValue < 0.0f || mmValue >= 1.0f  ) {
-		  mlp_log("MLPNetProvider", "The setting for <Momentum> from the config file may be not reasonable");
+		  mlp_log("MLPConfigProvider", "The setting for <Momentum> from the config file may be not reasonable");
 		  MLP_Exception("");
 	};
 	this->momentum = mmValue;
+
+	// read Epochs value
+	int  nEpoch = 0; 
+	string key5("Epochs:");
+    for (vector<string>::iterator it=lines.begin(); it != lines.end(); ++it) {
+          if ( (*it).compare(0,key5.length(),key5) == 0 ) {
+                istringstream mystream((*it).substr(key5.length()));
+
+                mystream >> nEpoch;
+                break;
+          };
+    };
+    if ( nEpoch < 1 || nEpoch >= 100000  ) {
+		  mlp_log("MLPConfigProvider", "The setting for <Epochs> from the config file may be not reasonable");
+		  MLP_Exception("");
+	};
+	this->epochs = nEpoch; 
 
 	// allocate memory for weights and biases data of each layer
 	this->biases[0] = NULL;
@@ -592,7 +630,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *trainingConfigFile, 
 
 
 // this constructor should be used by the MLPTester and MLPPredictor, not the MLPTrainer
-MLPNetProvider::MLPNetProvider(const char *dir, const char *nnetDataFile)
+MLPConfigProvider::MLPConfigProvider(const char *dir, const char *nnetDataFile)
 {
     string nnetFileName(dir);
 
@@ -604,7 +642,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *nnetDataFile)
 
     if ( ! nnetFile.is_open() )
     {
-        mlp_log("MLPNetProvider", "Failed to open MLP neural network data file for reading");
+        mlp_log("MLPConfigProvider", "Failed to open MLP neural network data file for reading");
         MLP_Exception("");
     };
 
@@ -618,7 +656,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *nnetDataFile)
 
     if ( corrMark != Mark )
     {
-        mlp_log("MLPNetProvider", "checking the integrity of MLP neural network data file failed, discarded");
+        mlp_log("MLPConfigProvider", "checking the integrity of MLP neural network data file failed, discarded");
         MLP_Exception("");
     };
 
@@ -637,7 +675,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *nnetDataFile)
 
     lowerCaselize(header.nnet_type);
 
-    // allocate data structures for the MLPNetProvider
+    // allocate data structures for the MLPConfigProvider
     this->nLayers = header.nLayers;
     this->netType = getNetTypeID(header.nnet_type);
     this->dimensions = new int[this->nLayers];
@@ -686,7 +724,7 @@ MLPNetProvider::MLPNetProvider(const char *dir, const char *nnetDataFile)
 };
 
 
-MLPNetProvider::~MLPNetProvider()
+MLPConfigProvider::~MLPConfigProvider()
 {
     for (int i=0; i< this->nLayers; i++)
         if ( this->biases[i] )
@@ -703,7 +741,7 @@ MLPNetProvider::~MLPNetProvider()
     delete [] this->actFuncs;
 };
 
-void MLPNetProvider::biasesInitialize()
+void MLPConfigProvider::biasesInitialize()
 {
     float *datap;
 
@@ -718,7 +756,7 @@ void MLPNetProvider::biasesInitialize()
     };
 };
 
-void MLPNetProvider::weightsInitialize()
+void MLPConfigProvider::weightsInitialize()
 {
     float *datap;
 
@@ -739,32 +777,75 @@ void MLPNetProvider::weightsInitialize()
         };
 };
 
-void MLPNetProvider::etasInitialize()
+void MLPConfigProvider::etasInitialize()
 {
     this->etas[0] = 0;
     for (int i=1; i< this->nLayers; i++)
         this->etas[i] = 0.0002f;
 };
 
-void MLPNetProvider::actFuncsInitialize()
+void MLPConfigProvider::actFuncsInitialize()
 {
     this->actFuncs[0] = ANOFUNC;
     for (int i=1; i< this->nLayers; i++)
         this->actFuncs[i] = AFUNC_SIGMOID;
 };
 
-int MLPNetProvider::getInputLayerSize()
+int MLPConfigProvider::getInputLayerSize()
 {
 	return(this->dimensions[0]);
 };
 
-int MLPNetProvider::getOutputLayerSize()
+int MLPConfigProvider::getOutputLayerSize()
 {
 	return(this->dimensions[this->nLayers-1]);
 };
 
+int MLPConfigProvider::getLayerSize(int layer)
+{
+    if ( layer < 0 || layer > this->nLayers-1 ) {
+         mlp_log("MLPConfigProvider", "The layer parameter is invalid one");
+         MLP_Exception("");
+	}; 
 
-void MLPNetProvider::saveConfig(const char *dir, const char *trainingConfigFile, const char *nnetDataFile)
+	return(this->dimensions[layer]); 
+}; 
+
+void MLPConfigProvider::setLayerWeights(int layer, int layerSize, int lowerLayerSize, float *weights_new)
+{
+    if ( layer < 1 || layer > this->nLayers-1 ) {
+         mlp_log("MLPConfigProvider", "The layer parameter is invalid one");
+         MLP_Exception("");
+	}; 
+	if ( layerSize != this->dimensions[layer] || lowerLayerSize != this->dimensions[layer-1] ) {
+         mlp_log("MLPConfigProvider", "The layer size parameters are invalid");
+         MLP_Exception(""); 
+	}; 
+
+	for (int row=0; row < lowerLayerSize; row++) 
+		 for (int col=0; col < layerSize; col++) {
+			  this->weights[layer][row*layerSize+col] = weights_new[row*layerSize+col]; 
+		 }; 
+}; 
+
+void MLPConfigProvider::setLayerBiases(int layer, int layerSize, float *biases_new)
+{
+    if ( layer < 1 || layer > this->nLayers-1 ) {
+         mlp_log("MLPConfigProvider", "The layer parameter is invalid one");
+         MLP_Exception("");
+	}; 
+	if ( layerSize != this->dimensions[layer] ) {
+         mlp_log("MLPConfigProvider", "The layer size parameters are invalid");
+         MLP_Exception(""); 
+	}; 
+
+    for (int col=0; col < layerSize; col++) 
+	     this->biases[layer][col] = biases_new[col]; 
+}; 
+
+
+
+void MLPConfigProvider::saveConfig(const char *dir, const char *trainingConfigFile, const char *nnetDataFile)
 {
     string configFileName(dir);
     string nnetFileName(dir);
@@ -780,7 +861,7 @@ void MLPNetProvider::saveConfig(const char *dir, const char *trainingConfigFile,
 
     if ( ! configFile.is_open() || ! nnetFile.is_open() )
     {
-        mlp_log("MLPNetProvider", "Failed to create MLP net config files");
+        mlp_log("MLPConfigProvider", "Failed to create MLP net config files");
         MLP_Exception("");
     };
 
@@ -792,12 +873,14 @@ void MLPNetProvider::saveConfig(const char *dir, const char *trainingConfigFile,
     configFile << endl << "Network Type: " << getNetTypeName(this->netType) << endl;
     configFile << endl << "Layers: " << this->nLayers << endl;
     configFile << endl << "Cost Function: " << getCostFuncName(this->costFunc) << endl;
-    configFile.precision(2);
-    configFile << endl << "Momentum: " << this->momentum << endl;
     configFile.precision(5);
     configFile << endl << "Layer 0: " << this->dimensions[0] << endl;
     for (int i=1; i < this->nLayers; i++ )
         configFile << "Layer " << i << ": " << this->dimensions[i] << " " << this->etas[i] << " " << getActFuncName(this->actFuncs[i]) << endl;
+
+    configFile.precision(2);
+    configFile << endl << "Momentum: " << this->momentum << endl;
+    configFile << endl << "Epochs: " << this->epochs << endl;
 
     configFile << endl;
 
@@ -811,7 +894,7 @@ void MLPNetProvider::saveConfig(const char *dir, const char *trainingConfigFile,
 
     struct mlp_nnet_data_header header;
 
-    // set up the header of the neural network data from the information in the MLPNetProvider
+    // set up the header of the neural network data from the information in the MLPConfigProvider
     header.nLayers = this->nLayers;
     strcpy(header.nnet_type, getNetTypeName(this->netType));
     for (int i=0; i < this->nLayers; i++)
@@ -883,17 +966,19 @@ void MLPNetProvider::saveConfig(const char *dir, const char *trainingConfigFile,
 
 
 
-void MLPNetProvider::showConfig()
+void MLPConfigProvider::showConfig()
 {
     cout << "Network Type: " << getNetTypeName(this->netType) << endl;
     cout << "Layers: " << this->nLayers << endl;
     cout << "Cost Function: " << getCostFuncName(this->costFunc) << endl;
-    cout.precision(2);
-    cout << "Momentum: " << this->momentum << endl;
     cout.precision(5);
     cout << "Layer 0: " << this->dimensions[0] << endl;
     for (int i=1; i < this->nLayers; i++ )
         cout << "Layer " << i << ": " << this->dimensions[i] << " " << this->etas[i] << " " << getActFuncName(this->actFuncs[i]) << endl;
+
+    cout.precision(2);
+    cout << "Momentum: " << this->momentum << endl;
+	cout << "Epochs: " << this->epochs << endl; 
 
     int myprec;
 

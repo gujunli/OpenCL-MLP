@@ -12,27 +12,29 @@
 #include "MLPTesterOCL.h"
 #include "MLPPredictorOCL.h"
 #include "MLPConfigProvider.h"
-#include "DNNPtcDataProvider.h"
 #include "MLPChkPointingMgr.h"
+#include "DNNPtcDataProvider.h"
 
 using namespace std;
 
-#define PTC_CH_DB_PATH "../../ptc_dataset/Chinese-ptc/"
+#define PTC_UPPERCASE_DB_PATH "../../ptc_dataset/Uppercase-ptc/"
 
-void ptc_ch_training();
-void ptc_ch_training2();
-void ptc_ch_training3();     // training with checkpointing support
-void ptc_ch_batch_testing();
-void ptc_ch_single_testing();
-void ptc_ch_predicting();
+void ptc_uppercase_training();
+void ptc_uppercase_training2();
+void ptc_uppercase_training3();     // training with checkpointing support
+void ptc_uppercase_batch_testing();
+void ptc_uppercase_single_testing();
+void ptc_uppercase_predicting();
 
-// do ptc_ch training with randomly initialized weights
-void ptc_ch_training()
+static bool use_stats = false; 
+
+// do ptc_uppercase_training with randomly initialized weights
+void ptc_uppercase_training()
 {
 	struct dnn_tv startv, endv;
 
 	int minibatch = 1024;
-	int shuffleBatches = 50;
+	int shuffleBatches = 20;
 	int batches;
 	int totalbatches;
 
@@ -40,21 +42,14 @@ void ptc_ch_training()
     DNNDataProvider *dataProviderp=NULL;
 
 
-	// Training the neural network using ptc_ch labelled dataset
+	// Training the neural network using ptc_en labelled dataset
     MLPTrainerBase *trainerp;
 
-	//dataProviderp = new MLPptc_chDataProvider(PTC_CH_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
-	dataProviderp = new DNNPtcDataProvider(PTC_CH_DB_PATH, false, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
+	dataProviderp = new DNNPtcDataProvider(PTC_UPPERCASE_DB_PATH,  use_stats, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
-
-	//dimensions[0] = dataProviderp->getFeatureSize();
-	//dimensions[nLayers-1] = dataProviderp->getLabelSize();
-
 
 	totalbatches = dataProviderp->getTotalBatches();
 
-
-    //configProviderp = new MLPConfigProvider(nettype, nLayers, dimensions, etas, momentum, actFuncs, costFunc, true);
     configProviderp = new MLPConfigProvider("./", "mlp_training_init.conf", true);
 
     trainerp = new MLPTrainerOCL(*configProviderp,*dataProviderp, DNN_OCL_DI_GPU, minibatch);    // set up the trainer
@@ -77,13 +72,13 @@ void ptc_ch_training()
 	delete trainerp;
 };
 
-// doing ptc_ch training based on pre-trained weights
-void ptc_ch_training2()
+// doing ptc_en training based on pre-trained weights
+void ptc_uppercase_training2()
 {
 	struct dnn_tv startv, endv;
 
 	int minibatch = 1024;
-	int shuffleBatches = 50;
+	int shuffleBatches = 20;
 	int batches;
 	int totalbatches;
 
@@ -91,11 +86,10 @@ void ptc_ch_training2()
     DNNDataProvider *dataProviderp=NULL;
 
 
-	// Training the neural network using ptc_ch labelled dataset
+	// Training the neural network using ptc_en labelled dataset
     MLPTrainerBase *trainerp;
 
-	dataProviderp = new DNNPtcDataProvider(PTC_CH_DB_PATH, false, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
-	//dataProviderp = new MLPptc_chDataProvider(ptc_ch_PATH3, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
+	dataProviderp = new DNNPtcDataProvider(PTC_UPPERCASE_DB_PATH,  use_stats, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
 	totalbatches = dataProviderp->getTotalBatches();
 
@@ -121,13 +115,13 @@ void ptc_ch_training2()
 	delete trainerp;
 };
 
-// doing ptc_ch training with checkpointing support
-void ptc_ch_training3()
+// doing ptc_uppercase_training with checkpointing support
+void ptc_uppercase_training3()
 {
 	struct dnn_tv startv, endv;
 
 	int minibatch = 1024;
-	int shuffleBatches = 50;
+	int shuffleBatches = 20;
 	int batches;
 	int totalbatches;
 	int startBatch;
@@ -147,8 +141,8 @@ void ptc_ch_training3()
 		 statep = cpManager.getChkPointState();
 		 configProviderp = new MLPConfigProvider(statep->netConfPath, statep->ncTrainingConfigFname, statep->ncNNetDataFname);
 
-	     //dataProviderp = new MLPptc_chDataProvider(ptc_ch_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
-         dataProviderp = new DNNPtcDataProvider(PTC_CH_DB_PATH, false, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
+	     //dataProviderp = new MLPptc_enDataProvider(ptc_en_PATH,  true, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
+         dataProviderp = new DNNPtcDataProvider(PTC_UPPERCASE_DB_PATH,  true, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
 		 dataProviderp->setupDataProvider(statep->cpFrameNo, true);
 
 		 startBatch = statep->cpBatchNo;
@@ -159,18 +153,17 @@ void ptc_ch_training3()
 	else {
 		 cout << "No old checkpoint found, start new checkpointing any way" << endl;
 
-         configProviderp = new MLPConfigProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
+          configProviderp = new MLPConfigProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
          //configProviderp = new MLPConfigProvider("./", "mlp_training_init.conf", true);
 
-	     //dataProviderp = new DNNPtcDataProvider(ptc_ch_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
-	     dataProviderp = new DNNPtcDataProvider(PTC_CH_DB_PATH, false, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
+	     dataProviderp = new DNNPtcDataProvider(PTC_UPPERCASE_DB_PATH,  use_stats, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
 	     dataProviderp->setupDataProvider(0, true);
 
 		 startBatch = 0;
 		 startEpoch = 0;
 	};
 
-	// Training the neural network using ptc_ch labelled dataset
+	// Training the neural network using ptc_en labelled dataset
     MLPTrainerBase *trainerp;
 
     trainerp = new MLPTrainerOCL(*configProviderp,*dataProviderp, DNN_OCL_DI_GPU, minibatch);
@@ -201,22 +194,23 @@ void ptc_ch_training3()
 	delete trainerp;
 };
 
-void ptc_ch_batch_testing()
+void ptc_uppercase_batch_testing()
 {
 	struct dnn_tv startv, endv;
 
-	int minibatch = 500;
-	int shuffleBatches = 20;
+	// 1117 * 10 * 3 = 33510 to match the number of samples in the testing set
+	int minibatch = 1117;
+	int shuffleBatches = 10;
 	int totalbatches;
 
 	MLPConfigProvider *configProviderp=NULL;
     DNNDataProvider *dataProviderp=NULL;
 
-	// Testing the ptc_ch labelled dataset on the trained neural network
+	// Testing the ptc_en labelled dataset on the trained neural network
 	MLPTesterBase *testerp=NULL;
 
 	configProviderp = new MLPConfigProvider("./", MLP_CP_NNET_DATA_NEW);
-	dataProviderp =	new DNNPtcDataProvider(PTC_CH_DB_PATH, false, DNN_DATAMODE_TEST, minibatch, shuffleBatches);
+	dataProviderp =	new DNNPtcDataProvider(PTC_UPPERCASE_DB_PATH,  use_stats, DNN_DATAMODE_TEST, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
 	testerp = new MLPTesterOCL(*configProviderp,*dataProviderp,DNN_OCL_DI_GPU,minibatch);
@@ -240,7 +234,7 @@ void ptc_ch_batch_testing()
 	delete testerp;
 };
 
-static bool ptc_ch_output_matching(float *frameOutput, float *frameLabel, int len)
+static bool ptc_uppercase_output_matching(float *frameOutput, float *frameLabel, int len)
 {
 	float element;
 
@@ -254,7 +248,7 @@ static bool ptc_ch_output_matching(float *frameOutput, float *frameLabel, int le
 	return(true);
 };
 
-void PTC_CH_single_testing()
+void ptc_uppercase_single_testing()
 {
 	struct dnn_tv startv, endv;
 
@@ -267,11 +261,11 @@ void PTC_CH_single_testing()
 	MLPConfigProvider *configProviderp=NULL;
     DNNDataProvider *dataProviderp=NULL;
 
-	// Testing the ptc_ch labelled dataset on the trained neural network
+	// Testing the ptc_en labelled dataset on the trained neural network
 	MLPTesterBase *testerp=NULL;
 
 	configProviderp = new MLPConfigProvider("./", MLP_CP_NNET_DATA_NEW);
-	dataProviderp =	new DNNPtcDataProvider(PTC_CH_DB_PATH, false, DNN_DATAMODE_TEST, minibatch, shuffleBatches);
+	dataProviderp =	new DNNPtcDataProvider(PTC_UPPERCASE_DB_PATH,  true, DNN_DATAMODE_TEST, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
 	testerp = new MLPTesterOCL(*configProviderp,*dataProviderp,DNN_OCL_DI_GPU,minibatch);
@@ -282,7 +276,7 @@ void PTC_CH_single_testing()
     inVecLen = testerp->getInputVectorSize();
     outVecLen = testerp->getOutputVectorSize();
 
-    // Using ptc_ch testing dataset to do single testing on the trained neural network
+    // Using ptc_en testing dataset to do single testing on the trained neural network
 	float *inputVectors;
 	float *labelVectors;
 
@@ -299,7 +293,7 @@ void PTC_CH_single_testing()
 		    MLP_CHECK(dataProviderp->getBatchData(testerp->getBatchSize(),inputVectors, labelVectors, true));
 
 			for (int i=0; i< testerp->getBatchSize(); i++) {
-				 if ( testerp->singleTesting(&inputVectors[i*inVecLen], &labelVectors[i*outVecLen], ptc_ch_output_matching) )
+				 if ( testerp->singleTesting(&inputVectors[i*inVecLen], &labelVectors[i*outVecLen], ptc_uppercase_output_matching) )
                        succNum++;
 				 frames++;
 			};
@@ -321,7 +315,7 @@ void PTC_CH_single_testing()
 };
 
 
-void ptc_ch_predicting()
+void ptc_uppercase_predicting()
 {
 	struct dnn_tv startv, endv;
 
@@ -334,13 +328,13 @@ void ptc_ch_predicting()
 	MLPConfigProvider *configProviderp=NULL;
     DNNDataProvider *dataProviderp=NULL;
 
-	// Using ptc_ch testing dataset to do batch predicting on the trained neural network
+	// Using ptc_en testing dataset to do batch predicting on the trained neural network
 	MLPPredictorBase *predictorp=NULL;
 	float *inputVectors;
 	float *outputVectors;
 
 	configProviderp = new MLPConfigProvider("./", MLP_CP_NNET_DATA_NEW);
-	dataProviderp =	new DNNPtcDataProvider(PTC_CH_DB_PATH, false, DNN_DATAMODE_PREDICT, minibatch, shuffleBatches);
+	dataProviderp =	new DNNPtcDataProvider(PTC_UPPERCASE_DB_PATH,  true, DNN_DATAMODE_PREDICT, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
 	predictorp = new MLPPredictorOCL(*configProviderp,DNN_OCL_DI_GPU, minibatch);
@@ -374,7 +368,7 @@ void ptc_ch_predicting()
 
 	dataProviderp->resetDataProvider();
 
-    // Using ptc_ch testing dataset to do single predicting on the trained neural network
+    // Using ptc_en testing dataset to do single predicting on the trained neural network
 	float *inputVector;
 	float *outputVector;
 

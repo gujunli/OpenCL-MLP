@@ -20,7 +20,7 @@
 #include "DNNApiExport.h"
 #include "DNNConstants.h"
 #include "DNNDataProvider.h"
-#include "MLPNetProvider.h"
+#include "MLPConfigProvider.h"
 #include "MLPChkPointState.h"
 
 // Implement the interfaces for training the MLP network
@@ -37,6 +37,7 @@ protected:
 	float momentum;              // Used to indicate the importance of historic variance of weights
 	ACT_FUNC *actFuncs;          // Activation function used by all layers,  usually all hidden layers use same activation function, the output uses different one
 	COST_FUNC costFunc;          // Cost function used to measure the error value of the input batch got on the current MLP network
+	int epochs; 
 
 	DNNDataProvider *dataProviderp;
 
@@ -50,7 +51,7 @@ protected:
 #endif
 
 protected:
-	void _initialize(MLPNetProvider & NetProvider, int minibatch);
+	void _initialize(MLPConfigProvider & NetProvider, int minibatch);
 
 private:
 	void _dispose();
@@ -60,18 +61,20 @@ public:
 	LIBDNNAPI virtual ~MLPTrainerBase()=0;
 
 public:
-	LIBDNNAPI virtual void setupMLP(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, int minipatch)=0;
+	LIBDNNAPI virtual void setupMLP(MLPConfigProvider & configProvider, DNNDataProvider & dataProvider, int minipatch)=0;
 
-	LIBDNNAPI virtual void synchronizeNetConfig(MLPNetProvider &netProvider)=0;
+	LIBDNNAPI virtual void synchronizeNetConfig(MLPConfigProvider &configProvider)=0;
 
-	LIBDNNAPI virtual int batchTrainingWithCheckPointing(int maxBatches, int epoches, int startBatch, int startEpoch, bool doChkPointing)=0;
+	LIBDNNAPI virtual int batchTrainingWithCheckPointing(int maxBatches, int startBatch, int startEpoch, bool doChkPointing)=0;
 
-	LIBDNNAPI int batchTraining(int maxBatches, int epoches);
+	LIBDNNAPI int batchTraining(int maxBatches);
 
 	LIBDNNAPI void saveNetConfig(const char *configPath);
 	LIBDNNAPI void showNetConfig();
 
 	LIBDNNAPI DNNDataProvider *getDataProvider();
+
+	LIBDNNAPI int getEpochs(); 
 
 	void checkPointing(struct MLPCheckPointState &state);
 };

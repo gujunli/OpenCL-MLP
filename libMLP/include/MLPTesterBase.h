@@ -13,7 +13,7 @@
 #include "DNNApiExport.h"
 #include "DNNConstants.h"
 #include "DNNDataProvider.h"
-#include "MLPNetProvider.h"
+#include "MLPConfigProvider.h"
 
 
 typedef bool (*VECTOR_MATCH)(float *inVector, float *labelVector, int len);
@@ -35,7 +35,7 @@ protected:
 	int totalTestFrames;
 
 protected:
-	void _initialize(MLPNetProvider & NetProvider, int minibatch);
+	void _initialize(MLPConfigProvider & configProvider, int minibatch);
 
 private:
 	void _dispose();
@@ -45,7 +45,7 @@ public:
 	LIBDNNAPI virtual ~MLPTesterBase()=0;
 
 public:
-	LIBDNNAPI virtual void setupMLP(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, int minipatch)=0;
+	LIBDNNAPI virtual void setupMLP(MLPConfigProvider & configProvider, DNNDataProvider & dataProvider, int minipatch)=0;
 
 	LIBDNNAPI virtual void batchTesting(int maxBatches)=0;
 	LIBDNNAPI virtual bool singleTesting(float *inputVector, float *labelVector, VECTOR_MATCH matchFunc)=0;

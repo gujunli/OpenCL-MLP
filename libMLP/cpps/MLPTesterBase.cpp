@@ -27,7 +27,7 @@ MLPTesterBase::~MLPTesterBase()
     this->_dispose();
 };
 
-void MLPTesterBase::_initialize(MLPNetProvider & provider, int _batchSize)
+void MLPTesterBase::_initialize(MLPConfigProvider & provider, int _batchSize)
 {
     this->netType = provider.netType;
 	this->nLayers = provider.nLayers;

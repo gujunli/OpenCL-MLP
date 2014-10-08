@@ -12,7 +12,7 @@
 #include "MLPTrainerOCL.h"
 #include "MLPTesterOCL.h"
 #include "MLPPredictorOCL.h"
-#include "MLPNetProvider.h"
+#include "MLPConfigProvider.h"
 #include "DNNIFlyDataProvider.h"
 #include "MLPChkPointingMgr.h"
 
@@ -39,9 +39,9 @@ void iflytek_training()
 	int shuffleBatches = 10;
 	int batches;
 	int totalbatches;
-	int epoches=2;
+	int epochs = 200; 
 
-	MLPNetProvider *netProviderp=NULL;
+	MLPConfigProvider *configProviderp=NULL;
     DNNDataProvider *dataProviderp=NULL;
 
 	// Training the neural network using MNist labelled dataset
@@ -54,14 +54,14 @@ void iflytek_training()
 	totalbatches = dataProviderp->getTotalBatches();
 
 	nettype = NETTYPE_MULTI_CLASSIFICATION;
-    netProviderp = new MLPNetProvider(nettype, nLayers, dimensions, etas, momentum, actFuncs, costFunc, true);
+    configProviderp = new MLPConfigProvider(nettype, nLayers, dimensions, etas, momentum, actFuncs, costFunc, epochs, true);
 
-    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, DNN_OCL_DI_GPU, minibatch);    // set up the trainer
+    trainerp = new MLPTrainerOCL(*configProviderp,*dataProviderp, DNN_OCL_DI_GPU, minibatch);    // set up the trainer
 
-	cout << totalbatches << " batches of data to be trained with " << epoches << " epoches, just waiting..." << endl;
+	cout << totalbatches << " batches of data to be trained with " << trainerp->getEpochs() << " epoches, just waiting..." << endl;
 
 	getCurrentTime(&startv);
-	batches = trainerp->batchTraining(0,epoches);                                       // do the training
+	batches = trainerp->batchTraining(0);                                       // do the training
 	getCurrentTime(&endv);
 
 	cout << batches << " batches of data were trained actually" << endl;
@@ -70,7 +70,7 @@ void iflytek_training()
     // Finalize the result from the training work, so that the Tester or Predictor can be set up based on it
 	trainerp->saveNetConfig("./");
 
-	delete netProviderp;
+	delete configProviderp;
 	delete dataProviderp;
 	delete trainerp;
 };
@@ -84,12 +84,11 @@ void iflytek_training2()
 	int shuffleBatches = 10;
 	int batches;
 	int totalbatches;
-	int epoches=16;
 	int startBatch;
 	int startEpoch;
 
 	MLPCheckPointManager cpManager;
-	MLPNetProvider *netProviderp=NULL;
+	MLPConfigProvider *configProviderp=NULL;
     DNNDataProvider *dataProviderp=NULL;
     MLPTrainerBase *trainerp;
 
@@ -100,7 +99,7 @@ void iflytek_training2()
 	     cout << "Valid checkpoint found, recover and start new checkpointing from this one"  << endl;
 
 		 statep = cpManager.getChkPointState();
-		 netProviderp = new MLPNetProvider(statep->netConfPath, statep->ncTrainingConfigFname, statep->ncNNetDataFname);
+		 configProviderp = new MLPConfigProvider(statep->netConfPath, statep->ncTrainingConfigFname, statep->ncNNetDataFname);
 
          dataProviderp = new DNNIFlyDataProvider(IFLY_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
 		 dataProviderp->setupDataProvider(statep->cpFrameNo, true);
@@ -117,7 +116,7 @@ void iflytek_training2()
 	else {
 		 cout << "No old checkpoint found, start new checkpointing any way" << endl;
 
-	     netProviderp = new MLPNetProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
+	     configProviderp = new MLPConfigProvider("./", "mlp_training_init.conf", "mlp_nnet_init.dat");
          dataProviderp = new DNNIFlyDataProvider(IFLY_PATH, DNN_DATAMODE_SP_TRAIN, minibatch, shuffleBatches);
 	     dataProviderp->setupDataProvider(0, true);
 
@@ -125,17 +124,17 @@ void iflytek_training2()
 		 startEpoch = 0;
 	};
 
-    trainerp = new MLPTrainerOCL(*netProviderp,*dataProviderp, DNN_OCL_DI_GPU, minibatch);
+    trainerp = new MLPTrainerOCL(*configProviderp,*dataProviderp, DNN_OCL_DI_GPU, minibatch);
 
 	cpManager.enableCheckPointing(*trainerp, "./tmp/");
 	MLP_CHECK( cpManager.startCheckPointing() );
 
 	totalbatches = dataProviderp->getTotalBatches();
 
-	cout << totalbatches << " batches of data to be trained with " << epoches << " epoches, just waiting..." << endl;
+	cout << totalbatches << " batches of data to be trained with " << trainerp->getEpochs() << " epoches, just waiting..." << endl;
 
 	getCurrentTime(&startv);
-	batches = trainerp->batchTrainingWithCheckPointing(0, epoches, startBatch, startEpoch,  true);
+	batches = trainerp->batchTrainingWithCheckPointing(0, startBatch, startEpoch,  true);
 	getCurrentTime(&endv);
 
 	MLP_CHECK( cpManager.endCheckPointing() );
@@ -148,7 +147,7 @@ void iflytek_training2()
 
 	cpManager.cpCleanUp("./tmp/");
 
-	delete netProviderp;
+	delete configProviderp;
 	delete dataProviderp;
 	delete trainerp;
 };
@@ -161,17 +160,17 @@ void iflytek_batch_testing()
 	int shuffleBatches = 4;
 	int totalbatches;
 
-	MLPNetProvider *netProviderp=NULL;
+	MLPConfigProvider *configProviderp=NULL;
     DNNDataProvider *dataProviderp=NULL;
 
 	// Testing the MNist labelled dataset on the trained neural network
 	MLPTesterBase *testerp=NULL;
 
-	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
+	configProviderp = new MLPConfigProvider("./", MLP_CP_NNET_DATA_NEW);
 	dataProviderp =	new DNNIFlyDataProvider(IFLY_PATH, DNN_DATAMODE_TEST, minibatch, shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
-	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,DNN_OCL_DI_GPU, minibatch);
+	testerp = new MLPTesterOCL(*configProviderp,*dataProviderp,DNN_OCL_DI_GPU, minibatch);
 
     totalbatches = dataProviderp->getTotalBatches();
 
@@ -188,7 +187,7 @@ void iflytek_batch_testing()
 	cout << totalNum << " frames tested," << succNum << " frames succeed, success ratio is " << ((float)succNum)*100.0f/((float)totalNum) << "%" << endl;
 
     delete dataProviderp;
-	delete netProviderp;
+	delete configProviderp;
 	delete testerp;
 };
 
@@ -201,7 +200,7 @@ void iflytek_predicting()
 	int totalbatches;
 	int frames;
 
-	MLPNetProvider *netProviderp=NULL;
+	MLPConfigProvider *configProviderp=NULL;
     DNNDataProvider *dataProviderp=NULL;
 
 	// Using MNist testing dataset to do batch predicting on the trained neural network
@@ -209,11 +208,11 @@ void iflytek_predicting()
 	float *inputVectors;
 	float *outputVectors;
 
-	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
+	configProviderp = new MLPConfigProvider("./", MLP_CP_NNET_DATA_NEW);
 	dataProviderp =	new DNNIFlyDataProvider(".", DNN_DATAMODE_PREDICT, minibatch, 0);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
-	predictorp = new MLPPredictorOCL(*netProviderp,DNN_OCL_DI_GPU, minibatch);
+	predictorp = new MLPPredictorOCL(*configProviderp,DNN_OCL_DI_GPU, minibatch);
 	outputVectors = new float[predictorp->getOutputVectorSize()*minibatch];
 
     totalbatches = dataProviderp->getTotalBatches();
@@ -280,7 +279,7 @@ void iflytek_predicting()
 
 	delete [] outputVector;
 
-	delete netProviderp;
+	delete configProviderp;
 	delete dataProviderp;
 	delete predictorp;
 };

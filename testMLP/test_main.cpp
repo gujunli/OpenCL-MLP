@@ -21,12 +21,19 @@ extern void mnist_batch_testing();
 extern void mnist_single_testing();
 extern void mnist_predicting();
 
-extern void ptc_en_training();
-extern void ptc_en_training2();
-extern void ptc_en_training3();     // training with checkpointing support
-extern void ptc_en_batch_testing();
-extern void ptc_en_single_testing();
-extern void ptc_en_predicting();
+extern void ptc_uppercase_training();
+extern void ptc_uppercase_training2();
+extern void ptc_uppercase_training3();     // training with checkpointing support
+extern void ptc_uppercase_batch_testing();
+extern void ptc_uppercase_single_testing();
+extern void ptc_uppercase_predicting();
+
+extern void ptc_lowercase_training();
+extern void ptc_lowercase_training2();
+extern void ptc_lowercase_training3();     // training with checkpointing support
+extern void ptc_lowercase_batch_testing();
+extern void ptc_lowercase_single_testing();
+extern void ptc_lowercase_predicting();
 
 extern void ptc_digital_training();
 extern void ptc_digital_training2();
@@ -72,8 +79,9 @@ int main()
 	//mnist_training();
 	//mnist_training3();
 	//ptc_ch_training3();
-	//ptc_en_training();
-	ptc_digital_training();
+	//ptc_uppercase_training2();
+	ptc_lowercase_training();
+	//ptc_digital_training();
 	//ptc_symbol_training2();
 	//vlp_ch_training2();
 	//simple_training();
@@ -87,8 +95,9 @@ int main()
 	//mnist_batch_testing();
 	//mnist_single_testing();
 	//ptc_ch_batch_testing();
-	//ptc_en_batch_testing();
-	ptc_digital_batch_testing();
+	//ptc_uppercase_batch_testing();
+	ptc_lowercase_batch_testing();
+	//ptc_digital_batch_testing();
 	//ptc_symbol_batch_testing();
 	//vlp_ch_batch_testing();
 	//simple_batch_testing();

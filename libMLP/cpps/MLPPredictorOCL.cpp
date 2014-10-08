@@ -43,7 +43,7 @@ MLPPredictorOCL::MLPPredictorOCL()
 };
 
 
-MLPPredictorOCL::MLPPredictorOCL(MLPNetProvider & netProvider, DNN_OCL_DEVTYPE dType, int _batchSize)
+MLPPredictorOCL::MLPPredictorOCL(MLPConfigProvider & configProvider, DNN_OCL_DEVTYPE dType, int _batchSize)
 {
   	this->devType = dType;
 
@@ -56,15 +56,15 @@ MLPPredictorOCL::MLPPredictorOCL(MLPNetProvider & netProvider, DNN_OCL_DEVTYPE d
 		this->setup_ocl_kernels();
 	}
 
-    this->setupMLP(netProvider, _batchSize);
+    this->setupMLP(configProvider, _batchSize);
 }
 
-void MLPPredictorOCL::setupMLP(MLPNetProvider & netProvider, int _batchSize)
+void MLPPredictorOCL::setupMLP(MLPConfigProvider & configProvider, int _batchSize)
 {
 
-	this->_initialize(netProvider, _batchSize);
+	this->_initialize(configProvider, _batchSize);
 
-	this->create_ocl_buffers(netProvider);
+	this->create_ocl_buffers(configProvider);
 
 	this->initialized = true;
 }
@@ -127,7 +127,7 @@ void MLPPredictorOCL::destroy_ocl_kernels()
 		CL_CHECK( clReleaseProgram(this->CLCtx->m_program) );
 };
 
-void MLPPredictorOCL::create_ocl_buffers(MLPNetProvider &provider)
+void MLPPredictorOCL::create_ocl_buffers(MLPConfigProvider &provider)
 {
     cl_int status;
 

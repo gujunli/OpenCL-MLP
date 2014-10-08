@@ -127,7 +127,7 @@ DNNMNistDataProvider::DNNMNistDataProvider()
 	this->total_batches = DIVUPK(this->num_frames,this->m_batchSize);
 };
 
-DNNMNistDataProvider::DNNMNistDataProvider(const char *dataPath, DNN_DATA_MODE mode, int batchSize, int shuffleBatches)
+DNNMNistDataProvider::DNNMNistDataProvider(const char *dataPath, bool use_stats_, DNN_DATA_MODE mode, int batchSize, int shuffleBatches)
 {
 	if ( (mode < 0) || (mode >= DNN_DATAMODE_ERROR) ) {
 		  dnn_log("DNNMNistDataProvider", "Data mode for constructing DNNMNistDataProvider is not correct");
@@ -146,6 +146,14 @@ DNNMNistDataProvider::DNNMNistDataProvider(const char *dataPath, DNN_DATA_MODE m
 	this->InitializeFromMNistSource(dataPath);
 
 	this->total_batches = DIVUPK(this->num_frames,this->m_batchSize);
+
+	this->use_stats = use_stats_; 
+	if ( this->use_stats ) {
+		 string mypath(dataPath); 
+		 dnn_log("DNNPtcDataProvider", "Mean values and standard deviations will be used for normalizing the input vectors"); 		 
+		 mypath.append("/mnist_dataset_stats.dat");  
+		 this->load_stats_info(mypath.c_str());
+	}; 
 };
 
 DNNMNistDataProvider::~DNNMNistDataProvider()
@@ -211,8 +219,12 @@ void DNNMNistDataProvider::setup_cont_data_batches()
 			  };
 		 };
 
-		 for (int i=0; i < this->m_dataFeatureSize; i++)
-			  this->featureData[frame*this->m_dataFeatureSize+i] = (float)imagebuf[i]/255.0f-0.5f;
+		 for (int i=0; i < this->m_dataFeatureSize; i++) {
+			 if ( this->use_stats ) 
+				 this->featureData[frame*this->m_dataFeatureSize+i] = (this->stddevs[i]>0.0f)?((float)imagebuf[i]-this->meanvalues[i])/this->stddevs[i]:0.0f; 
+			 else 
+			      this->featureData[frame*this->m_dataFeatureSize+i] = (float)imagebuf[i]/255.0f-0.5f;
+		 }; 
 
 		 if ( this->haveLabel ) {
 		      for (int i=0; i < this->m_dataLabelSize; i++)
@@ -234,8 +246,8 @@ endf:
 		 while ( dst < this->m_batchSize * batches ) {
 				src = dst % readCount;
 
-		        for (int i=0; i < this->m_dataFeatureSize; i++)
-			           this->featureData[dst*this->m_dataFeatureSize+i] = this->featureData[src*this->m_dataFeatureSize+i];
+		        for (int i=0; i < this->m_dataFeatureSize; i++) 
+			         this->featureData[dst*this->m_dataFeatureSize+i] = this->featureData[src*this->m_dataFeatureSize+i];
 
 				if ( this->haveLabel )
 		             for (int i=0; i < this->m_dataLabelSize; i++)

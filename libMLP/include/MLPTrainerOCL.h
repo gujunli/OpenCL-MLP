@@ -19,7 +19,7 @@
 
 #include "MLPOclCommon.h"
 #include "SingleDevClass.h"
-#include "MLPNetProvider.h"
+#include "MLPConfigProvider.h"
 #include "MLPChkPointState.h"
 #include "MLPTrainerBase.h"
 
@@ -49,7 +49,7 @@ private:
 private:
 	void setup_ocl_kernels();
 	void destroy_ocl_kernels();
-	void create_ocl_buffers(MLPNetProvider &provider);
+	void create_ocl_buffers(MLPConfigProvider &provider);
 	void release_ocl_buffers();
 
 private:
@@ -62,14 +62,14 @@ private:
 
 public:
 	LIBDNNAPI MLPTrainerOCL();
-	LIBDNNAPI MLPTrainerOCL(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, DNN_OCL_DEVTYPE devType, int _minibatch);
+	LIBDNNAPI MLPTrainerOCL(MLPConfigProvider & configProvider, DNNDataProvider & dataProvider, DNN_OCL_DEVTYPE devType, int _minibatch);
     ~MLPTrainerOCL();
 
 public:
-	void setupMLP(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, int _minipatch);
+	void setupMLP(MLPConfigProvider & configProvider, DNNDataProvider & dataProvider, int _minipatch);
 
-	int batchTrainingWithCheckPointing(int maxBatches, int epoches, int startBatch, int startEpoch, bool doChkPointing);
-	void synchronizeNetConfig(MLPNetProvider &netProvider);
+	int batchTrainingWithCheckPointing(int maxBatches, int startBatch, int startEpoch, bool doChkPointing);
+	void synchronizeNetConfig(MLPConfigProvider &configProvider);
 
 };
 

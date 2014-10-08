@@ -42,7 +42,7 @@ MLPTesterOCL::MLPTesterOCL()
 	this->initialized = false;
 };
 
-MLPTesterOCL::MLPTesterOCL(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, DNN_OCL_DEVTYPE dType, int _batchSize)
+MLPTesterOCL::MLPTesterOCL(MLPConfigProvider & configProvider, DNNDataProvider & dataProvider, DNN_OCL_DEVTYPE dType, int _batchSize)
 {
 	this->devType = dType;
 
@@ -55,14 +55,14 @@ MLPTesterOCL::MLPTesterOCL(MLPNetProvider & netProvider, DNNDataProvider & dataP
 		this->setup_ocl_kernels();
 	}
 
-    this->setupMLP(netProvider, dataProvider, _batchSize);
+    this->setupMLP(configProvider, dataProvider, _batchSize);
 };
 
-void MLPTesterOCL::setupMLP(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, int _batchSize)
+void MLPTesterOCL::setupMLP(MLPConfigProvider & configProvider, DNNDataProvider & dataProvider, int _batchSize)
 {
- 	if (  ( netProvider.getInputLayerSize() != dataProvider.getFeatureSize() ) ||
-		  ( netProvider.getOutputLayerSize() != dataProvider.getLabelSize() )   ) {
-		   mlp_log("MLPTester", "The setting provided from MLPDataProvider doesn't match those of the MLPNetProvider");
+ 	if (  ( configProvider.getInputLayerSize() != dataProvider.getFeatureSize() ) ||
+		  ( configProvider.getOutputLayerSize() != dataProvider.getLabelSize() )   ) {
+		   mlp_log("MLPTester", "The setting provided from MLPDataProvider doesn't match those of the MLPConfigProvider");
 		   MLP_Exception("");
 	};
 
@@ -71,9 +71,9 @@ void MLPTesterOCL::setupMLP(MLPNetProvider & netProvider, DNNDataProvider & data
 		   MLP_Exception("");
 	};
 
-	this->_initialize(netProvider, _batchSize);
+	this->_initialize(configProvider, _batchSize);
 
-	this->create_ocl_buffers(netProvider);
+	this->create_ocl_buffers(configProvider);
 
     this->dataProviderp = &dataProvider;
 
@@ -136,7 +136,7 @@ void MLPTesterOCL::destroy_ocl_kernels()
 		CL_CHECK( clReleaseProgram(this->CLCtx->m_program) );
 };
 
-void MLPTesterOCL::create_ocl_buffers(MLPNetProvider &provider)
+void MLPTesterOCL::create_ocl_buffers(MLPConfigProvider &provider)
 {
     cl_int status;
 

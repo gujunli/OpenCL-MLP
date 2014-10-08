@@ -235,7 +235,7 @@ void DNNIFlyDataProvider::InitializeFromIFlySource(const char *dataPath)
 	     this->mySetStart = this->TestSetStart;
 	};
 
-	// read the mean and covariance data from the "plp.norm" file
+	// read the mean and standard deviation data from the "plp.norm" file
 	string normfname(dataPath);
 	ifstream normFile;
 

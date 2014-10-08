@@ -12,7 +12,7 @@
 #include "MLPTrainerOCL.h"
 #include "MLPTesterOCL.h"
 #include "MLPPredictorOCL.h"
-#include "MLPNetProvider.h"
+#include "MLPConfigProvider.h"
 #include "DNNSimpleDataProvider.h"
 
 using namespace std;
@@ -39,9 +39,8 @@ void simple_training()
 	int shuffleBatches = 10;
 	int batches;
 	int totalbatches;
-	int epoches = 200;
 
-	MLPNetProvider *netProviderp=NULL;
+	MLPConfigProvider *configProviderp=NULL;
     DNNDataProvider *dataProviderp=NULL;
 
 
@@ -49,18 +48,18 @@ void simple_training()
 	MLPTrainerBase *trainerp=NULL;
 
 	nettype = NETTYPE_MULTI_CLASSIFICATION;
-	netProviderp = new MLPNetProvider(nettype,nLayers,dimensions,etas, momentum, actFuncs,costFunc, true);
+	configProviderp = new MLPConfigProvider(nettype,nLayers,dimensions,etas, momentum, actFuncs,costFunc, 10, true);
 	dataProviderp =	new DNNSimpleDataProvider(DNN_DATAMODE_SP_TRAIN,dimensions[0],dimensions[nLayers-1],minibatch,shuffleBatches);
 	dataProviderp->setupDataProvider();                            // set up the data provider
     totalbatches = dataProviderp->getTotalBatches();
 
     trainerp = new MLPTrainerOCL();
-	trainerp->setupMLP(*netProviderp,*dataProviderp,minibatch);    // set up the trainer
+	trainerp->setupMLP(*configProviderp,*dataProviderp,minibatch);    // set up the trainer
 
-	cout << totalbatches << " batches of data to be trained with " << epoches << " epoches, just waiting..." << endl;
+	cout << totalbatches << " batches of data to be trained with " << trainerp->getEpochs() << " epoches, just waiting..." << endl;
 
 	getCurrentTime(&startv);
-	batches = trainerp->batchTraining(0,epoches);               // do the training
+	batches = trainerp->batchTraining(0);               // do the training
 	getCurrentTime(&endv);
 
 	cout << batches << " batches of data were trained actually" << endl;
@@ -69,7 +68,7 @@ void simple_training()
     //save the result from the training work, so that the Tester or Predictor can be set up based on it
 	trainerp->saveNetConfig("./");
 
-	delete netProviderp;
+	delete configProviderp;
 	delete dataProviderp;
 	delete trainerp;
 }
@@ -85,17 +84,17 @@ void simple_batch_testing()
 	int shuffleBatches = 1;
 	// int totalbatches;
 
-	MLPNetProvider *netProviderp=NULL;
+	MLPConfigProvider *configProviderp=NULL;
     DNNDataProvider *dataProviderp=NULL;
 
 	// Testing the Simple labelled dataset on the trained neural network
 	MLPTesterBase *testerp=NULL;
 
-	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
+	configProviderp = new MLPConfigProvider("./", MLP_CP_NNET_DATA_NEW);
 	dataProviderp =	new DNNSimpleDataProvider(DNN_DATAMODE_TEST,dimensions[0],dimensions[nLayers-1],minibatch,shuffleBatches);
 	dataProviderp->setupDataProvider();                              // set up the data provider
 
-	testerp = new MLPTesterOCL(*netProviderp,*dataProviderp,DNN_OCL_DI_GPU, minibatch);
+	testerp = new MLPTesterOCL(*configProviderp,*dataProviderp,DNN_OCL_DI_GPU, minibatch);
 
 	// totalbatches = dataProviderp->getTotalBatches();
 
@@ -109,7 +108,7 @@ void simple_batch_testing()
 	testerp->getTestingStats(totalNum, succNum);
 	cout << totalNum << " frames tested," << succNum << " frames succeed, success ratio is " << ((float)succNum)*100.0f/((float)totalNum) << "%" << endl;
 
-	delete netProviderp;
+	delete configProviderp;
 	delete dataProviderp;
 	delete testerp;
 }
@@ -126,7 +125,7 @@ void simple_predicting()
 	int totalbatches;
 	int frames;
 
-	MLPNetProvider *netProviderp=NULL;
+	MLPConfigProvider *configProviderp=NULL;
     DNNDataProvider *dataProviderp=NULL;
 
 	// Using Simple testing dataset to do batch predicting on the trained neural network
@@ -134,11 +133,11 @@ void simple_predicting()
 	float *inputVectors;
 	float *outputVectors;
 
-	netProviderp = new MLPNetProvider("./", MLP_NP_NNET_DATA_NEW);
+	configProviderp = new MLPConfigProvider("./", MLP_CP_NNET_DATA_NEW);
     dataProviderp =	new DNNSimpleDataProvider(DNN_DATAMODE_PREDICT,dimensions[0],dimensions[nLayers-1],minibatch,0);
 	dataProviderp->setupDataProvider();                               // set up the data provider
 
-	predictorp = new MLPPredictorOCL(*netProviderp,DNN_OCL_DI_GPU, minibatch);
+	predictorp = new MLPPredictorOCL(*configProviderp,DNN_OCL_DI_GPU, minibatch);
 	outputVectors = new float[predictorp->getOutputVectorSize() * minibatch];
 
 	getCurrentTime(&startv);
@@ -199,7 +198,7 @@ void simple_predicting()
 
 	delete [] outputVectors;
 
-	delete netProviderp;
+	delete configProviderp;
 	delete dataProviderp;
 	delete predictorp;
 }

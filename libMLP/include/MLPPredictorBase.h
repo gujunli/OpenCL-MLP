@@ -13,7 +13,7 @@
 #include "DNNApiExport.h"
 #include "DNNConstants.h"
 #include "DNNDataProvider.h"
-#include "MLPNetProvider.h"
+#include "MLPConfigProvider.h"
 
 
 class MLPPredictorBase
@@ -28,7 +28,7 @@ protected:
 	ACT_FUNC *actFuncs;
 
 protected:
-	void _initialize(MLPNetProvider & NetProvider, int minibatch);
+	void _initialize(MLPConfigProvider & configProvider, int minibatch);
 
 private:
 	void _dispose();
@@ -38,7 +38,7 @@ public:
 	LIBDNNAPI virtual ~MLPPredictorBase()=0;
 
 public:
-	LIBDNNAPI virtual void setupMLP(MLPNetProvider & netProvider, int batchSize)=0;
+	LIBDNNAPI virtual void setupMLP(MLPConfigProvider & configProvider, int batchSize)=0;
 
 	LIBDNNAPI virtual void batchPredicting(float *inVectors, float *outVectors)=0;
 	LIBDNNAPI virtual void singlePredicting(float *inVector, float *outVector)=0;

@@ -6,9 +6,14 @@
  */
 
 #include <algorithm>
+#include <fstream> 
 
 #include "DNNUtil.h"
 #include "DNNDataProvider.h"
+#include "conv_endian.h"
+#include "stats_info.h"
+
+using namespace std; 
 
 DNNDataProvider::DNNDataProvider()
 {
@@ -22,6 +27,10 @@ DNNDataProvider::DNNDataProvider()
 	     this->labels[i] = NULL;
 	};
 
+	this->use_stats = false; 
+	this->meanvalues = NULL; 
+	this->stddevs = NULL; 
+
 	this->running = false;
 
 	this->initialized = false;
@@ -29,6 +38,10 @@ DNNDataProvider::DNNDataProvider()
 
 DNNDataProvider::~DNNDataProvider()
 {
+	if ( this->meanvalues ) 
+		 delete [] this->meanvalues; 
+	if ( this->stddevs )
+		 delete [] this->stddevs;  
 };
 
 // create the data buffers and initialize the locks and condition variable
@@ -602,3 +615,10 @@ DNN_DATA_MODE DNNDataProvider::getDataMode()
     return(this->dataMode);
 };
 
+void DNNDataProvider::load_stats_info(const char *filePath)
+{
+	this->meanvalues = new float[this->m_dataFeatureSize]; 
+	this->stddevs = new float[this->m_dataFeatureSize]; 
+    
+	read_stats_info(filePath, this->m_dataFeatureSize, this->meanvalues, this->stddevs); 
+}; 

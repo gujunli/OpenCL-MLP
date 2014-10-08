@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef _MLP_NET_PROVIDER_H_
-#define _MLP_NET_PROVIDER_H_
+#ifndef _MLP_CONFIG_PROVIDER_H_
+#define _MLP_CONFIG_PROVIDER_H_
 
 #include "DNNApiExport.h"
 
@@ -50,8 +50,8 @@ struct mlp_nnet_data_header {
 };
 
 
-// Implements the MLP network used by the MLPTrainer/MLPTester/MLPPredictor
-class MLPNetProvider
+// Implements the MLP neural network configuration used by the MLPTrainer/MLPTester/MLPPredictor
+class MLPConfigProvider
 {
 	friend class MLPTrainerBase;   // add more friend class here
 	friend class MLPTesterBase;
@@ -62,6 +62,7 @@ class MLPNetProvider
 private:
 	MLP_NETTYPE netType;
 	int nLayers;
+	int epochs; 
 	int *dimensions;
 	float *etas;
 	float **biases;
@@ -77,28 +78,31 @@ private:
 	void actFuncsInitialize();
 
 public:
-	LIBDNNAPI MLPNetProvider();
-    LIBDNNAPI MLPNetProvider(int layers, int dimensions[], bool DoInitialize=false);
-    LIBDNNAPI MLPNetProvider(MLP_NETTYPE type, int layers, int dimensions_[], float etas_[], float momentum_, ACT_FUNC actFuncs_[], COST_FUNC costFunc_, bool DoInitialize);
-    LIBDNNAPI MLPNetProvider(const char *dir, const char *trainingConfigFile, const char *nnetDataFile);   // initialized weights from the file
-	LIBDNNAPI MLPNetProvider(const char *dir, const char *trainingConfigFile, bool DoInitialize);     // using randomly initialized weights
+	LIBDNNAPI MLPConfigProvider();
+    LIBDNNAPI MLPConfigProvider(int layers, int dimensions[], bool DoInitialize=false);
+    LIBDNNAPI MLPConfigProvider(MLP_NETTYPE type, int layers, int dimensions_[], float etas_[], float momentum_, ACT_FUNC actFuncs_[], COST_FUNC costFunc_, int _epochs, bool DoInitialize);
+    LIBDNNAPI MLPConfigProvider(const char *dir, const char *trainingConfigFile, const char *nnetDataFile);   // initialized weights from the file
+	LIBDNNAPI MLPConfigProvider(const char *dir, const char *trainingConfigFile, bool DoInitialize);         // using randomly initialized weights
 
-	LIBDNNAPI MLPNetProvider(const char *dir, const char *nnetDataFile);   // used for the MLPTester and MLPPredictor
+	LIBDNNAPI MLPConfigProvider(const char *dir, const char *nnetDataFile);   // used for the MLPTester and MLPPredictor
 
-	LIBDNNAPI ~MLPNetProvider();
+	LIBDNNAPI ~MLPConfigProvider();
 
-	void saveConfig(const char *dir, const char *trainingConfigFile, const char *nnetDataFile);
+	LIBDNNAPI void saveConfig(const char *dir, const char *trainingConfigFile, const char *nnetDataFile);
 
-	void showConfig();
+	LIBDNNAPI void showConfig();
 
-	int getInputLayerSize();
-	int getOutputLayerSize();
+	LIBDNNAPI int getInputLayerSize();
+	LIBDNNAPI int getOutputLayerSize();
+	LIBDNNAPI int getLayerSize(int layer); 
+	LIBDNNAPI void setLayerWeights(int layer, int layerSize, int lowerLayerSize, float *weights); 
+	LIBDNNAPI void setLayerBiases(int layer, int layerSize, float *biases); 
 };
 
-#define MLP_NP_TRAINING_CONF "mlp_training.conf"
-#define MLP_NP_NNET_DATA "mlp_nnet.dat"
-#define MLP_NP_TRAINING_CONF_NEW "mlp_training_new.conf"
-#define MLP_NP_NNET_DATA_NEW "mlp_nnet_new.dat"
+#define MLP_CP_TRAINING_CONF "mlp_training.conf"
+#define MLP_CP_NNET_DATA "mlp_nnet.dat"
+#define MLP_CP_TRAINING_CONF_NEW "mlp_training_new.conf"
+#define MLP_CP_NNET_DATA_NEW "mlp_nnet_new.dat"
 
 
 #endif

@@ -30,6 +30,10 @@ enum  DNN_DATA_MODE
 class DNNDataProvider
 {
 protected:
+	bool use_stats;              // whether to use the mean and stddev of the dataset samples to normalize the input of the neural network
+	float *meanvalues;           // mean values for all dimensions of the sample vectors
+	float *stddevs;              // standard deviations for all dimensions of the sample vectors
+
 	DNN_DATA_MODE  dataMode;     // TRAIN, TEST, PREDICT standing for three different usages of the neural network
 	int  total_batches;          // Total number of batches provided by the data source and provider (shuffled batches also counted)
 
@@ -113,6 +117,8 @@ protected:
 
     LIBDNNAPI void shuffle_data(int *index, int len);
 
+	LIBDNNAPI void load_stats_info(const char *filePath); 
+
 private:
 	static void * worker_fun(void *argp);
 
@@ -142,6 +148,5 @@ public:
 
 	LIBDNNAPI virtual ~DNNDataProvider()=0;
 };
-
 
 #endif

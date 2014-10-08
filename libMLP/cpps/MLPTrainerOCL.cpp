@@ -44,7 +44,7 @@ MLPTrainerOCL::MLPTrainerOCL()
 	this->initialized = false;
 };
 
-MLPTrainerOCL::MLPTrainerOCL(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, DNN_OCL_DEVTYPE dType, int _minibatch)
+MLPTrainerOCL::MLPTrainerOCL(MLPConfigProvider & configProvider, DNNDataProvider & dataProvider, DNN_OCL_DEVTYPE dType, int _minibatch)
 {
    	this->devType = dType;
 
@@ -59,15 +59,15 @@ MLPTrainerOCL::MLPTrainerOCL(MLPNetProvider & netProvider, DNNDataProvider & dat
 		this->setup_ocl_kernels();
 	}
 
-	this->setupMLP(netProvider, dataProvider, _minibatch);
+	this->setupMLP(configProvider, dataProvider, _minibatch);
 }
 
 
-void MLPTrainerOCL::setupMLP(MLPNetProvider & netProvider, DNNDataProvider & dataProvider, int _minibatch)
+void MLPTrainerOCL::setupMLP(MLPConfigProvider & configProvider, DNNDataProvider & dataProvider, int _minibatch)
 {
- 	if (  ( netProvider.getInputLayerSize() != dataProvider.getFeatureSize() ) ||
-		  ( netProvider.getOutputLayerSize() != dataProvider.getLabelSize() )   ) {
-		   mlp_log("MLPTrainer", "The setting provided from MLPDataProvider doesn't match those of the MLPNetProvider");
+ 	if (  ( configProvider.getInputLayerSize() != dataProvider.getFeatureSize() ) ||
+		  ( configProvider.getOutputLayerSize() != dataProvider.getLabelSize() )   ) {
+		   mlp_log("MLPTrainer", "The setting provided from MLPDataProvider doesn't match those of the MLPConfigProvider");
 		   MLP_Exception("");
 	};
 
@@ -76,9 +76,9 @@ void MLPTrainerOCL::setupMLP(MLPNetProvider & netProvider, DNNDataProvider & dat
 		   MLP_Exception("");
 	};
 
-	this->_initialize(netProvider, _minibatch);
+	this->_initialize(configProvider, _minibatch);
 
-	this->create_ocl_buffers(netProvider);
+	this->create_ocl_buffers(configProvider);
 
     this->dataProviderp = &dataProvider;
 
@@ -185,7 +185,7 @@ void MLPTrainerOCL::destroy_ocl_kernels()
 		CL_CHECK( clReleaseProgram(this->CLCtx->m_program) );
 };
 
-void MLPTrainerOCL::create_ocl_buffers(MLPNetProvider &provider)
+void MLPTrainerOCL::create_ocl_buffers(MLPConfigProvider &provider)
 {
 	cl_int status;
 
@@ -254,19 +254,20 @@ void MLPTrainerOCL::release_ocl_buffers()
 		delete [] this->biases;
 };
 
-void MLPTrainerOCL::synchronizeNetConfig(MLPNetProvider &netProvider)
+void MLPTrainerOCL::synchronizeNetConfig(MLPConfigProvider &configProvider)
 {
 	cl_int status;
 
 	for ( int i = 0; i < this->nLayers; i++ )
-		 netProvider.etas[i] = this->etas[i];
+		 configProvider.etas[i] = this->etas[i];
 
 	for ( int i = 0; i < this->nLayers; i++ )
-		 netProvider.actFuncs[i] = this->actFuncs[i];
+		 configProvider.actFuncs[i] = this->actFuncs[i];
 
-	netProvider.netType = this->netType;
-	netProvider.costFunc = this->costFunc;
-	netProvider.momentum = this->momentum;
+	configProvider.netType = this->netType;
+	configProvider.costFunc = this->costFunc;
+	configProvider.momentum = this->momentum;
+	configProvider.epochs = this->epochs; 
 
 	// The Input/Output of layer i is stored in this->inputs[i+1], so this->inputs[1] is for the input layer, this->inputs[2] is for
 	// the first hidden layer, this->inputs[0] is for the output layer
@@ -277,12 +278,12 @@ void MLPTrainerOCL::synchronizeNetConfig(MLPNetProvider &netProvider)
 	    tmpBuff = clCreateBuffer(this->CLCtx->m_context, CL_MEM_READ_WRITE, sizeof(cl_float)*this->dimensions[i-1]*this->dimensions[i], NULL,&status);
 		this->transpose_float_matrix(this->weightT[i], tmpBuff, this->dimensions[i-1], this->dimensions[i]);    // make tmpBuff in original format
 		status = clEnqueueReadBuffer(this->CLCtx->m_queues[0], tmpBuff, CL_TRUE, 0,sizeof(cl_float)*this->dimensions[i-1]*this->dimensions[i],
-			                         netProvider.weights[i], 0, NULL, NULL);
+			                         configProvider.weights[i], 0, NULL, NULL);
 		CL_CHECK(status);
         clReleaseMemObject(tmpBuff);
 
 		status = clEnqueueReadBuffer(this->CLCtx->m_queues[0], this->biases[i], CL_TRUE, 0,sizeof(cl_float)*this->dimensions[i],
-			                         netProvider.biases[i], 0, NULL, NULL);
+			                         configProvider.biases[i], 0, NULL, NULL);
 		CL_CHECK(status);
 	}
 };
@@ -380,7 +381,7 @@ void MLPTrainerOCL::derivative(int layer, cl_mem delta1, cl_mem y, cl_mem delta2
 };
 
 
-int MLPTrainerOCL::batchTrainingWithCheckPointing(int maxBatches, int epoches, int startBatch, int startEpoch,  bool doChkPointing)
+int MLPTrainerOCL::batchTrainingWithCheckPointing(int maxBatches, int startBatch, int startEpoch,  bool doChkPointing)
 {
 	if ( !this->initialized ) {
 		 mlp_log("MLPTrainer", "This Trainer object should be setup with NetProvider and DataProvider first");
@@ -485,7 +486,7 @@ int MLPTrainerOCL::batchTrainingWithCheckPointing(int maxBatches, int epoches, i
 	myBatch = this->currBatchNo;
 	myEpoch = this->currEpoch;
 
-	while ( myEpoch < epoches ) {
+	while ( myEpoch < this->epochs ) {
 
 	    while (  this->dataProviderp->batchAvailable() && (maxBatches == 0 || myBatch < maxBatches) ) {
 
