@@ -3,7 +3,7 @@
           
           a) download AMD-APP-SDK-v2.9-lnx64.tgz and clAmdBlas-1.10.321.tar.gz from the AMD developer website
           b) Install AMD APP SDK under thte /opt directory of your Linux 
-          c) Install the clAmdBlas package under the /opt/directory of your Linux and make the linking 
+          c) Install the clAmdBlas package under the /opt/ directory of your Linux and make the linking 
               #> cd /opt;  ln -s clAmdBlas-1.10.321 clAmdBlas 
 
           d) Under your CodeBlocks project environment, set your compiler and linker options to point to the 
@@ -21,6 +21,8 @@
                          kernels.cl                                ; kernel file need for running the OpenCL codes
                          testMLP                                   ; Binary of produced testMLP project, just copied to here
                          libMLP.so                                 ; Dynamic library produced by libMLP project, copied to here
+                         libDNNCommon.so                           ; Dynamic library produced by libMLP project, copied to here
+                         libDNNDataProvider.so                     ; Dynamic library produced by libMLP project, copied to here
                          clAmdBlas.so                              ; Copied to here from /opt/clAmdBlas/lib64 if doesn't set the
                                                                          LD_LIBRARY_PATH to include /opt/clAmdBlas/lib64/
                          mlp_training_init.conf                    ; (optional) MLP training configuration if you want to use pretrained weights
