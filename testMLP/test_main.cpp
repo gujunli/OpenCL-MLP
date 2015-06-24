@@ -75,12 +75,12 @@ int main()
 {
 	char anykey;
 
-    //iflytek_training2();
+       iflytek_training2();
 	//mnist_training();
 	//mnist_training3();
 	//ptc_ch_training3();
 	//ptc_uppercase_training2();
-	ptc_lowercase_training();
+	//ptc_lowercase_training();
 	//ptc_digital_training();
 	//ptc_symbol_training2();
 	//vlp_ch_training2();
@@ -91,12 +91,12 @@ int main()
 	//cin >> anykey;
 
 	//iflytek_batch_testing();
-	//iflytek_predicting();
+	 iflytek_predicting();
 	//mnist_batch_testing();
 	//mnist_single_testing();
 	//ptc_ch_batch_testing();
 	//ptc_uppercase_batch_testing();
-	ptc_lowercase_batch_testing();
+	//ptc_lowercase_batch_testing();
 	//ptc_digital_batch_testing();
 	//ptc_symbol_batch_testing();
 	//vlp_ch_batch_testing();
